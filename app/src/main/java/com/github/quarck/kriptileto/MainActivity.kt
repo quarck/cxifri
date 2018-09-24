@@ -5,14 +5,18 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.TextView
+import org.bouncycastle.crypto.BufferedBlockCipher
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.crypto.KeyGenerationParameters
+import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.DESedeEngine
 import org.bouncycastle.crypto.generators.DESedeKeyGenerator
 import org.bouncycastle.crypto.modes.CBCBlockCipher
+import org.bouncycastle.crypto.modes.CTSBlockCipher
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher
 import org.bouncycastle.crypto.params.DESedeParameters
 import org.bouncycastle.crypto.params.KeyParameter
+import org.bouncycastle.crypto.params.ParametersWithIV
 import org.bouncycastle.util.encoders.Hex
 import java.io.*
 import java.security.SecureRandom
@@ -23,12 +27,15 @@ class DESExample(private val inputStream: BufferedInputStream,
                  private val encrypt: Boolean
 ) {
     // To hold the initialised DESede cipher
-    private var cipher: PaddedBufferedBlockCipher = PaddedBufferedBlockCipher(CBCBlockCipher(DESedeEngine()))
+//    private var cipher: BufferedBlockCipher = CTSBlockCipher(AESEngine())// PaddedBufferedBlockCipher(CBCBlockCipher(DESedeEngine()))
+    private var cipher: PaddedBufferedBlockCipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
 
     fun performEncrypt() {
         // initialise the cipher with the key bytes, for encryption
 
-        cipher.init(true, KeyParameter(key))
+        val params = ParametersWithIV(KeyParameter(key), ByteArray(16))
+
+        cipher.init(true, params)
 
         /*
          * Create some temporary byte arrays for use in
@@ -161,7 +168,14 @@ class DESExample(private val inputStream: BufferedInputStream,
             val output = ByteArrayOutputStream(text.length * 2)
             val outputStream = BufferedOutputStream(output)
 
-            val de = DESExample(inputStream, outputStream, key.toByteArray(), encrypt)
+            val finalKey = ByteArray(24)
+            val keyIn = key.toByteArray()
+
+            for (i in 0 until finalKey.size) {
+                finalKey[i] = keyIn[i % keyIn.size]
+            }
+
+            val de = DESExample(inputStream, outputStream, finalKey, encrypt)
             if (encrypt)
                 de.performEncrypt()
             else
