@@ -13,6 +13,7 @@ import org.bouncycastle.crypto.engines.DESedeEngine
 import org.bouncycastle.crypto.generators.DESedeKeyGenerator
 import org.bouncycastle.crypto.modes.CBCBlockCipher
 import org.bouncycastle.crypto.modes.CTSBlockCipher
+import org.bouncycastle.crypto.paddings.PKCS7Padding
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher
 import org.bouncycastle.crypto.params.DESedeParameters
 import org.bouncycastle.crypto.params.KeyParameter
@@ -33,7 +34,14 @@ class DESExample(private val inputStream: BufferedInputStream,
     fun performEncrypt() {
         // initialise the cipher with the key bytes, for encryption
 
-        val params = ParametersWithIV(KeyParameter(key), ByteArray(16))
+        val iv = ByteArray(16)
+        val random = SecureRandom()
+        random.nextBytes(iv)
+
+        val ivEncoded = Hex.encode(iv, 0, iv.size)
+        outputStream.write(ivEncoded, 0, ivEncoded.size)
+
+        val params = ParametersWithIV(KeyParameter(key), iv)
 
         cipher.init(true, params)
 
@@ -74,7 +82,6 @@ class DESExample(private val inputStream: BufferedInputStream,
                 if (outL > 0) {
                     rv = Hex.encode(outblock, 0, outL)
                     outputStream.write(rv, 0, rv.size)
-                    outputStream.write("\n".toByteArray())
                 }
             }
 
@@ -87,7 +94,6 @@ class DESExample(private val inputStream: BufferedInputStream,
                 if (outL > 0) {
                     rv = Hex.encode(outblock, 0, outL)
                     outputStream.write(rv, 0, rv.size)
-                    outputStream.write("\n".toByteArray())
                 }
             } catch (ce: CryptoException) {
 
@@ -101,16 +107,20 @@ class DESExample(private val inputStream: BufferedInputStream,
 
     fun performDecrypt() {
 
-        // initialise the cipher for decryption
-        cipher.init(false, KeyParameter(key))
-
-        /*
-         * As the decryption is from our preformatted file,
-         * and we know that it's a hex encoded format, then
-         * we wrap the InputStream with a BufferedReader
-         * so that we can read it easily.
-         */
         val br = BufferedReader(InputStreamReader(inputStream))
+
+        // initialise the cipher for decryption
+        val ivEncoded = CharArray(16 * 2)
+        val numRead = br.read(ivEncoded, 0, ivEncoded.size)
+        if (numRead != 32)
+            return
+        val iv = Hex.decode(String(ivEncoded))
+        if (iv.size != 16)
+            return
+
+        val params = ParametersWithIV(KeyParameter(key), iv)
+
+        cipher.init(false, params)
 
         /*
          * now, read the file, and output the chunks
