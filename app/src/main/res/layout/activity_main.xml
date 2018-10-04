@@ -12,23 +12,47 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         >
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
 
-    <Button
-        android:id="@+id/buttonE"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Encrypt!"/>
+        <EditText
+            android:id="@+id/message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Name" />
 
-    <Button
-        android:id="@+id/buttonD"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Decrypt!"/>
+        <EditText
+            android:id="@+id/password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="textPassword" />
+
+        <Button
+            android:id="@+id/buttonE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Encrypt!"/>
+
+        <Button
+            android:id="@+id/buttonD"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Decrypt!"/>
+
+
+        <Button
+            android:id="@+id/buttonT"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RUN TESTS!"/>
+
+        <TextView
+            android:id="@+id/textTestResult"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TEST_RESULTS" />
+
     </LinearLayout>
 
 </ScrollView>
