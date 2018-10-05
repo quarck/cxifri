@@ -11,7 +11,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Context.CLIPBOARD_SERVICE
-
+import java.net.URLEncoder
 
 
 class MainActivity : Activity() {
@@ -37,26 +37,35 @@ class MainActivity : Activity() {
         message = findViewById(R.id.message)
         password = findViewById(R.id.password)
 
+        val uri = intent.data
+        if (uri != null) {
+            message.setText(uri.toString())
+        }
+
         buttonEncrypt.setOnClickListener{
             val msg = message.text.toString()
             val pass = password.text.toString()
             val encrypted = AESTextMessage.encrypt(msg, pass)
-            message.setText(encrypted)
+            message.setText(UrlWrapper.wrap(encrypted))
         }
 
         buttonDecrypt.setOnClickListener {
             val msg = message.text.toString()
             val pass = password.text.toString()
-            val decrypted = AESTextMessage.decrypt(msg, pass)
+
+            val unwrapped = UrlWrapper.unwrap(msg)
+            val decrypted = AESTextMessage.decrypt(unwrapped ?: msg, pass)
             if (decrypted != null)
                 message.setText(decrypted)
         }
 
         buttonCopy.setOnClickListener {
             val msg = message.text.toString()
-            val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clip = ClipData.newPlainText(getString(R.string.clipboard_clip_label), msg)
-            clipboard.setPrimaryClip(clip)
+            if (msg.length != 0) {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                val clip = ClipData.newPlainText(getString(R.string.clipboard_clip_label), msg)
+                clipboard.setPrimaryClip(clip)
+            }
         }
 
         buttonPaste.setOnClickListener {

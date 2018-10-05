@@ -1,4 +1,11 @@
 <resources>
     <string name="app_name">Kriptileto</string> <!-- Cxu vi parolas Esperanton? -->
     <string name="clipboard_clip_label">kript-il-et-o</string>
+    <string name="hint_password">password</string>
+    <string name="hint_privatemessage">Private message</string>
+    <string name="encrypt">ENCRYPT</string>
+    <string name="decrypt">DECRYPT</string>
+    <string name="copy">COPY</string>
+    <string name="paste">PASTE</string>
+    <string name="clear">CLEAR</string>
 </resources>

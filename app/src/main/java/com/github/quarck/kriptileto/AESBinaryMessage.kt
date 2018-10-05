@@ -25,7 +25,7 @@ object AESBinaryMessage{
         val random = SecureRandom()
         random.nextBytes(iv)
 
-        val salt = ByteArray(cipherBlockSize)
+        val salt = ByteArray(mac.macSize)
         random.nextBytes(salt)
 
         val params = ParametersWithIV(KeyParameter(key), iv)
@@ -108,7 +108,7 @@ object AESBinaryMessage{
             val macCalculated = ByteArray(mac.macSize)
             val macMessage = ByteArray(mac.macSize)
 
-            val salt = ByteArray(cipher.blockSize)
+            val salt = ByteArray(mac.macSize)
 
             if (salt.size + macMessage.size > decryptedRawL)
                 return null

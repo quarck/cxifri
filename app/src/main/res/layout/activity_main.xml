@@ -18,9 +18,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
+            android:inputType="textLongMessage"
             android:text=""
-            android:hint="Private message"
+            android:hint="@string/hint_privatemessage"
             />
 
         <EditText
@@ -29,53 +29,72 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPassword|textNoSuggestions"
-            android:hint="password"
+            android:hint="@string/hint_password"
             />
 
-        <Button
-            android:id="@+id/buttonEncrypt"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Encrypt!"
-            android:layout_margin="16sp"
-            android:layout_gravity="center"
-            />
+            android:orientation="horizontal"
+            android:layout_gravity="center">
 
-        <Button
-            android:id="@+id/buttonDecrypt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Decrypt!"
-            android:layout_margin="16sp"
-            android:layout_gravity="center"
-            />
+            <Button
+                android:id="@+id/buttonEncrypt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/encrypt"
+                android:layout_margin="16sp"
+                android:layout_gravity="center"
+                />
 
-        <Button
-            android:id="@+id/buttonClear"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Clear"
-            android:layout_margin="16sp"
-            android:layout_gravity="center"
-            />
+            <Button
+                android:id="@+id/buttonDecrypt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/decrypt"
+                android:layout_margin="16sp"
+                android:layout_gravity="center"
+                />
 
-        <Button
-            android:id="@+id/buttonPaste"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="From clipboard"
-            android:layout_margin="16sp"
-            android:layout_gravity="center"
-            />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/buttonCopy"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="To clipboard"
-            android:layout_margin="16sp"
-            android:layout_gravity="center"
-            />
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/buttonCopy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/copy"
+                android:layout_margin="16sp"
+                android:layout_gravity="center"
+                />
+
+            <Button
+                android:id="@+id/buttonPaste"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/paste"
+                android:layout_margin="16sp"
+                android:layout_gravity="center"
+                />
+
+            <Button
+                android:id="@+id/buttonClear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/clear"
+                android:layout_margin="16sp"
+                android:layout_gravity="center"
+                />
+
+        </LinearLayout>
+
+
+
+
 
 
     </LinearLayout>
