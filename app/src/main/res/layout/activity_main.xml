@@ -9,7 +9,7 @@
 
 
     <LinearLayout android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         >
 
@@ -18,40 +18,65 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:text="Name" />
+            android:inputType="textMultiLine|textNoSuggestions|textVisiblePassword"
+            android:text=""
+            android:hint="Private message"
+            />
 
         <EditText
             android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPassword" />
+            android:inputType="textPassword|textNoSuggestions"
+            android:hint="password"
+            />
 
         <Button
-            android:id="@+id/buttonE"
-            android:layout_width="wrap_content"
+            android:id="@+id/buttonEncrypt"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Encrypt!"/>
+            android:text="Encrypt!"
+            android:layout_margin="16sp"
+            android:layout_gravity="center"
+            />
 
         <Button
-            android:id="@+id/buttonD"
-            android:layout_width="wrap_content"
+            android:id="@+id/buttonDecrypt"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Decrypt!"/>
-
+            android:text="Decrypt!"
+            android:layout_margin="16sp"
+            android:layout_gravity="center"
+            />
 
         <Button
-            android:id="@+id/buttonT"
-            android:layout_width="wrap_content"
+            android:id="@+id/buttonClear"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="RUN TESTS!"/>
+            android:text="Clear"
+            android:layout_margin="16sp"
+            android:layout_gravity="center"
+            />
 
-        <TextView
-            android:id="@+id/textTestResult"
-            android:layout_width="wrap_content"
+        <Button
+            android:id="@+id/buttonPaste"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="TEST_RESULTS" />
+            android:text="From clipboard"
+            android:layout_margin="16sp"
+            android:layout_gravity="center"
+            />
+
+        <Button
+            android:id="@+id/buttonCopy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="To clipboard"
+            android:layout_margin="16sp"
+            android:layout_gravity="center"
+            />
+
 
     </LinearLayout>
 

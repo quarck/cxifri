@@ -17,7 +17,7 @@ object AESBinaryMessage{
     // MAC = MAC of SALT + MESSAGE
     fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
 
-        val cipher: PaddedBufferedBlockCipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
+        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
         val mac = CBCBlockCipherMac(AESEngine())
         val cipherBlockSize = cipher.blockSize
 
@@ -79,7 +79,7 @@ object AESBinaryMessage{
     // Returns null if decryption fails or MAC check fails
     fun decrypt(message: ByteArray, key: ByteArray): ByteArray? {
 
-        val cipher: PaddedBufferedBlockCipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
+        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
         val mac = CBCBlockCipherMac(AESEngine())
         val cipherBlockSize = cipher.blockSize
 
@@ -110,7 +110,7 @@ object AESBinaryMessage{
 
             val salt = ByteArray(cipher.blockSize)
 
-            if (salt.size + macMessage.size >= decryptedRawL)
+            if (salt.size + macMessage.size > decryptedRawL)
                 return null
 
             System.arraycopy(decryptedRaw, 0, macMessage, 0, macMessage.size)
@@ -135,5 +135,7 @@ object AESBinaryMessage{
         }
     }
 
-    val keySize: Int get() = 16 // not 100% accurate as it is between 16 and 32, but enought for now
+    val KEY_LEN_MIN = 16 // AES-128
+    val KEY_LEN_MID = 24 // AES-192
+    val KEY_LEN_MAX = 32 // AES-256
 }

@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Kriptileto</string>
+    <string name="app_name">Kriptileto</string> <!-- Cxu vi parolas Esperanton? -->
+    <string name="clipboard_clip_label">kript-il-et-o</string>
 </resources>

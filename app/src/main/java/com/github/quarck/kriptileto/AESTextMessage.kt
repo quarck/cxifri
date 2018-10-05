@@ -15,7 +15,7 @@ object AESTextMessage {
 
     fun encrypt(message: String, password: String): String {
 
-        val key = DerivedKeyGenerator.generate(password, "", 1000, AESBinaryMessage.keySize)
+        val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
                 ?: throw CryptoException("Failed to derive key")
         return encrypt(message, key)
     }
@@ -34,7 +34,7 @@ object AESTextMessage {
     }
 
     fun decrypt(message: String, password: String): String? {
-        val key = DerivedKeyGenerator.generate(password, "", 1000, AESBinaryMessage.keySize)
+        val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
                 ?: throw CryptoException("Failed to derive key")
         return decrypt(message, key)
     }
