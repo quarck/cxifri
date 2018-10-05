@@ -8,4 +8,6 @@
     <string name="copy">COPY</string>
     <string name="paste">PASTE</string>
     <string name="clear">CLEAR</string>
+    <string name="share">SHARE</string>
+    <string name="share_using">Share using</string>
 </resources>
