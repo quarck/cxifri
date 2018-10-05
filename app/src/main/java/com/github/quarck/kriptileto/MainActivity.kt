@@ -39,24 +39,7 @@ class MainActivity : Activity() {
         message = findViewById(R.id.message)
         password = findViewById(R.id.password)
 
-        when (intent.action) {
-            Intent.ACTION_VIEW -> {
-                val uri = intent.data
-                if (uri != null) {
-                    message.setText(uri.toString())
-                    isTextEncrypted = true
-                    buttonShare.isEnabled = isTextEncrypted
-                }
-            }
-            Intent.ACTION_SEND -> {
-                val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
-                if (text != null) {
-                    message.setText(text)
-                    isTextEncrypted = false
-                    buttonShare.isEnabled = isTextEncrypted
-                }
-            }
-        }
+        handleIntent(intent)
 
         buttonEncrypt.setOnClickListener{
             val msg = message.text.toString()
@@ -118,4 +101,33 @@ class MainActivity : Activity() {
             buttonShare.isEnabled = isTextEncrypted
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    fun handleIntent(intent: Intent) {
+        when (intent.action) {
+            Intent.ACTION_VIEW -> {
+                val uri = intent.data
+                if (uri != null) {
+                    message.setText(uri.toString())
+                    isTextEncrypted = true
+                    buttonShare.isEnabled = isTextEncrypted
+                }
+            }
+            Intent.ACTION_SEND -> {
+                val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
+                if (text != null) {
+                    message.setText(text)
+                    isTextEncrypted = false
+                    buttonShare.isEnabled = isTextEncrypted
+                }
+            }
+            else ->
+                buttonShare.isEnabled = false
+        }
+    }
 }
+

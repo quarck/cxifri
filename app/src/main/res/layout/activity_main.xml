@@ -43,7 +43,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/encrypt"
-                android:layout_margin="16sp"
+                android:layout_margin="10sp"
                 android:layout_gravity="center"
                 />
 
@@ -52,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/decrypt"
-                android:layout_margin="16sp"
+                android:layout_margin="10sp"
                 android:layout_gravity="center"
                 />
 
@@ -61,7 +61,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/share"
-                android:layout_margin="16sp"
+                android:layout_margin="10sp"
                 android:layout_gravity="center"
                 />
 
