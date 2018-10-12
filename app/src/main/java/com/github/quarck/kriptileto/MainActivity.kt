@@ -22,6 +22,7 @@ class MainActivity : Activity() {
     lateinit var buttonClear: Button
     lateinit var message: EditText
     lateinit var password: EditText
+    lateinit var buttonManageKeys: Button
 
     var isTextEncrypted = false
 
@@ -35,6 +36,7 @@ class MainActivity : Activity() {
         buttonCopy = findViewById(R.id.buttonCopy)
         buttonPaste = findViewById(R.id.buttonPaste)
         buttonClear = findViewById(R.id.buttonClear)
+        buttonManageKeys = findViewById(R.id.buttonManageKeys)
 
         message = findViewById(R.id.message)
         password = findViewById(R.id.password)
@@ -99,6 +101,11 @@ class MainActivity : Activity() {
             password.setText("")
             isTextEncrypted = false
             buttonShare.isEnabled = isTextEncrypted
+        }
+
+        buttonManageKeys.setOnClickListener {
+            val intent = Intent(this, KeysActivity::class.java)
+            startActivity(intent)
         }
     }
 

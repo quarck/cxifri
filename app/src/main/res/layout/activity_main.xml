@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textLongMessage"
+            android:inputType="textMultiLine"
             android:text=""
             android:hint="@string/hint_privatemessage"
             />
@@ -103,6 +103,14 @@
 
 
 
+        <Button
+            android:id="@+id/buttonManageKeys"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/manage_keys"
+            android:layout_margin="16sp"
+            android:layout_gravity="center"
+            />
 
 
 

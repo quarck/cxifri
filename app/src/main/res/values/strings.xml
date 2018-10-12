@@ -10,4 +10,10 @@
     <string name="clear">CLEAR</string>
     <string name="share">SHARE</string>
     <string name="share_using">Share using</string>
+    <string name="manage_key_button_text">Manage</string>
+    <string name="add_new_key_button_label">Add new key</string>
+    <string name="button_save_title">Save</string>
+    <string name="button_cancel_title">Cancel</string>
+    <string name="existing_keys">Existing keys:</string>
+    <string name="manage_keys">Manage Keys</string>
 </resources>

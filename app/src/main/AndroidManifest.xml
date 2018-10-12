@@ -29,6 +29,9 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".KeysActivity"
+            android:parentActivityName=".MainActivity"/>
     </application>
 
 </manifest>
