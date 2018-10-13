@@ -2,8 +2,6 @@ package com.github.quarck.kriptileto
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -112,22 +110,8 @@ class KeysActivity : Activity() {
                     context = this,
                     inflater = layoutInflater,
                     key = key,
-                    onReplaceKey = {
-                        // Ignored - we don't have it implemented yet
-                    },
-                    onDeleteKey = {
-
-                        if (AndroidKeyStore.isSupported) {
-                            // this will render DB key useless - so do it first thing
-                            AndroidKeyStore().dropKey(key.id)
-                        }
-
-                        KeysDatabase(context = this).use {
-                            db -> db.deleteKey(key.id)
-                        }
-
-                        reload()
-                    }
+                    onReplaceKey = this::onReplaceKey,
+                    onDeleteKey = this::onDeleteKey
             )
 
             keyStates.add(keyState)
@@ -135,39 +119,56 @@ class KeysActivity : Activity() {
 
         }
 
-        addNewKeyButton.setOnClickListener {
-            addNewKeyButton.visibility = View.GONE
-            addKeyLayout.visibility = View.VISIBLE
+        addNewKeyButton.setOnClickListener(this::onButtonAddKey)
 
+        buttonSaveKey.setOnClickListener(this::onButtonSave)
+
+        buttonCancel.setOnClickListener(this::onButtonCancel)
+    }
+
+    private fun onButtonAddKey(v: View) {
+        addNewKeyButton.visibility = View.GONE
+        addKeyLayout.visibility = View.VISIBLE
+    }
+
+    private fun onButtonSave(v: View) {
+
+        val name = keyName.text.toString()
+        val password = keyPassword.text.toString()
+        val passwordConfirm = keyPasswordConfirmation.text.toString()
+
+        val onError = {
+            text: String ->
+            textError.setText(text)
+            textError.visibility = View.VISIBLE
         }
 
-        buttonSaveKey.setOnClickListener {
+        if (name.isEmpty()) {
+            onError("Name is empty!")
+            return
+        }
+        else if (password != passwordConfirm) {
+            onError("Passwords didn't match!")
+            return
+        }
+        else if (password.isEmpty()) {
+            onError("Password is empty")
+            return
+        }
+        else if (password.length < 8) {
+            onError("Password is way too short - 8 chars min")
+            return
+        }
 
-            val name = keyName.text.toString()
-            val password = keyPassword.text.toString()
-            val passwordConfirm = keyPasswordConfirmation.text.toString()
+        val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
+                ?: throw CryptoException("Failed to derive key")
 
-            if (name.isEmpty()) {
-                textError.setText("Name is empty!")
-                textError.visibility = View.VISIBLE
-                return@setOnClickListener
-            }
+        KeysDatabase(context = this).use {
+            db ->
 
-            if (password != passwordConfirm) {
-                textError.setText("Passwords didn't match!")
-                textError.visibility = View.VISIBLE
-                return@setOnClickListener
-            }
+            val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
 
-            val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
-                    ?: throw CryptoException("Failed to derive key")
-
-            KeysDatabase(context = this).use {
-                db ->
-
-                val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
-
-                val updatedKeyEntry =
+            val updatedKeyEntry =
                     if (AndroidKeyStore.isSupported) {
                         val aks = AndroidKeyStore()
                         aks.createKey(id) // create matchng keystore key that would be encrypting this key in DB
@@ -180,23 +181,37 @@ class KeysActivity : Activity() {
                         KeyEntry(id, name, base64Key.toString(charset = Charsets.UTF_8), false)
                     }
 
-                db.update(updatedKeyEntry)
-            }
+            db.update(updatedKeyEntry)
+        }
 
-            reload()
+        reload()
 
 //            addNewKeyButton.visibility = View.VISIBLE
 //            addKeyLayout.visibility = View.GONE
-        }
-
-        buttonCancel.setOnClickListener {
-            addNewKeyButton.visibility = View.VISIBLE
-            addKeyLayout.visibility = View.GONE
-        }
     }
 
-    private fun onDeleteKey(key: KeyEntry) {
 
+    private fun onButtonCancel(v: View) {
+        addNewKeyButton.visibility = View.VISIBLE
+        addKeyLayout.visibility = View.GONE
+    }
+
+    private fun onReplaceKey(key: KeyEntry){
+        // Ignored - we don't have it implemented yet
+    }
+
+    private fun onDeleteKey(key: KeyEntry){
+
+        if (AndroidKeyStore.isSupported) {
+            // this will render DB key useless - so do it first thing
+            AndroidKeyStore().dropKey(key.id)
+        }
+
+        KeysDatabase(context = this).use {
+            db -> db.deleteKey(key.id)
+        }
+
+        reload()
     }
 
     fun reload() {
