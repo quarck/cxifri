@@ -23,6 +23,15 @@
             android:hint="@string/hint_privatemessage"
             />
 
+        <Button
+            android:id="@+id/buttonKeySelect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="key: choose"
+            android:layout_margin="10sp"
+            android:layout_gravity="center"
+            />
+
         <EditText
             android:id="@+id/password"
             android:layout_width="match_parent"
@@ -30,6 +39,7 @@
             android:ems="10"
             android:inputType="textPassword|textNoSuggestions"
             android:hint="@string/hint_password"
+            android:visibility="gone"
             />
 
         <LinearLayout

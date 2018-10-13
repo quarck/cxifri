@@ -20,6 +20,10 @@ object AESTextMessage {
         return encrypt(message, key)
     }
 
+    fun encrypt(message: String, key: KeyEntry): String {
+        return encrypt(message, key.asDecryptedBinary ?: throw Exception("Key failed"))
+    }
+
     fun decrypt(message: String, key: ByteArray): String? {
         try {
             val unbase64 = UrlBase64.decode(message)
@@ -37,5 +41,9 @@ object AESTextMessage {
         val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
                 ?: throw CryptoException("Failed to derive key")
         return decrypt(message, key)
+    }
+
+    fun decrypt(message: String, key: KeyEntry): String? {
+        return decrypt(message, key.asDecryptedBinary ?: throw Exception("Key failed"))
     }
 }

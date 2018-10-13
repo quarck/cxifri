@@ -43,7 +43,7 @@ class KeysDatabaseImpl {
         return db.update(
                 TABLE_NAME,
                 encodeContentValues(key),
-                "WHERE $KEY_ID = ?",
+                "$KEY_ID = ?",
                 arrayOf(key.id.toString())
         ) == 1
     }
@@ -91,6 +91,29 @@ class KeysDatabaseImpl {
         cursor.close()
 
         Log.d(LOG_TAG, "eventsImpl, returning ${ret.size} requests")
+
+        return ret
+    }
+
+    fun getKey(db: SQLiteDatabase, keyId: Long): KeyEntry? {
+
+        var ret: KeyEntry? = null
+
+        val cursor = db.query(TABLE_NAME, // a. table
+                SELECT_COLUMNS, // b. column names
+                " $KEY_ID = ?", // c. selections
+                arrayOf(keyId.toString()),
+                null, // e. group by
+                null, // f. h aving
+                null, // g. order by
+                null) // h. limit
+
+        if (cursor.moveToFirst()) {
+            do {
+                ret = cursorToKey(cursor)
+            } while (cursor.moveToNext())
+        }
+        cursor.close()
 
         return ret
     }

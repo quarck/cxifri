@@ -16,4 +16,6 @@
     <string name="button_cancel_title">Cancel</string>
     <string name="existing_keys">Existing keys:</string>
     <string name="manage_keys">Manage Keys</string>
+    <string name="key_name_hint">Key name</string>
+    <string name="confirm_password_hint">Confirm password</string>
 </resources>

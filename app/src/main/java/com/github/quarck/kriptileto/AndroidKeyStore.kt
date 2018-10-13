@@ -11,54 +11,48 @@ import java.security.KeyStore
 import javax.crypto.Cipher
 import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
+import javax.crypto.spec.IvParameterSpec
 
 class AndroidKeyStore() {
 
-    private val MASTER_KEY_NAME = "master_key"
+    private val KEY_PREFIX = "key_"
 
-    init {
-        if (!wasKeyCreated())
-            createKey()
-    }
+    private fun keyNameForId(id: Long) = "${KEY_PREFIX}_$id"
 
-    fun encrypt(input: ByteArray): ByteArray? = encryptDecryptData(input, true)
+    fun encrypt(keyId: Long, input: ByteArray): ByteArray? = encryptDecryptData(keyId, input, true)
 
-    fun decrypt(input: ByteArray): ByteArray? = encryptDecryptData(input, false)
+    fun decrypt(keyId: Long, input: ByteArray): ByteArray? = encryptDecryptData(keyId, input, false)
 
-    private fun wasKeyCreated(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-            return false
-
-        try {
-            val keyStore = KeyStore.getInstance("AndroidKeyStore")
-            keyStore.load(null)
-            val secretKey = keyStore.getKey(MASTER_KEY_NAME, null) as SecretKey?
-            return secretKey != null
-        } catch (e: UserNotAuthenticatedException) {
-            // User is not authenticated, let's authenticate with device credentials.
-            return false
-        } catch (e: KeyPermanentlyInvalidatedException) {
-            return false
-        } catch (e: Exception) {
-            throw e
-        }
-    }
-
-    private fun encryptDecryptData(input: ByteArray, encrypt: Boolean): ByteArray? {
+    private fun encryptDecryptData(keyId: Long, input: ByteArray, encrypt: Boolean): ByteArray? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return null
         try {
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
-            val secretKey = keyStore.getKey(MASTER_KEY_NAME, null) as SecretKey?
+            val secretKey = keyStore.getKey(keyNameForId(keyId), null) as SecretKey?
             if (secretKey != null) {
+                // YES, ECB! We are encrypting two-block length binary random key, so no need for IV and
+                // other overhead
                 val transformation = KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" +
                         KeyProperties.ENCRYPTION_PADDING_PKCS7
 
                 val cipher = Cipher.getInstance(transformation)
-                cipher.init(if (encrypt) Cipher.ENCRYPT_MODE else Cipher.DECRYPT_MODE, secretKey)
 
-                return cipher.doFinal(input)
+                if (encrypt) {
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKey)
+                    val iv = cipher.iv
+                    val encoded = cipher.doFinal(input)
+                    return iv + encoded
+                }
+                else  {
+                    val ivLen = 16
+                    val iv = ByteArray(ivLen)
+                    val msg = ByteArray(input.size - ivLen)
+                    System.arraycopy(input, 0, iv, 0, ivLen)
+                    System.arraycopy(input, ivLen, msg, 0, input.size - ivLen)
+                    cipher.init(Cipher.DECRYPT_MODE, secretKey,  IvParameterSpec(iv))
+                    return cipher.doFinal(msg)
+                }
             }
             return null
         } catch (e: UserNotAuthenticatedException) {
@@ -70,13 +64,18 @@ class AndroidKeyStore() {
         }
     }
 
-    private fun createKey() {
+    fun createKey(id: Long) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return
 
         try {
+            val keyName = keyNameForId(id)
+
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
+
+            if (keyStore.containsAlias(keyName))
+                return // already there
 
             val keyGenerator = KeyGenerator.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")
@@ -84,7 +83,7 @@ class AndroidKeyStore() {
             val purpose = KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
 
             keyGenerator.init(
-                    KeyGenParameterSpec.Builder(MASTER_KEY_NAME, purpose)
+                    KeyGenParameterSpec.Builder(keyName, purpose)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     //.setUserAuthenticationRequired(true)
                     //.setUserAuthenticationValidityDurationSeconds(AUTHENTICATION_DURATION_SECONDS)
@@ -92,6 +91,21 @@ class AndroidKeyStore() {
                     .build())
             keyGenerator.generateKey()
 
+        } catch (ex: Exception) {
+            throw ex
+        }
+    }
+
+    fun dropKey(id: Long) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
+            return
+
+        try {
+            val keyName = keyNameForId(id)
+
+            val keyStore = KeyStore.getInstance("AndroidKeyStore")
+            keyStore.load(null)
+            keyStore.deleteEntry(keyName)
         } catch (ex: Exception) {
             throw ex
         }
