@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/textViewKeyName"
@@ -31,13 +36,24 @@
         android:layout_marginStart="5dp"
         android:layout_marginTop="10dp"
         android:text="@string/add_new_key_button_label"
-        android:visibility="visible" />
+        android:visibility="visible"
+        style="?android:attr/buttonStyle"
+        />
 
     <LinearLayout
         android:id="@+id/layoutAddKey"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" android:orientation="vertical"
         android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:text="@string/add_a_new_key"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:layout_margin="16sp"
+            />
 
         <EditText
             android:id="@+id/keyName"
@@ -87,6 +103,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/button_save_title"
+                style="?android:attr/buttonStyle"
                 />
 
             <Button
@@ -94,11 +111,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/button_cancel_title"
+                style="?android:attr/buttonStyle"
                 />
 
         </LinearLayout>
 
     </LinearLayout>
 
+    </LinearLayout>
 
-</LinearLayout>
+</ScrollView>

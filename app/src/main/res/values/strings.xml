@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Kriptileto</string> <!-- Cxu vi parolas Esperanton? -->
     <string name="clipboard_clip_label">kript-il-et-o</string>
-    <string name="hint_password">password</string>
+    <string name="hint_password">Password</string>
     <string name="hint_privatemessage">Private message</string>
     <string name="encrypt">ENCRYPT</string>
     <string name="decrypt">DECRYPT</string>
@@ -20,4 +20,8 @@
     <string name="confirm_password_hint">Confirm password</string>
     <string name="big_x">X</string>
     <string name="big_r">R</string>
+    <string name="require_device_password_or_fingerprint">Require device password or fingerprint</string>
+    <string name="reply">Reply</string>
+    <string name="quote">Quote</string>
+    <string name="add_a_new_key">Add a new key:</string>
 </resources>

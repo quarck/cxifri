@@ -1,5 +1,8 @@
 package com.github.quarck.kriptileto
 
+import android.annotation.TargetApi
+import android.os.Build
+import android.security.keystore.UserNotAuthenticatedException
 import org.bouncycastle.util.encoders.UrlBase64
 
 data class KeyEntry(
@@ -25,8 +28,13 @@ data class KeyEntry(
             }
             val unbase64 = UrlBase64.decode(value)
             if (encrypted) {
-                val aks = AndroidKeyStore()
-                return aks.decrypt(id, unbase64)
+                try {
+                    val aks = AndroidKeyStore()
+                    return aks.decrypt(id, unbase64)
+                }
+                catch (ex: Exception) {
+                    return null
+                }
             } else {
                 return unbase64
             }

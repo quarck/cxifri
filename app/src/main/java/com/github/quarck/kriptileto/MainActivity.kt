@@ -2,6 +2,7 @@ package com.github.quarck.kriptileto
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.app.KeyguardManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -9,8 +10,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.TextView
 
 
 class MainActivity : Activity() {
@@ -25,10 +28,10 @@ class MainActivity : Activity() {
     lateinit var buttonKeySelect: Button
     lateinit var password: EditText
     lateinit var buttonManageKeys: Button
+    lateinit var textViewError: TextView
 
     var isTextEncrypted = false
 
-    var currentKeyId: Long = -1
     var currentKey: KeyEntry? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,11 +46,10 @@ class MainActivity : Activity() {
         buttonClear = findViewById(R.id.buttonClear)
         buttonManageKeys = findViewById(R.id.buttonManageKeys)
         buttonKeySelect = findViewById(R.id.buttonKeySelect)
+        textViewError = findViewById(R.id.textViewError)
 
         message = findViewById(R.id.message)
         password = findViewById(R.id.password)
-
-        handleIntent(intent)
 
         buttonKeySelect.setOnClickListener(this::onButtonKeySelect)
         buttonEncrypt.setOnClickListener(this::onButtonEncrypt)
@@ -61,6 +63,8 @@ class MainActivity : Activity() {
         buttonClear.setOnClickListener(this::onButtonClear)
 
         buttonManageKeys.setOnClickListener(this::onButtonManageKeys)
+
+        handleIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -68,60 +72,33 @@ class MainActivity : Activity() {
         handleIntent(intent)
     }
 
-    fun handleEncryptedTextIntent(text: String) {
-
-        val keys = KeysDatabase(context = this).use { it.keys }
-
-        val unwrapped = UrlWrapper.unwrap(text) ?: text
-
-        var success = false
-
-        for (key in keys) {
-            val decrypted = AESTextMessage.decrypt(unwrapped, key)
-            if (decrypted != null) {
-                message.setText(decrypted)
-                isTextEncrypted = false
-                buttonShare.isEnabled = isTextEncrypted
-
-                password.visibility = View.GONE
-                buttonKeySelect.text = "key: ${key.name}"
-                currentKey = key
-
-                success = true
-            }
-        }
-
-        if (!success) {
-            message.setText(text)  // original encrypted
-            isTextEncrypted = true
-            buttonShare.isEnabled = isTextEncrypted
-
-            password.visibility = View.VISIBLE
-            buttonKeySelect.text = "key: type below"
-            currentKey = null
-        }
-    }
-
-    fun handleSharedRawTextIntent(text: String) {
-        message.setText(text)
-        isTextEncrypted = false
-        buttonShare.isEnabled = isTextEncrypted
-    }
-
     fun handleIntent(intent: Intent) {
-        when (intent.action) {
-            Intent.ACTION_VIEW -> {
-                val uri = intent.data
-                if (uri != null)
-                    handleEncryptedTextIntent(uri.toString())
-            }
-            Intent.ACTION_SEND -> {
-                val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
-                if (text != null)
-                    handleSharedRawTextIntent(text)
-            }
-            else ->
+        val intentTextExtra = intent.getStringExtra(INTENT_EXTRA_TEXT)
+        val intentKeyIdExtra = intent.getLongExtra(INTENT_EXTRA_KEY_ID, -1L)
+
+        if (intentKeyIdExtra != -1L) {
+            onKeySelected(intentKeyIdExtra)
+            if (intentTextExtra != null) {
+                message.setText(intentTextExtra)
+                isTextEncrypted = false
                 buttonShare.isEnabled = false
+            }
+        }
+        else if (intentTextExtra != null) {
+            message.setText(intentTextExtra)
+            isTextEncrypted = false
+            buttonShare.isEnabled = false
+        }
+        else if (intent.action == Intent.ACTION_SEND) {
+            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
+            if (text != null) {
+                message.setText(text)
+                isTextEncrypted = false
+                buttonShare.isEnabled = false
+            }
+        }
+        else {
+            buttonShare.isEnabled = false
         }
     }
 
@@ -144,10 +121,8 @@ class MainActivity : Activity() {
         builder.setAdapter(arrayAdapter) {
             dialog, which ->
             if (which >= 0 && which < values.size && which < names.size) {
-                val name = names[which]
-                val currentKeyId = values[which]
-
-                onKeySelected(name, currentKeyId)
+                val keyId = values[which]
+                onKeySelected(keyId)
             }
         }
 
@@ -155,11 +130,11 @@ class MainActivity : Activity() {
 
     }
 
-    private fun onKeySelected(name: String, keyId: Long) {
+    private fun onKeySelected(keyId: Long) {
         if (keyId != -1L) {
             password.visibility = View.GONE
-            buttonKeySelect.text = "key: $name"
             currentKey = KeysDatabase(context = this).use { it.getKey(keyId) }
+            buttonKeySelect.text = "key: ${currentKey?.name}"
         }
         else {
             password.visibility = View.VISIBLE
@@ -168,35 +143,64 @@ class MainActivity : Activity() {
         }
     }
 
+
+
     private fun onButtonEncrypt(v: View) {
         val msg = message.text.toString()
 
-        val encrypted =
-                if (currentKey != null)
-                    AESTextMessage.encrypt(msg, currentKey!!) // FIXME
-                else
-                    AESTextMessage.encrypt(msg, password.text.toString())
+        var encrypted: String? = null
 
-        message.setText(UrlWrapper.wrap(encrypted))
-        isTextEncrypted = true
-        buttonShare.isEnabled = isTextEncrypted
+        val cKey = currentKey
+        if (cKey != null) {
+            try {
+                encrypted = AESTextMessage.encrypt(msg, cKey)
+            }
+            catch (ex: Exception){
+                encrypted = null
+            }
+        }
+        else {
+            val key = password.text.toString()
+            if (key.isEmpty()) {
+                textViewError.setText("Key is empty")
+                textViewError.visibility = View.VISIBLE
+            }
+            else if (key.length < 8) {
+                textViewError.setText("Key is too short (min 8 chars)")
+                textViewError.visibility = View.VISIBLE
+            }
+            else {
+                encrypted = AESTextMessage.encrypt(msg, key)
+            }
+        }
+
+        if (encrypted != null) {
+            message.setText(UrlWrapper.wrap(encrypted))
+            isTextEncrypted = true
+            buttonShare.isEnabled = isTextEncrypted
+        }
     }
 
     private fun onButtonDecrypt(v: View) {
         val msg = message.text.toString()
 
-        val unwrapped = UrlWrapper.unwrap(msg)
+        val unwrapped = UrlWrapper.unwrap(msg) ?: msg
 
-        val decrypted =
-                if (currentKey != null)
-                    AESTextMessage.decrypt(unwrapped ?: msg, currentKey!!) // FIXME
-                else
-                    AESTextMessage.decrypt(unwrapped ?: msg, password.text.toString())
+        try {
+            val cKey = currentKey
+            val decrypted =
+                    if (cKey != null)
+                        AESTextMessage.decrypt(unwrapped, cKey)
+                    else
+                        AESTextMessage.decrypt(unwrapped, password.text.toString())
 
-        if (decrypted != null) {
-            message.setText(decrypted)
-            isTextEncrypted = false
-            buttonShare.isEnabled = isTextEncrypted
+            if (decrypted != null) {
+                message.setText(decrypted)
+                isTextEncrypted = false
+                buttonShare.isEnabled = isTextEncrypted
+            }
+        }
+        catch (ex: Exception) {
         }
     }
 
@@ -241,6 +245,11 @@ class MainActivity : Activity() {
     private fun onButtonManageKeys(v: View) {
         val intent = Intent(this, KeysActivity::class.java)
         startActivity(intent)
+    }
+
+    companion object {
+        const val INTENT_EXTRA_TEXT = "text"
+        const val INTENT_EXTRA_KEY_ID = "keyId"
     }
 }
 

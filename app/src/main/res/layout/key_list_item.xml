@@ -16,7 +16,8 @@
         android:layout_marginTop="16dp"
         android:padding="0dp"
         android:text="@string/big_x"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        style="?android:attr/buttonStyle"/>
 
     <Button
         android:id="@+id/buttonReplace"
@@ -31,6 +32,7 @@
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:layout_alignBaseline="@id/buttonDelete"
         android:layout_toStartOf="@id/buttonDelete"
+        style="?android:attr/buttonStyle"
         />
 
     <TextView

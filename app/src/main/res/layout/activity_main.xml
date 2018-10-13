@@ -25,11 +25,12 @@
 
         <Button
             android:id="@+id/buttonKeySelect"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="key: choose"
-            android:layout_margin="10sp"
+            android:layout_margin="5dp"
             android:layout_gravity="center"
+            style="?android:attr/buttonStyle"
             />
 
         <EditText
@@ -42,6 +43,20 @@
             android:visibility="gone"
             />
 
+        <TextView
+            android:id="@+id/textViewError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:text="_key_name_placeholder_ some long long"
+            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            tools:ignore="HardcodedText"
+            android:visibility="gone" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,29 +65,35 @@
 
             <Button
                 android:id="@+id/buttonEncrypt"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/encrypt"
-                android:layout_margin="10sp"
+                android:layout_margin="5sp"
                 android:layout_gravity="center"
+                style="?android:attr/buttonStyle"
+                android:layout_weight="1"
                 />
 
             <Button
                 android:id="@+id/buttonDecrypt"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/decrypt"
-                android:layout_margin="10sp"
+                android:layout_margin="5sp"
                 android:layout_gravity="center"
+                style="?android:attr/buttonStyle"
+                android:layout_weight="1"
                 />
 
             <Button
                 android:id="@+id/buttonShare"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/share"
-                android:layout_margin="10sp"
+                android:layout_margin="5sp"
                 android:layout_gravity="center"
+                style="?android:attr/buttonStyle"
+                android:layout_weight="1"
                 />
 
         </LinearLayout>
@@ -84,29 +105,35 @@
 
             <Button
                 android:id="@+id/buttonCopy"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/copy"
-                android:layout_margin="16sp"
+                android:layout_margin="5sp"
                 android:layout_gravity="center"
+                style="?android:attr/buttonStyle"
+                android:layout_weight="1"
                 />
 
             <Button
                 android:id="@+id/buttonPaste"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/paste"
-                android:layout_margin="16sp"
+                android:layout_margin="5sp"
                 android:layout_gravity="center"
+                style="?android:attr/buttonStyle"
+                android:layout_weight="1"
                 />
 
             <Button
                 android:id="@+id/buttonClear"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/clear"
-                android:layout_margin="16sp"
+                android:layout_margin="5sp"
                 android:layout_gravity="center"
+                style="?android:attr/buttonStyle"
+                android:layout_weight="1"
                 />
 
         </LinearLayout>
@@ -118,11 +145,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/manage_keys"
-            android:layout_margin="16sp"
+            android:layout_margin="5dp"
             android:layout_gravity="center"
+            style="?android:attr/buttonStyle"
             />
-
-
 
     </LinearLayout>
 

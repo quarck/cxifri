@@ -5,7 +5,7 @@ import android.net.Uri
 object UrlWrapper {
 
     fun wrap(text: String): String {
-        return "$schemeHttps$text"
+        return "$schemeHttps$text/"
     }
 
     fun unwrap(uri: Uri): String? {
@@ -18,12 +18,15 @@ object UrlWrapper {
             return null
 
         val firstPos = schemePos + schemeHttps.length
-        val spaces = charArrayOf(' ', '\t', '\r', '\n')
-        val firstSpace = raw.indexOfAny(spaces, firstPos)
-        if (firstSpace == -1)
-            return raw.substring(firstPos)
-        else
-            return raw.substring(firstPos, firstSpace)
+        val firstSlash = raw.indexOf('/', firstPos)
+
+        val result =
+            if (firstSlash == -1)
+                raw.substring(firstPos)
+            else
+                raw.substring(firstPos, firstSlash)
+
+        return result.replace("\\s".toRegex(), "")
     }
 
     val schemeHttps = "https://privmsg.space/"
