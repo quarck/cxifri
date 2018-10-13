@@ -1,18 +1,80 @@
 package com.github.quarck.kriptileto
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.util.encoders.UrlBase64
+
+class KeyStateEntry(
+        var context: Context,
+        inflater: LayoutInflater,
+        val key: KeyEntry,
+        val onReplaceKey: (KeyEntry) -> Unit,
+        val onDeleteKey: (KeyEntry) -> Unit
+) {
+
+    val layout: RelativeLayout
+    val keyName: TextView
+    val keyDetails: TextView
+    val buttonReplace: Button
+    val buttonDelete: Button
+
+    init {
+        layout = inflater.inflate(R.layout.key_list_item, null) as RelativeLayout? ?: throw Exception("Layout error")
+
+        keyName = layout.findViewById<TextView>(R.id.textViewKeyName) ?: throw Exception("Layout error")
+        keyDetails = layout.findViewById<TextView>(R.id.textViewKeyDetails) ?: throw Exception("Layout error")
+        buttonReplace = layout.findViewById(R.id.buttonReplace)
+        buttonDelete = layout.findViewById(R.id.buttonDelete)
+
+        buttonReplace.setOnClickListener(this::onButtonReplace)
+        buttonDelete.setOnClickListener(this::onButtonDelete)
+
+        keyName.setText(key.name)
+        keyDetails.setText(key.toStringDetails())
+    }
+
+    fun onButtonReplace(v: View) {
+
+        AlertDialog.Builder(context)
+                .setMessage("Key replacement is not implemented yet!")
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok) {
+                    _, _ ->
+                }
+//                .setNegativeButton(android.R.string.cancel) {
+//                    _, _ ->
+//                }
+                .create()
+                .show()
+
+        // onReplaceKey(key)
+    }
+
+    fun onButtonDelete(v: View) {
+
+        AlertDialog.Builder(context)
+                .setMessage("Delete key ${key.name}?")
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok) {
+                    _, _ ->
+                    onDeleteKey(key)
+                }
+                .setNegativeButton(android.R.string.cancel) {
+                    _, _ ->
+                }
+                .create()
+                .show()
+    }
+}
 
 class KeysActivity : Activity() {
     lateinit var keysRoot: LinearLayout
@@ -24,6 +86,9 @@ class KeysActivity : Activity() {
     lateinit var buttonSaveKey: Button
     lateinit var buttonCancel: Button
     lateinit var textError: TextView
+
+    lateinit var keyStates: MutableList<KeyStateEntry>
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,24 +105,34 @@ class KeysActivity : Activity() {
         textError = findViewById(R.id.textError) ?: throw Exception("Layout error")
 
         val keys = KeysDatabase(context = this).use { it.keys }
+        keyStates = mutableListOf<KeyStateEntry>()
+
         for (key in keys) {
+            val keyState = KeyStateEntry(
+                    context = this,
+                    inflater = layoutInflater,
+                    key = key,
+                    onReplaceKey = {
+                        // Ignored - we don't have it implemented yet
+                    },
+                    onDeleteKey = {
 
-            val childLayout = layoutInflater.inflate(R.layout.key_list_item, null)
+                        if (AndroidKeyStore.isSupported) {
+                            // this will render DB key useless - so do it first thing
+                            AndroidKeyStore().dropKey(key.id)
+                        }
 
-            val title = childLayout.findViewById<TextView>(R.id.textViewKeyName)
-            val manageBtn = childLayout.findViewById<Button>(R.id.buttonManageKey)
-            title.setText(key.name)
-            manageBtn.setOnClickListener {
-                if (AndroidKeyStore.isSupported)
-                    AndroidKeyStore().dropKey(key.id) // this will render DB key useless - so do it first thing
-                KeysDatabase(context = this).use {
-                    db -> db.deleteKey(key.id)
-                } // fixme -- just a debug, need to prompt what to do
+                        KeysDatabase(context = this).use {
+                            db -> db.deleteKey(key.id)
+                        }
 
-                reload()
-            }
+                        reload()
+                    }
+            )
 
-            keysRoot.addView(childLayout)
+            keyStates.add(keyState)
+            keysRoot.addView(keyState.layout)
+
         }
 
         addNewKeyButton.setOnClickListener {
@@ -118,6 +193,10 @@ class KeysActivity : Activity() {
             addNewKeyButton.visibility = View.VISIBLE
             addKeyLayout.visibility = View.GONE
         }
+    }
+
+    private fun onDeleteKey(key: KeyEntry) {
+
     }
 
     fun reload() {

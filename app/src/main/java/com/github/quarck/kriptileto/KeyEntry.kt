@@ -11,6 +11,13 @@ data class KeyEntry(
         var replacementKeyId: Long = 0,
         var deleteAfter: Long = 0
 ) {
+    fun toStringDetails(): String {
+        if (encrypted)
+            return "Encrypted by AndroidKeyStore"
+        else
+            return "No AndroidKeyStore support - stored as PT"
+    }
+
     val asDecryptedBinary: ByteArray?
         get() {
             if (encrypted && !AndroidKeyStore.isSupported) {
