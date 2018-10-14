@@ -1,10 +1,11 @@
 package com.github.quarck.kriptileto
 
+import org.bouncycastle.crypto.engines.AESEngine
 import org.junit.Test
 
 import org.junit.Assert.*
 
-class AESEncryptionUnitTests {
+class EncryptionUnitTests {
 
     fun runTestsForDataLen(len: Int) {
 
@@ -15,9 +16,9 @@ class AESEncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = AESBinaryMessage.encrypt(dataIn, key)
+        val encrypted = CryptoBinaryMessage{ AESEngine() }.encrypt(dataIn, key)
 
-        val decrypted = AESBinaryMessage.decrypt(encrypted, key)
+        val decrypted = CryptoBinaryMessage{ AESEngine() }.decrypt(encrypted, key)
 
         assertNotNull(decrypted)
 
@@ -28,7 +29,7 @@ class AESEncryptionUnitTests {
         // deliberately destroy the key
         key[0] = 100
 
-        val decrypted2 = AESBinaryMessage.decrypt(encrypted, key)
+        val decrypted2 = CryptoBinaryMessage{ AESEngine() }.decrypt(encrypted, key)
         assertNull(decrypted2)
     }
 

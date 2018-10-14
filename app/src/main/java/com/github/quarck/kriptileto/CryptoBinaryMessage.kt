@@ -1,5 +1,6 @@
 package com.github.quarck.kriptileto
 
+import org.bouncycastle.crypto.BlockCipher
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.crypto.InvalidCipherTextException
 import org.bouncycastle.crypto.engines.AESEngine
@@ -10,15 +11,14 @@ import org.bouncycastle.crypto.params.KeyParameter
 import org.bouncycastle.crypto.params.ParametersWithIV
 import java.security.SecureRandom
 
-
-object AESBinaryMessage{
+class CryptoBinaryMessage(val createEngine: ()->BlockCipher){
     // Message layout:
     // [IV PLAIN TEXT] ENCRYPTED[ MAC, SALT, MESSAGE]
     // MAC = MAC of SALT + MESSAGE
     fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
 
-        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
-        val mac = CBCBlockCipherMac(AESEngine())
+        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
+        val mac = CBCBlockCipherMac(createEngine())
         val cipherBlockSize = cipher.blockSize
 
         val iv = ByteArray(cipherBlockSize)
@@ -79,8 +79,8 @@ object AESBinaryMessage{
     // Returns null if decryption fails or MAC check fails
     fun decrypt(message: ByteArray, key: ByteArray): ByteArray? {
 
-        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(AESEngine()))
-        val mac = CBCBlockCipherMac(AESEngine())
+        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
+        val mac = CBCBlockCipherMac(createEngine())
         val cipherBlockSize = cipher.blockSize
 
         try {
@@ -134,8 +134,4 @@ object AESBinaryMessage{
             return null
         }
     }
-
-    val KEY_LEN_MIN = 16 // AES-128
-    val KEY_LEN_MID = 24 // AES-192
-    val KEY_LEN_MAX = 32 // AES-256
 }

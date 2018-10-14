@@ -2,7 +2,6 @@ package com.github.quarck.kriptileto
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.KeyguardManager
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
@@ -10,10 +9,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import org.bouncycastle.crypto.engines.AESEngine
 
 
 class MainActivity : Activity() {
@@ -153,7 +152,7 @@ class MainActivity : Activity() {
         val cKey = currentKey
         if (cKey != null) {
             try {
-                encrypted = AESTextMessage.encrypt(msg, cKey)
+                encrypted = CryptoTextMessage {AESEngine()}.encrypt(msg, cKey)
             }
             catch (ex: Exception){
                 encrypted = null
@@ -170,7 +169,7 @@ class MainActivity : Activity() {
                 textViewError.visibility = View.VISIBLE
             }
             else {
-                encrypted = AESTextMessage.encrypt(msg, key)
+                encrypted = CryptoTextMessage {AESEngine()}.encrypt(msg, key)
             }
         }
 
@@ -190,9 +189,9 @@ class MainActivity : Activity() {
             val cKey = currentKey
             val decrypted =
                     if (cKey != null)
-                        AESTextMessage.decrypt(unwrapped, cKey)
+                        CryptoTextMessage {AESEngine()}.decrypt(unwrapped, cKey)
                     else
-                        AESTextMessage.decrypt(unwrapped, password.text.toString())
+                        CryptoTextMessage {AESEngine()}.decrypt(unwrapped, password.text.toString())
 
             if (decrypted != null) {
                 message.setText(decrypted)

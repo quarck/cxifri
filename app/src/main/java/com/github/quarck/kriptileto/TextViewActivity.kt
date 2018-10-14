@@ -1,19 +1,15 @@
 package com.github.quarck.kriptileto
 
 import android.app.Activity
-import android.app.AlertDialog
-import android.app.KeyguardManager
 import android.os.Bundle
 import android.widget.Button
-import android.widget.EditText
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.view.View
-import android.widget.ArrayAdapter
 import android.widget.TextView
+import org.bouncycastle.crypto.engines.AESEngine
 
 class TextViewActivity : Activity() {
 
@@ -56,9 +52,11 @@ class TextViewActivity : Activity() {
 
         var success = false
 
+        val cryptoMessage = CryptoTextMessage { AESEngine() }
+
         for (key in keys) {
             try {
-                val decrypted = AESTextMessage.decrypt(unwrapped, key)
+                val decrypted = cryptoMessage.decrypt(unwrapped, key)
                 if (decrypted != null) {
                     textViewMessage.setText(decrypted)
                     textViewAuthStatus.setText("Message authenticated with key ${key.name}:")

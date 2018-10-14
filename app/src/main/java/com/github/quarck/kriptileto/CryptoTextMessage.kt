@@ -1,21 +1,24 @@
 package com.github.quarck.kriptileto
 
+import org.bouncycastle.crypto.BlockCipher
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.util.encoders.UrlBase64
 
-object AESTextMessage {
+class CryptoTextMessage(var createEngine: ()->BlockCipher, var keyLen: Int) {
+
+    val binaryCryptor = CryptoBinaryMessage(createEngine)
 
     fun encrypt(message: String, key: ByteArray): String {
 
         val binaryMessage = message.toByteArray(charset = Charsets.UTF_8)
-        val encoded = AESBinaryMessage.encrypt(binaryMessage, key)
+        val encoded = binaryCryptor.encrypt(binaryMessage, key)
         val base64 = UrlBase64.encode(encoded)
         return base64.toString(charset = Charsets.UTF_8)
     }
 
     fun encrypt(message: String, password: String): String {
 
-        val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
+        val key = DerivedKeyGenerator.generate(password, "", 0, keyLen)
                 ?: throw CryptoException("Failed to derive key")
         return encrypt(message, key)
     }
@@ -27,7 +30,7 @@ object AESTextMessage {
     fun decrypt(message: String, key: ByteArray): String? {
         try {
             val unbase64 = UrlBase64.decode(message)
-            val decrypt = AESBinaryMessage.decrypt(unbase64, key)
+            val decrypt = binaryCryptor.decrypt(unbase64, key)
             if (decrypt != null)
                 return decrypt.toString(charset = Charsets.UTF_8)
         }
@@ -38,7 +41,7 @@ object AESTextMessage {
     }
 
     fun decrypt(message: String, password: String): String? {
-        val key = DerivedKeyGenerator.generate(password, "", 0, AESBinaryMessage.KEY_LEN_MAX)
+        val key = DerivedKeyGenerator.generate(password, "", 0, keyLen)
                 ?: throw CryptoException("Failed to derive key")
         return decrypt(message, key)
     }
