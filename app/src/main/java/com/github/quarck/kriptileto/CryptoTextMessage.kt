@@ -1,3 +1,6 @@
+// Draft class for what become KriptiletoMessage lately
+
+
 package com.github.quarck.kriptileto
 
 import org.bouncycastle.crypto.BlockCipher

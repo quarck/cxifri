@@ -29,5 +29,22 @@ object UrlWrapper {
         return result.replace("\\s".toRegex(), "")
     }
 
+    fun unwrapOrKillSpaces(raw: String): String {
+        val schemePos = raw.indexOf(schemeHttps)
+        if (schemePos == -1)
+            return raw.replace("\\s".toRegex(), "")
+
+        val firstPos = schemePos + schemeHttps.length
+        val firstSlash = raw.indexOf('/', firstPos)
+
+        val result =
+                if (firstSlash == -1)
+                    raw.substring(firstPos)
+                else
+                    raw.substring(firstPos, firstSlash)
+
+        return result.replace("\\s".toRegex(), "")
+    }
+
     val schemeHttps = "https://privmsg.space/"
 }
