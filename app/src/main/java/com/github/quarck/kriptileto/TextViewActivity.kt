@@ -52,7 +52,10 @@ class TextViewActivity : Activity() {
 
         var success = false
 
-        val cryptoMessage = CryptoTextMessage { AESEngine() }
+        val cryptoMessage = CryptoTextMessage(
+                createEngine = { AESTwofishSerpentEngine()},
+                keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
+        )
 
         for (key in keys) {
             try {
@@ -63,6 +66,7 @@ class TextViewActivity : Activity() {
                     currentKey = key
 
                     success = true
+                    break
                 }
             }
             catch (ex: Exception) {

@@ -160,8 +160,7 @@ class KeysActivity : Activity() {
             return
         }
 
-        val key = DerivedKeyGenerator.generate(password, "", 0, CryptoBinaryMessage.KEY_LEN_MAX)
-                ?: throw CryptoException("Failed to derive key")
+        val key = DerivedKeyGenerator.generateForAESTwofishSerpent(password)
 
         KeysDatabase(context = this).use {
             db ->

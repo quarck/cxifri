@@ -12,6 +12,7 @@ import android.content.Intent
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.crypto.engines.AESEngine
 
 
@@ -152,7 +153,10 @@ class MainActivity : Activity() {
         val cKey = currentKey
         if (cKey != null) {
             try {
-                encrypted = CryptoTextMessage {AESEngine()}.encrypt(msg, cKey)
+                encrypted = CryptoTextMessage(
+                        createEngine = { AESTwofishSerpentEngine()},
+                        keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
+                ).encrypt(msg, cKey)
             }
             catch (ex: Exception){
                 encrypted = null
@@ -169,7 +173,10 @@ class MainActivity : Activity() {
                 textViewError.visibility = View.VISIBLE
             }
             else {
-                encrypted = CryptoTextMessage {AESEngine()}.encrypt(msg, key)
+                encrypted = CryptoTextMessage(
+                        createEngine = { AESTwofishSerpentEngine()},
+                        keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
+                ).encrypt(msg, key)
             }
         }
 
@@ -189,9 +196,15 @@ class MainActivity : Activity() {
             val cKey = currentKey
             val decrypted =
                     if (cKey != null)
-                        CryptoTextMessage {AESEngine()}.decrypt(unwrapped, cKey)
+                        CryptoTextMessage(
+                                createEngine = { AESTwofishSerpentEngine()},
+                                keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
+                        ).decrypt(unwrapped, cKey)
                     else
-                        CryptoTextMessage {AESEngine()}.decrypt(unwrapped, password.text.toString())
+                        CryptoTextMessage(
+                                createEngine = { AESTwofishSerpentEngine()},
+                                keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
+                        ).decrypt(unwrapped, password.text.toString())
 
             if (decrypted != null) {
                 message.setText(decrypted)

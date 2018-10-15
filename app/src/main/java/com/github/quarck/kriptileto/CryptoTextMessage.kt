@@ -4,7 +4,7 @@ import org.bouncycastle.crypto.BlockCipher
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.util.encoders.UrlBase64
 
-class CryptoTextMessage(var createEngine: ()->BlockCipher, var keyLen: Int) {
+class CryptoTextMessage(var createEngine: ()->BlockCipher, val keyGenerator: (String) -> ByteArray) {
 
     val binaryCryptor = CryptoBinaryMessage(createEngine)
 
@@ -18,8 +18,7 @@ class CryptoTextMessage(var createEngine: ()->BlockCipher, var keyLen: Int) {
 
     fun encrypt(message: String, password: String): String {
 
-        val key = DerivedKeyGenerator.generate(password, "", 0, keyLen)
-                ?: throw CryptoException("Failed to derive key")
+        val key = keyGenerator(password)
         return encrypt(message, key)
     }
 
@@ -41,8 +40,7 @@ class CryptoTextMessage(var createEngine: ()->BlockCipher, var keyLen: Int) {
     }
 
     fun decrypt(message: String, password: String): String? {
-        val key = DerivedKeyGenerator.generate(password, "", 0, keyLen)
-                ?: throw CryptoException("Failed to derive key")
+        val key = keyGenerator(password)
         return decrypt(message, key)
     }
 

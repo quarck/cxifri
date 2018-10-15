@@ -10,12 +10,6 @@ import org.bouncycastle.util.Arrays
 
 class AESTwofishSerpentEngine() : BlockCipher {
 
-    val BLOCK_SIZE = 16
-
-    val KEY_LENGTH_AES = 32
-    val KEY_LENGTH_TWOFISH = 32
-    val KEY_LENGTH_SERPENT = 32
-    val KEY_LENGTH_BYTES = KEY_LENGTH_AES + KEY_LENGTH_TWOFISH + KEY_LENGTH_SERPENT
 
     val aesEngine = AESEngine()
     val twofishEngine = TwofishEngine()
@@ -50,11 +44,14 @@ class AESTwofishSerpentEngine() : BlockCipher {
                 aesEngine.init(forEncryption, KeyParameter(aesKey))
                 twofishEngine.init(forEncryption, KeyParameter(twofishKey))
                 serpentEngine.init(forEncryption, KeyParameter(serpentKey))
+
+            } else {
+                throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init, key length is ${key.size}, supported key length: $KEY_LENGTH_BYTES")
             }
             return
         }
 
-
+        throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init - " + params?.javaClass?.name)
     }
 
     override fun getAlgorithmName(): String {
@@ -96,5 +93,14 @@ class AESTwofishSerpentEngine() : BlockCipher {
         aesBlock.wipe()
         twofishBlock.wipe()
         serpentBlock.wipe()
+    }
+
+    companion object {
+        val BLOCK_SIZE = 16
+
+        val KEY_LENGTH_AES = 32
+        val KEY_LENGTH_TWOFISH = 32
+        val KEY_LENGTH_SERPENT = 32
+        val KEY_LENGTH_BYTES = KEY_LENGTH_AES + KEY_LENGTH_TWOFISH + KEY_LENGTH_SERPENT
     }
 }
