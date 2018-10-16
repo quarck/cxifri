@@ -41,26 +41,31 @@ class KriptiletoMessage() {
     private fun decryptToBinaryBlob(message: String, key: KeyEntry) =
             decryptToBinaryBlob(message, key.asDecryptedBinary ?: throw Exception("Key failed"))
 
+    fun packBinaryBlob(message: String): ByteArray {
+        val utf8 = message.toByteArray(charset = Charsets.UTF_8)
+        val binaryMessage = ByteArray(1 + utf8.size)
+        binaryMessage[0] = MESSAGE_FORMAT_PLAINTEXT
+        System.arraycopy(utf8, 0, binaryMessage, 1, utf8.size)
+        return binaryMessage
+    }
+
 
     fun encrypt(message: String, key: ByteArray): String {
-        val binaryMessage = byteArrayOf(MESSAGE_FORMAT_PLAINTEXT) + message.toByteArray(charset = Charsets.UTF_8)
-        return encryptBinaryBlob(binaryMessage, key)
+        return UrlWrapper.wrap(encryptBinaryBlob(packBinaryBlob(message), key))
     }
 
     fun encrypt(message: String, password: String): String {
-        val binaryMessage = byteArrayOf(MESSAGE_FORMAT_PLAINTEXT) + message.toByteArray(charset = Charsets.UTF_8)
-        return encryptBinaryBlob(binaryMessage, password)
+        return UrlWrapper.wrap(encryptBinaryBlob(packBinaryBlob(message), password))
     }
 
     fun encrypt(message: String, key: KeyEntry): String {
-        val binaryMessage = byteArrayOf(MESSAGE_FORMAT_PLAINTEXT) + message.toByteArray(charset = Charsets.UTF_8)
-        return encryptBinaryBlob(binaryMessage, key)
+        return UrlWrapper.wrap(encryptBinaryBlob(packBinaryBlob(message), key))
     }
 
     private fun unpackBlob(blob: ByteArray?): String? {
         if (blob == null)
             return null
-        if (blob.size <= 1)
+        if (blob.size < 1)
             return null
         if (blob[0] == MESSAGE_FORMAT_PLAINTEXT) {
             return String(blob, 1, blob.size - 1, Charsets.UTF_8)

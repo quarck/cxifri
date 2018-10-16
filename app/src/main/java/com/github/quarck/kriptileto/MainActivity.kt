@@ -147,72 +147,74 @@ class MainActivity : Activity() {
 
     private fun onButtonEncrypt(v: View) {
         val msg = message.text.toString()
+        val key = password.text.toString()
 
-        var encrypted: String? = null
+        textViewError.visibility = View.VISIBLE
 
-        val cKey = currentKey
-        if (cKey != null) {
-            try {
-                encrypted = CryptoTextMessage(
-                        createEngine = { AESTwofishSerpentEngine()},
-                        keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
-                ).encrypt(msg, cKey)
-            }
-            catch (ex: Exception){
-                encrypted = null
-            }
-        }
-        else {
-            val key = password.text.toString()
-            if (key.isEmpty()) {
-                textViewError.setText("Key is empty")
-                textViewError.visibility = View.VISIBLE
-            }
-            else if (key.length < 8) {
-                textViewError.setText("Key is too short (min 8 chars)")
-                textViewError.visibility = View.VISIBLE
+        background {
+            var encrypted: String? = null
+            val cKey = currentKey
+
+            if (cKey != null) {
+                try {
+                    encrypted = KriptiletoMessage().encrypt(msg, cKey)
+                }
+                catch (ex: Exception){
+                    encrypted = null
+                }
             }
             else {
-                encrypted = CryptoTextMessage(
-                        createEngine = { AESTwofishSerpentEngine()},
-                        keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
-                ).encrypt(msg, key)
+                if (key.isEmpty()) {
+                    runOnUiThread {
+                        textViewError.setText("Key is empty")
+                        textViewError.visibility = View.VISIBLE
+                    }
+                }
+                else if (key.length < 8) {
+                    runOnUiThread {
+                        textViewError.setText("Key is too short (min 8 chars)")
+                        textViewError.visibility = View.VISIBLE
+                    }
+                }
+                else {
+                    encrypted = KriptiletoMessage().encrypt(msg, key)
+                }
             }
-        }
 
-        if (encrypted != null) {
-            message.setText(UrlWrapper.wrap(encrypted))
-            isTextEncrypted = true
-            buttonShare.isEnabled = isTextEncrypted
+            if (encrypted != null) {
+                isTextEncrypted = true
+                runOnUiThread{
+                    message.setText(encrypted)
+                    buttonShare.isEnabled = isTextEncrypted
+                }
+            }
         }
     }
 
     private fun onButtonDecrypt(v: View) {
         val msg = message.text.toString()
+        val key = password.text.toString()
 
-        val unwrapped = UrlWrapper.unwrap(msg) ?: msg
+        textViewError.visibility = View.VISIBLE
 
-        try {
-            val cKey = currentKey
-            val decrypted =
-                    if (cKey != null)
-                        CryptoTextMessage(
-                                createEngine = { AESTwofishSerpentEngine()},
-                                keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
-                        ).decrypt(unwrapped, cKey)
-                    else
-                        CryptoTextMessage(
-                                createEngine = { AESTwofishSerpentEngine()},
-                                keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
-                        ).decrypt(unwrapped, password.text.toString())
+        background {
+            try {
+                val cKey = currentKey
+                val decrypted =
+                        if (cKey != null)
+                            KriptiletoMessage().decrypt(msg, cKey)
+                        else
+                            KriptiletoMessage().decrypt(msg, key)
 
-            if (decrypted != null) {
-                message.setText(decrypted)
-                isTextEncrypted = false
-                buttonShare.isEnabled = isTextEncrypted
+                if (decrypted != null) {
+                    isTextEncrypted = false
+                    runOnUiThread{
+                        message.setText(decrypted)
+                        buttonShare.isEnabled = isTextEncrypted
+                    }
+                }
+            } catch (ex: Exception) {
             }
-        }
-        catch (ex: Exception) {
         }
     }
 

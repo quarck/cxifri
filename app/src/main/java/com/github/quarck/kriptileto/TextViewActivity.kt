@@ -20,7 +20,6 @@ class TextViewActivity : Activity() {
     lateinit var buttonCopy: Button
 
     var currentKey: KeyEntry? = null
-    var encryptedText: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,38 +45,36 @@ class TextViewActivity : Activity() {
 
     fun handleEncryptedTextIntent(text: String) {
 
-        val keys = KeysDatabase(context = this).use { it.keys }
+        background {
+            val keys = KeysDatabase(context = this).use { it.keys }
+            var success = false
 
-        val unwrapped = UrlWrapper.unwrap(text) ?: text
+            val cryptoMessage = KriptiletoMessage()
 
-        var success = false
-
-        val cryptoMessage = CryptoTextMessage(
-                createEngine = { AESTwofishSerpentEngine()},
-                keyGenerator = { DerivedKeyGenerator.generateForAESTwofishSerpent(it) }
-        )
-
-        for (key in keys) {
-            try {
-                val decrypted = cryptoMessage.decrypt(unwrapped, key)
-                if (decrypted != null) {
-                    textViewMessage.setText(decrypted)
-                    textViewAuthStatus.setText("Message authenticated with key ${key.name}:")
-                    currentKey = key
-
-                    success = true
-                    break
+            for (key in keys) {
+                try {
+                    val decrypted = cryptoMessage.decrypt(text, key)
+                    if (decrypted != null) {
+                        runOnUiThread {
+                            textViewMessage.setText(decrypted)
+                            textViewAuthStatus.setText("Decrypted and valid, key: ${key.name}")
+                        }
+                        currentKey = key
+                        success = true
+                        break
+                    }
+                } catch (ex: Exception) {
                 }
             }
-            catch (ex: Exception) {
-            }
-        }
 
-        if (!success) {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra(MainActivity.INTENT_EXTRA_TEXT, text)
-            startActivity(intent)
-            finish()
+            if (!success) {
+                runOnUiThread {
+                    val intent = Intent(this, MainActivity::class.java)
+                    intent.putExtra(MainActivity.INTENT_EXTRA_TEXT, text)
+                    startActivity(intent)
+                    finish()
+                }
+            }
         }
     }
 
@@ -85,8 +82,13 @@ class TextViewActivity : Activity() {
         if (intent.action == Intent.ACTION_VIEW) {
             val uri = intent.data
             if (uri != null) {
-                encryptedText = uri.toString()
-                handleEncryptedTextIntent(encryptedText)
+                handleEncryptedTextIntent(uri.toString())
+            }
+        }
+        else if (intent.action == Intent.ACTION_SEND) {
+            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
+            if (text != null) {
+                 handleEncryptedTextIntent(text)
             }
         }
     }

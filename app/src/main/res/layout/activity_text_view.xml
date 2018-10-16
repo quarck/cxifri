@@ -38,10 +38,12 @@
             android:layout_marginTop="5dp"
             android:autoLink="web|email|phone|map"
             android:ems="10"
-            android:text="_key_name_placeholder_ some long long"
+            android:text="_key_name_placeholder_ some long long  some long long  some long\nlong  some long long\nsome long long  some long long "
+            android:background="@android:drawable/editbox_dropdown_light_frame"
             android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-            tools:ignore="HardcodedText"
-            />
+            android:textIsSelectable="true
+"
+            tools:ignore="HardcodedText" />
 
         <LinearLayout
             android:layout_width="match_parent"
