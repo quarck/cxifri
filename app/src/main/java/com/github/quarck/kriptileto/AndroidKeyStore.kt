@@ -41,8 +41,6 @@ class AndroidKeyStore() {
             val secretKey = keyStore.getKey(keyNameForId(keyId), null) as SecretKey?
 
             if (secretKey != null) {
-                // YES, ECB! We are encrypting two-block length binary random key, so no need for IV and
-                // other overhead
                 val transformation = KeyProperties.KEY_ALGORITHM_AES + "/" + KeyProperties.BLOCK_MODE_CBC + "/" +
                         KeyProperties.ENCRYPTION_PADDING_PKCS7
 
@@ -95,8 +93,6 @@ class AndroidKeyStore() {
             keyGenerator.init(
                     KeyGenParameterSpec.Builder(keyName, purpose)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
-//                    .setUserAuthenticationRequired(needsFingerprint)
-//                    .setUserAuthenticationValidityDurationSeconds(60)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
                     .build())
 
