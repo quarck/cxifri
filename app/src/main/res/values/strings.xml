@@ -24,4 +24,5 @@
     <string name="reply">Reply</string>
     <string name="quote">Quote</string>
     <string name="add_a_new_key">Add a new key:</string>
+    <string name="encrypt_decrypt_activity_label">Kriptileto</string>
 </resources>

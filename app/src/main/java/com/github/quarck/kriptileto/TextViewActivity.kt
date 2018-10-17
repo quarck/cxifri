@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
 import android.widget.TextView
 import org.bouncycastle.crypto.engines.AESEngine
@@ -89,6 +90,14 @@ class TextViewActivity : Activity() {
             val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
             if (text != null) {
                  handleEncryptedTextIntent(text)
+            }
+        }
+        else if (intent.action == Intent.ACTION_PROCESS_TEXT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val text = intent.getCharSequenceExtra(android.content.Intent.EXTRA_PROCESS_TEXT)
+                if (text != null) {
+                    handleEncryptedTextIntent(text.toString())
+                }
             }
         }
     }
