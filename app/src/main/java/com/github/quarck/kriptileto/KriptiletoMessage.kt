@@ -85,7 +85,7 @@ class KriptiletoMessage() {
         else if (blob[0] == MESSAGE_FORMAT_GZIP_PLAINTEXT) {
             val ungzip = GZipBlob().inflate(blob, 1, blob.size-1)
             return if (ungzip != null)
-                       String(blob, 0, ungzip.size, Charsets.UTF_8)
+                       ungzip.toString(charset=Charsets.UTF_8)
                     else
                         null
         }
