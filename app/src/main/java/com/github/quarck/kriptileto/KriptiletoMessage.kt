@@ -6,6 +6,7 @@ import org.bouncycastle.util.encoders.UrlBase64
 class KriptiletoMessage() {
 
     val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
+    val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
 
     val binaryCryptor = CryptoBinaryMessage({AESTwofishSerpentEngine()})
 
@@ -43,10 +44,21 @@ class KriptiletoMessage() {
 
     fun packBinaryBlob(message: String): ByteArray {
         val utf8 = message.toByteArray(charset = Charsets.UTF_8)
-        val binaryMessage = ByteArray(1 + utf8.size)
-        binaryMessage[0] = MESSAGE_FORMAT_PLAINTEXT
-        System.arraycopy(utf8, 0, binaryMessage, 1, utf8.size)
-        return binaryMessage
+
+        val gzipUtf8 = GZipBlob().deflate(utf8)
+
+        if (utf8.size < gzipUtf8.size) {
+            val binaryMessage = ByteArray(1 + utf8.size)
+            binaryMessage[0] = MESSAGE_FORMAT_PLAINTEXT
+            System.arraycopy(utf8, 0, binaryMessage, 1, utf8.size)
+            return binaryMessage
+        }
+        else {
+            val binaryMessage = ByteArray(1 + gzipUtf8.size)
+            binaryMessage[0] = MESSAGE_FORMAT_GZIP_PLAINTEXT
+            System.arraycopy(utf8, 0, binaryMessage, 1, gzipUtf8.size)
+            return binaryMessage
+        }
     }
 
 
@@ -69,6 +81,13 @@ class KriptiletoMessage() {
             return null
         if (blob[0] == MESSAGE_FORMAT_PLAINTEXT) {
             return String(blob, 1, blob.size - 1, Charsets.UTF_8)
+        }
+        else if (blob[0] == MESSAGE_FORMAT_GZIP_PLAINTEXT) {
+            val ungzip = GZipBlob().inflate(blob, 1, blob.size-1)
+            return if (ungzip != null)
+                       String(blob, 0, ungzip.size, Charsets.UTF_8)
+                    else
+                        null
         }
         else {
             return null

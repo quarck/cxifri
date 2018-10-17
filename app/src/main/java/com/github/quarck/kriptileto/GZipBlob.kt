@@ -25,4 +25,14 @@ class GZipBlob {
         byteStream.close()
         return blob
     }
+
+
+    fun inflate(inp: ByteArray, offset: Int, size: Int): ByteArray? {
+        val byteStream = ByteArrayInputStream(inp, offset, size)
+        val gzipStream = GZIPInputStream(byteStream)
+        val blob = gzipStream.readBytes()
+        gzipStream.close()
+        byteStream.close()
+        return blob
+    }
 }
