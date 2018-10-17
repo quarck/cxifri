@@ -1,5 +1,7 @@
 package com.github.quarck.kriptileto
 
+import com.github.quarck.kriptileto.crypto.AESTwofishSerpentEngine
+import com.github.quarck.kriptileto.crypto.CryptoBinaryMessage
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine
@@ -19,9 +21,9 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = CryptoBinaryMessage{ AESEngine() }.encrypt(dataIn, key)
+        val encrypted = CryptoBinaryMessage { AESEngine() }.encrypt(dataIn, key)
 
-        val decrypted = CryptoBinaryMessage{ AESEngine() }.decrypt(encrypted, key)
+        val decrypted = CryptoBinaryMessage { AESEngine() }.decrypt(encrypted, key)
 
         assertNotNull(decrypted)
 
@@ -32,7 +34,7 @@ class EncryptionUnitTests {
         // deliberately destroy the key
         key[0] = 100
 
-        val decrypted2 = CryptoBinaryMessage{ AESEngine() }.decrypt(encrypted, key)
+        val decrypted2 = CryptoBinaryMessage { AESEngine() }.decrypt(encrypted, key)
         assertNull(decrypted2)
     }
 
@@ -52,9 +54,9 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = CryptoBinaryMessage{ AESTwofishSerpentEngine() }.encrypt(dataIn, key)
+        val encrypted = CryptoBinaryMessage { AESTwofishSerpentEngine() }.encrypt(dataIn, key)
 
-        val decrypted = CryptoBinaryMessage{ AESTwofishSerpentEngine() }.decrypt(encrypted, key)
+        val decrypted = CryptoBinaryMessage { AESTwofishSerpentEngine() }.decrypt(encrypted, key)
 
         assertNotNull(decrypted)
 
@@ -65,7 +67,7 @@ class EncryptionUnitTests {
         // deliberately destroy the key
         key[0] = 100
 
-        val decrypted2 = CryptoBinaryMessage{ AESTwofishSerpentEngine() }.decrypt(encrypted, key)
+        val decrypted2 = CryptoBinaryMessage { AESTwofishSerpentEngine() }.decrypt(encrypted, key)
         assertNull(decrypted2)
     }
 

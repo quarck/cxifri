@@ -18,7 +18,7 @@
 //
 
 
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.utils
 
 // Anko is not building properly for me for some reason, so
 // it was easier to just create a few lines of code below rather then

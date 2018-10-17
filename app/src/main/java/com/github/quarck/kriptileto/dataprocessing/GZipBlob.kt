@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.dataprocessing
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

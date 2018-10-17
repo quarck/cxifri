@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.ui
 
 import android.app.Activity
 import android.os.Bundle
@@ -7,10 +7,9 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.view.View
 import android.widget.TextView
-import org.bouncycastle.crypto.engines.AESEngine
+import com.github.quarck.kriptileto.R
 
 class TextViewActivity : Activity() {
 

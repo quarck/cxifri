@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.ui
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -8,7 +8,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import org.bouncycastle.crypto.CryptoException
+import com.github.quarck.kriptileto.aks.AndroidKeyStore
+import com.github.quarck.kriptileto.crypto.DerivedKeyGenerator
+import com.github.quarck.kriptileto.R
+import com.github.quarck.kriptileto.keysdb.KeyEntry
+import com.github.quarck.kriptileto.keysdb.KeysDatabase
 import org.bouncycastle.util.encoders.UrlBase64
 
 class KeyStateEntry(

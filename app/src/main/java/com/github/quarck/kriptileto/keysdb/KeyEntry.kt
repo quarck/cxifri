@@ -1,8 +1,6 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.keysdb
 
-import android.annotation.TargetApi
-import android.os.Build
-import android.security.keystore.UserNotAuthenticatedException
+import com.github.quarck.kriptileto.aks.AndroidKeyStore
 import org.bouncycastle.util.encoders.UrlBase64
 
 data class KeyEntry(

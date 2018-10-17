@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.ui
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -13,6 +13,11 @@ import android.os.Build
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import com.github.quarck.kriptileto.crypto.KriptiletoMessage
+import com.github.quarck.kriptileto.R
+import com.github.quarck.kriptileto.keysdb.KeyEntry
+import com.github.quarck.kriptileto.keysdb.KeysDatabase
+import com.github.quarck.kriptileto.utils.background
 
 
 class MainActivity : Activity() {
@@ -219,32 +224,28 @@ class MainActivity : Activity() {
             if (cKey != null) {
                 try {
                     encrypted = KriptiletoMessage().encrypt(msg, cKey)
-                }
-                catch (ex: Exception){
+                } catch (ex: Exception) {
                     encrypted = null
                 }
-            }
-            else {
+            } else {
                 if (key.isEmpty()) {
                     runOnUiThread {
                         textViewError.setText("Key is empty")
                         textViewError.visibility = View.VISIBLE
                     }
-                }
-                else if (key.length < 8) {
+                } else if (key.length < 8) {
                     runOnUiThread {
                         textViewError.setText("Key is too short (min 8 chars)")
                         textViewError.visibility = View.VISIBLE
                     }
-                }
-                else {
+                } else {
                     encrypted = KriptiletoMessage().encrypt(msg, key)
                 }
             }
 
             if (encrypted != null) {
                 isTextEncrypted = true
-                runOnUiThread{
+                runOnUiThread {
                     message.setText(encrypted)
                     buttonShare.isEnabled = isTextEncrypted
                 }
@@ -269,7 +270,7 @@ class MainActivity : Activity() {
 
                 if (decrypted != null) {
                     isTextEncrypted = false
-                    runOnUiThread{
+                    runOnUiThread {
                         message.setText(decrypted)
                         buttonShare.isEnabled = isTextEncrypted
                     }

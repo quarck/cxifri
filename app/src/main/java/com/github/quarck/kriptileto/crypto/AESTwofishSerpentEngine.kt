@@ -1,12 +1,12 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.crypto
 
+import com.github.quarck.kriptileto.utils.wipe
 import org.bouncycastle.crypto.BlockCipher
 import org.bouncycastle.crypto.CipherParameters
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine
 import org.bouncycastle.crypto.params.KeyParameter
-import org.bouncycastle.util.Arrays
 
 class AESTwofishSerpentEngine() : BlockCipher {
 

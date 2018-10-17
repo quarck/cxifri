@@ -1,8 +1,7 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.keysdb
 
 import android.content.ContentValues
 import android.database.Cursor
-import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import java.util.*
@@ -121,13 +120,20 @@ class KeysDatabaseImpl {
     private fun cursorToKey(cursor: Cursor): KeyEntry {
 
         return KeyEntry(
-                id =(cursor.getLong(PROJECTION_KEY_ID) as Long?) ?: throw Exception("Can't read key ID"),
-                name = (cursor.getString(PROJECTION_KEY_NAME) as String?) ?: throw Exception("Can't read key name"),
-                value = (cursor.getString(PROJECTION_KEY_VALUE) as String?) ?: throw Exception("Can't read key value"),
-                encrypted = ((cursor.getInt(PROJECTION_KEY_IS_ENCRYPTED) as Int?) ?: throw Exception("Can't get isEncrypted flag")) != 0,
-                replaceRequested = ((cursor.getInt(PROJECTION_KEY_IS_REPLACEMENT_REQUESTED) as Int?) ?: throw Exception("Can't get isReplacementRequested flag")) != 0,
-                replacementKeyId =(cursor.getLong(PROJECTION_KEY_REPLACEMENT_KEY_ID) as Long?) ?: throw Exception("Can't read key replacement ID"),
-                deleteAfter =(cursor.getLong(PROJECTION_KEY_DELETE_AFTER) as Long?) ?: throw Exception("Can't read key deleteAfter")
+                id = (cursor.getLong(PROJECTION_KEY_ID) as Long?)
+                        ?: throw Exception("Can't read key ID"),
+                name = (cursor.getString(PROJECTION_KEY_NAME) as String?)
+                        ?: throw Exception("Can't read key name"),
+                value = (cursor.getString(PROJECTION_KEY_VALUE) as String?)
+                        ?: throw Exception("Can't read key value"),
+                encrypted = ((cursor.getInt(PROJECTION_KEY_IS_ENCRYPTED) as Int?)
+                        ?: throw Exception("Can't get isEncrypted flag")) != 0,
+                replaceRequested = ((cursor.getInt(PROJECTION_KEY_IS_REPLACEMENT_REQUESTED) as Int?)
+                        ?: throw Exception("Can't get isReplacementRequested flag")) != 0,
+                replacementKeyId = (cursor.getLong(PROJECTION_KEY_REPLACEMENT_KEY_ID) as Long?)
+                        ?: throw Exception("Can't read key replacement ID"),
+                deleteAfter = (cursor.getLong(PROJECTION_KEY_DELETE_AFTER) as Long?)
+                        ?: throw Exception("Can't read key deleteAfter")
         )
     }
 

@@ -19,7 +19,7 @@
         android:theme="@style/AppTheme">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:launchMode="singleTask"
             >
             <intent-filter>
@@ -49,13 +49,13 @@
         </activity>
 
         <activity
-            android:name=".TextViewActivity"
-            android:parentActivityName=".MainActivity"
+            android:name=".ui.TextViewActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:permission="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT">
         </activity>
 
-        <activity android:name=".KeysActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".ui.KeysActivity"
+            android:parentActivityName=".ui.MainActivity"/>
     </application>
 
 </manifest>

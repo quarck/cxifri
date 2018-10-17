@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.utils
 
 fun ByteArray.wipe() {
     for (i in 0 until size)

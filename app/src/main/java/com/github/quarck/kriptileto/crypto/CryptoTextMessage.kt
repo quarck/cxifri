@@ -1,10 +1,10 @@
 // Draft class for what become KriptiletoMessage lately
 
 
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.crypto
 
+import com.github.quarck.kriptileto.keysdb.KeyEntry
 import org.bouncycastle.crypto.BlockCipher
-import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.util.encoders.UrlBase64
 
 class CryptoTextMessage(var createEngine: ()->BlockCipher, val keyGenerator: (String) -> ByteArray) {

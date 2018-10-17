@@ -1,6 +1,8 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.crypto
 
-import org.bouncycastle.crypto.BlockCipher
+import com.github.quarck.kriptileto.dataprocessing.GZipBlob
+import com.github.quarck.kriptileto.dataprocessing.UrlWrapper
+import com.github.quarck.kriptileto.keysdb.KeyEntry
 import org.bouncycastle.util.encoders.UrlBase64
 
 class KriptiletoMessage() {
@@ -8,10 +10,10 @@ class KriptiletoMessage() {
     val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
     val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
 
-    val binaryCryptor = CryptoBinaryMessage({AESTwofishSerpentEngine()})
+    val binaryCryptor = CryptoBinaryMessage({ AESTwofishSerpentEngine() })
 
     private fun deriveKeyFromPassword(password: String) =
-        DerivedKeyGenerator.generateForAESTwofishSerpent(password)
+            DerivedKeyGenerator.generateForAESTwofishSerpent(password)
 
     private fun encryptBinaryBlob(message: ByteArray, key: ByteArray): String {
         val encoded = binaryCryptor.encrypt(message, key)

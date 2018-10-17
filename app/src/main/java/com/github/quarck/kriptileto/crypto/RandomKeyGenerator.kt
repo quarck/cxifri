@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.crypto
 
 import java.security.SecureRandom
 

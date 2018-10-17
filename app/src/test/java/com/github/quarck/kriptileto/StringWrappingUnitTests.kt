@@ -1,5 +1,6 @@
 package com.github.quarck.kriptileto
 
+import com.github.quarck.kriptileto.dataprocessing.UrlWrapper
 import org.junit.Test
 
 import org.junit.Assert.*

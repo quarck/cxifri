@@ -1,9 +1,8 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.crypto
 
 import org.bouncycastle.crypto.BlockCipher
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.crypto.InvalidCipherTextException
-import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.macs.CBCBlockCipherMac
 import org.bouncycastle.crypto.modes.CBCBlockCipher
 import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher

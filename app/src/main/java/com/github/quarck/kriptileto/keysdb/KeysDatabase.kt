@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.keysdb
 
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
@@ -10,7 +10,7 @@ import java.io.Closeable
 class KeysDatabase(val context: Context)
     : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_CURRENT_VERSION), Closeable {
 
-    private var impl =  KeysDatabaseImpl()
+    private var impl = KeysDatabaseImpl()
 
     override fun onCreate(db: SQLiteDatabase)
             = impl.createDb(db)

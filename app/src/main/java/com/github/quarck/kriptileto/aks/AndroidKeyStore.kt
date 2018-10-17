@@ -1,6 +1,6 @@
 // Android key store is only used to encrypt keypairs stored in the DB
 // Main app encryption is performed by the Bouncy Castle implementation, not by this
-package com.github.quarck.kriptileto
+package com.github.quarck.kriptileto.aks
 
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
