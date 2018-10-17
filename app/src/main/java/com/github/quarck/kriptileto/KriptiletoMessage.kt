@@ -56,7 +56,7 @@ class KriptiletoMessage() {
         else {
             val binaryMessage = ByteArray(1 + gzipUtf8.size)
             binaryMessage[0] = MESSAGE_FORMAT_GZIP_PLAINTEXT
-            System.arraycopy(utf8, 0, binaryMessage, 1, gzipUtf8.size)
+            System.arraycopy(gzipUtf8, 0, binaryMessage, 1, gzipUtf8.size)
             return binaryMessage
         }
     }

@@ -195,7 +195,7 @@ class MainActivity : Activity() {
         val msg = message.text.toString()
         val key = password.text.toString()
 
-        textViewError.visibility = View.VISIBLE
+        textViewError.visibility = View.GONE
 
         background {
             try {
