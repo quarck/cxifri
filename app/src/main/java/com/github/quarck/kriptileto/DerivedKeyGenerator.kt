@@ -7,12 +7,15 @@ import org.bouncycastle.crypto.params.KeyParameter
 object DerivedKeyGenerator {
 
     val DEFAULT_NUM_ITERATIONS = 10000
+    val SALT_AES = "kriptileto-AES"
+    val SALT_TWOFISH = "kriptileto-Twofish"
+    val SALT_SERPENT = "kriptileto-Serpent"
 
     fun generateForAES(password: String): ByteArray {
         val pGen = PKCS5S2ParametersGenerator(SHA256Digest())
         pGen.init(
                 password.toByteArray(charset = Charsets.UTF_8),
-                "".toByteArray(charset = Charsets.UTF_8),
+                SALT_AES.toByteArray(charset = Charsets.UTF_8),
                 DEFAULT_NUM_ITERATIONS
         )
         val keyLenBytes = 32
@@ -23,9 +26,9 @@ object DerivedKeyGenerator {
     fun generateForAESTwofishSerpent(password: String): ByteArray {
         val keyLenBytesEach = 32
 
-        val saltAES = "cipher-AES".toByteArray(charset = Charsets.UTF_8)
-        val saltTwofish = "cipher-Twofish".toByteArray(charset = Charsets.UTF_8)
-        val saltSerpent = "cipher-Serpent".toByteArray(charset = Charsets.UTF_8)
+        val saltAES = SALT_AES.toByteArray(charset = Charsets.UTF_8)
+        val saltTwofish = SALT_TWOFISH.toByteArray(charset = Charsets.UTF_8)
+        val saltSerpent = SALT_SERPENT.toByteArray(charset = Charsets.UTF_8)
 
         val pGenAES = PKCS5S2ParametersGenerator(SHA256Digest())
         val pGenTwofish = PKCS5S2ParametersGenerator(SHA256Digest())
