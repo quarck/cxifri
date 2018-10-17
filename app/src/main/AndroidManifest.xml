@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.github.quarck.kriptileto">
 
+    <!-- define a permission -->
+    <permission
+        android:protectionLevel="signature"
+        android:name="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT"/>
+
+    <uses-permission android:name="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT" />
+
     <application
         android:allowBackup="false"
         android:fullBackupContent="false"
@@ -19,13 +26,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
 
-        <activity
-            android:name=".TextViewActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="@string/encrypt_decrypt_activity_label"
-            >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -45,6 +46,12 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
+        </activity>
+
+        <activity
+            android:name=".TextViewActivity"
+            android:parentActivityName=".MainActivity"
+            android:permission="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT">
         </activity>
 
         <activity android:name=".KeysActivity"

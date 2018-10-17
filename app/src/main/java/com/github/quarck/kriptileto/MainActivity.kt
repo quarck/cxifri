@@ -9,11 +9,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import org.bouncycastle.crypto.CryptoException
-import org.bouncycastle.crypto.engines.AESEngine
 
 
 class MainActivity : Activity() {
@@ -73,8 +72,8 @@ class MainActivity : Activity() {
     }
 
     fun handleIntent(intent: Intent) {
-        val intentTextExtra = intent.getStringExtra(INTENT_EXTRA_TEXT)
-        val intentKeyIdExtra = intent.getLongExtra(INTENT_EXTRA_KEY_ID, -1L)
+        val intentTextExtra = intent.getStringExtra(TextViewActivity.INTENT_EXTRA_TEXT)
+        val intentKeyIdExtra = intent.getLongExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, -1L)
 
         if (intentKeyIdExtra != -1L) {
             onKeySelected(intentKeyIdExtra)
@@ -89,16 +88,78 @@ class MainActivity : Activity() {
             isTextEncrypted = false
             buttonShare.isEnabled = false
         }
+//        else if (intent.action == Intent.ACTION_SEND) {
+//            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
+//            if (text != null) {
+//                message.setText(text)
+//                isTextEncrypted = false
+//                buttonShare.isEnabled = false
+//            }
+//        }
+        else if (intent.action == Intent.ACTION_VIEW) {
+            val uri = intent.data
+            if (uri != null) {
+                handleTextIntent(uri.toString())
+            }
+        }
         else if (intent.action == Intent.ACTION_SEND) {
             val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
             if (text != null) {
-                message.setText(text)
-                isTextEncrypted = false
-                buttonShare.isEnabled = false
+                handleTextIntent(text)
+            }
+        }
+        else if (intent.action == Intent.ACTION_PROCESS_TEXT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                val text = intent.getCharSequenceExtra(android.content.Intent.EXTRA_PROCESS_TEXT)
+                if (text != null) {
+                    handleTextIntent(text.toString())
+                }
             }
         }
         else {
             buttonShare.isEnabled = false
+        }
+    }
+
+    fun handleTextIntent(text: String) {
+
+        // Text can be either encrypted (user wants to decrypt it) or plaintext (user wants to
+        // encrypt it). Attempt to decrypt using known keys, if success - show the activity
+        // with the decrypted text, otherwise -- just populate text field here
+        background {
+            val keys = KeysDatabase(context = this).use { it.keys }
+            var success = false
+
+            val cryptoMessage = KriptiletoMessage()
+
+            for (key in keys) {
+                try {
+                    val decrypted = cryptoMessage.decrypt(text, key)
+                    if (decrypted != null) {
+                        runOnUiThread {
+                            val intent = Intent(this, TextViewActivity::class.java)
+                            intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, decrypted)
+                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, key.id)
+                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, key.name)
+                            startActivity(intent)
+//                            textViewMessage.setText(decrypted)
+//                            textViewAuthStatus.setText("Decrypted and valid, key: ${key.name}")
+                        }
+                        currentKey = key
+                        success = true
+                        break
+                    }
+                } catch (ex: Exception) {
+                }
+            }
+
+            if (!success) {
+                isTextEncrypted = false // don't allow sharing
+                runOnUiThread {
+                    message.setText(text)
+                    buttonShare.isEnabled = false
+                }
+            }
         }
     }
 
@@ -259,11 +320,6 @@ class MainActivity : Activity() {
     private fun onButtonManageKeys(v: View) {
         val intent = Intent(this, KeysActivity::class.java)
         startActivity(intent)
-    }
-
-    companion object {
-        const val INTENT_EXTRA_TEXT = "text"
-        const val INTENT_EXTRA_KEY_ID = "keyId"
     }
 }
 

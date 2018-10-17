@@ -20,7 +20,7 @@ class TextViewActivity : Activity() {
     lateinit var buttonQuote: Button
     lateinit var buttonCopy: Button
 
-    var currentKey: KeyEntry? = null
+    var currentKeyId: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,62 +44,14 @@ class TextViewActivity : Activity() {
         handleIntent(intent)
     }
 
-    fun handleEncryptedTextIntent(text: String) {
-
-        background {
-            val keys = KeysDatabase(context = this).use { it.keys }
-            var success = false
-
-            val cryptoMessage = KriptiletoMessage()
-
-            for (key in keys) {
-                try {
-                    val decrypted = cryptoMessage.decrypt(text, key)
-                    if (decrypted != null) {
-                        runOnUiThread {
-                            textViewMessage.setText(decrypted)
-                            textViewAuthStatus.setText("Decrypted and valid, key: ${key.name}")
-                        }
-                        currentKey = key
-                        success = true
-                        break
-                    }
-                } catch (ex: Exception) {
-                }
-            }
-
-            if (!success) {
-                runOnUiThread {
-                    val intent = Intent(this, MainActivity::class.java)
-                    intent.putExtra(MainActivity.INTENT_EXTRA_TEXT, text)
-                    startActivity(intent)
-                    finish()
-                }
-            }
-        }
-    }
-
     fun handleIntent(intent: Intent) {
-        if (intent.action == Intent.ACTION_VIEW) {
-            val uri = intent.data
-            if (uri != null) {
-                handleEncryptedTextIntent(uri.toString())
-            }
-        }
-        else if (intent.action == Intent.ACTION_SEND) {
-            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
-            if (text != null) {
-                 handleEncryptedTextIntent(text)
-            }
-        }
-        else if (intent.action == Intent.ACTION_PROCESS_TEXT) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val text = intent.getCharSequenceExtra(android.content.Intent.EXTRA_PROCESS_TEXT)
-                if (text != null) {
-                    handleEncryptedTextIntent(text.toString())
-                }
-            }
-        }
+
+        val text = intent.getStringExtra(INTENT_EXTRA_TEXT) ?: throw Exception("Must give text")
+        currentKeyId = intent.getIntExtra(INTENT_EXTRA_KEY_ID, -1)
+        val keyName = intent.getStringExtra(INTENT_EXTRA_KEY_NAME) ?: throw Exception("Must give key name")
+
+        textViewMessage.setText(text)
+        textViewAuthStatus.setText("Decrypted and valid, key: ${keyName}")
     }
 
     private fun onButtonCopy(v: View) {
@@ -113,27 +65,29 @@ class TextViewActivity : Activity() {
 
     private fun onButtonReply(v: View) {
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra(MainActivity.INTENT_EXTRA_KEY_ID, currentKey?.id ?: -1L)
+        intent.putExtra(INTENT_EXTRA_KEY_ID, currentKeyId)
         startActivity(intent)
         finish()
     }
 
     private fun onButtonQuote(v: View) {
         val intent = Intent(this, MainActivity::class.java)
-        intent.putExtra(MainActivity.INTENT_EXTRA_KEY_ID, currentKey?.id ?: -1L)
+        intent.putExtra(INTENT_EXTRA_KEY_ID, currentKeyId)
         val text =
                 textViewMessage.text.toString()
                         .split("(\\n|\\r\\n)".toRegex())
                         .map { "> $it" }
                         .joinToString("\r\n")
 
-        intent.putExtra(MainActivity.INTENT_EXTRA_TEXT, text)
+        intent.putExtra(INTENT_EXTRA_TEXT, text)
         startActivity(intent)
         finish()
     }
 
     companion object {
-        private const val REQUEST_CODE_CONFIRM_DEVICE_CREDENTIALS = 1
+        const val INTENT_EXTRA_TEXT = "text"
+        const val INTENT_EXTRA_KEY_ID = "keyId"
+        const val INTENT_EXTRA_KEY_NAME = "keyName"
     }
 }
 
