@@ -164,7 +164,7 @@ class KeysActivity : Activity() {
             return
         }
 
-        val key = DerivedKeyGenerator.generateForAESTwofishSerpent(password)
+        val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
 
         KeysDatabase(context = this).use {
             db ->

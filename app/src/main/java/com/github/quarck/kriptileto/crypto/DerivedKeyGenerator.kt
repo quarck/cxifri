@@ -5,7 +5,7 @@ import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator
 import org.bouncycastle.crypto.params.KeyParameter
 
-object DerivedKeyGenerator {
+class DerivedKeyGenerator {
 
     val DEFAULT_NUM_ITERATIONS = 10000
     val SALT_AES = "kriptileto-AES"
@@ -40,11 +40,11 @@ object DerivedKeyGenerator {
         pGenTwofish.init(passAsByteArray, saltTwofish, DEFAULT_NUM_ITERATIONS)
         pGenSerpent.init(passAsByteArray, saltSerpent, DEFAULT_NUM_ITERATIONS)
 
-        passAsByteArray.wipe()
-
         val keyAES = pGenAES.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
-        val keyTwofish = pGenAES.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
-        val keySerpent = pGenAES.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
+        val keyTwofish = pGenTwofish.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
+        val keySerpent = pGenSerpent.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
+
+        passAsByteArray.wipe()
 
         return keyAES.key + keyTwofish.key + keySerpent.key
     }

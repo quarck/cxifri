@@ -13,7 +13,7 @@ class KriptiletoMessage() {
     val binaryCryptor = CryptoBinaryMessage({ AESTwofishSerpentEngine() })
 
     private fun deriveKeyFromPassword(password: String) =
-            DerivedKeyGenerator.generateForAESTwofishSerpent(password)
+            DerivedKeyGenerator().generateForAESTwofishSerpent(password)
 
     private fun encryptBinaryBlob(message: ByteArray, key: ByteArray): String {
         val encoded = binaryCryptor.encrypt(message, key)
