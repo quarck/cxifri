@@ -80,7 +80,9 @@ class KeyStateEntry(
 
 class KeysActivity : Activity() {
     lateinit var keysRoot: LinearLayout
-    lateinit var addNewKeyButton: Button
+    lateinit var addNewPasswordKeyButton: Button
+    lateinit var genNewKeyButton: Button
+    lateinit var scanNewKeyButton: Button
     lateinit var addKeyLayout: LinearLayout
     lateinit var keyName: EditText
     lateinit var keyPassword: EditText
@@ -88,6 +90,7 @@ class KeysActivity : Activity() {
     lateinit var buttonSaveKey: Button
     lateinit var buttonCancel: Button
     lateinit var textError: TextView
+    lateinit var layoutAddNewKeyButtons: LinearLayout
 
     lateinit var keyStates: MutableList<KeyStateEntry>
 
@@ -97,7 +100,9 @@ class KeysActivity : Activity() {
         setContentView(R.layout.activity_keys)
 
         keysRoot = findViewById(R.id.layoutExistingKeysRoot) ?: throw Exception("Layout error")
-        addNewKeyButton = findViewById(R.id.buttonAddNewKey) ?: throw Exception("Layout error")
+        addNewPasswordKeyButton = findViewById(R.id.buttonAddNewPasswordKey) ?: throw Exception("Layout error")
+        genNewKeyButton = findViewById(R.id.buttonGenerateRandomKey) ?: throw Exception("Layout error")
+        scanNewKeyButton = findViewById(R.id.buttonScanRandomKey) ?: throw Exception("Layout error")
         addKeyLayout = findViewById(R.id.layoutAddKey) ?: throw Exception("Layout error")
         keyName = findViewById(R.id.keyName) ?: throw Exception("Layout error")
         keyPassword = findViewById(R.id.password) ?: throw Exception("Layout error")
@@ -105,6 +110,9 @@ class KeysActivity : Activity() {
         buttonSaveKey = findViewById(R.id.buttonSaveKey) ?: throw Exception("Layout error")
         buttonCancel = findViewById(R.id.buttonCancel) ?: throw Exception("Layout error")
         textError = findViewById(R.id.textError) ?: throw Exception("Layout error")
+        layoutAddNewKeyButtons = findViewById(R.id.layoutAddNewKeyButtons) ?: throw Exception("Layout error")
+
+        addKeyLayout.visibility = View.GONE
 
         val keys = KeysDatabase(context = this).use { it.keys }
         keyStates = mutableListOf<KeyStateEntry>()
@@ -123,19 +131,29 @@ class KeysActivity : Activity() {
 
         }
 
-        addNewKeyButton.setOnClickListener(this::onButtonAddKey)
+        addNewPasswordKeyButton.setOnClickListener(this::onButtonAddPasswordKey)
+        genNewKeyButton.setOnClickListener(this::onButtonGenerateKey)
+        scanNewKeyButton.setOnClickListener(this::onButtonScanNewKey)
 
-        buttonSaveKey.setOnClickListener(this::onButtonSave)
+        buttonSaveKey.setOnClickListener(this::onButtonAddPasswordKeySave)
 
-        buttonCancel.setOnClickListener(this::onButtonCancel)
+        buttonCancel.setOnClickListener(this::onButtonAddPasswordKeyCancel)
     }
 
-    private fun onButtonAddKey(v: View) {
-        addNewKeyButton.visibility = View.GONE
+    private fun onButtonAddPasswordKey(v: View) {
+        layoutAddNewKeyButtons.visibility = View.GONE
         addKeyLayout.visibility = View.VISIBLE
     }
 
-    private fun onButtonSave(v: View) {
+    private fun onButtonGenerateKey(v: View) {
+
+    }
+
+    private fun onButtonScanNewKey(v: View) {
+
+    }
+
+    private fun onButtonAddPasswordKeySave(v: View) {
 
         val name = keyName.text.toString()
         val password = keyPassword.text.toString()
@@ -189,13 +207,13 @@ class KeysActivity : Activity() {
 
         reload()
 
-//            addNewKeyButton.visibility = View.VISIBLE
+//            addNewPasswordKeyButton.visibility = View.VISIBLE
 //            addKeyLayout.visibility = View.GONE
     }
 
 
-    private fun onButtonCancel(v: View) {
-        addNewKeyButton.visibility = View.VISIBLE
+    private fun onButtonAddPasswordKeyCancel(v: View) {
+        layoutAddNewKeyButtons.visibility = View.VISIBLE
         addKeyLayout.visibility = View.GONE
     }
 

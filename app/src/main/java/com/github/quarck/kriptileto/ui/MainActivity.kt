@@ -175,8 +175,8 @@ class MainActivity : Activity() {
         builder.setIcon(R.drawable.ic_launcher_foreground)
         builder.setTitle("Pick a key")
 
-        val names = listOf<String>("Custom") + keys.map { it.name }.toList()
-        val values = listOf<Long>(-1L) + keys.map { it.id }.toList()
+        val names = keys.map { it.name }.toList() + listOf<String>("Text password")
+        val values = keys.map { it.id }.toList() + listOf<Long>(-1L)
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, names)
 
@@ -275,7 +275,16 @@ class MainActivity : Activity() {
                         buttonShare.isEnabled = isTextEncrypted
                     }
                 }
+                else
+                    runOnUiThread {
+                        textViewError.visibility = View.VISIBLE
+                        textViewError.setText("Failed to decrypt (wrong key?)")
+                    }
             } catch (ex: Exception) {
+                runOnUiThread {
+                    textViewError.visibility = View.VISIBLE
+                    textViewError.setText("Failed to decrypt (wrong key?)")
+                }
             }
         }
     }
