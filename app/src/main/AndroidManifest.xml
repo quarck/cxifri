@@ -4,10 +4,10 @@
 
     <!-- define a permission -->
     <permission
-        android:protectionLevel="signature"
-        android:name="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT"/>
+        android:name="com.github.quarck.kriptileto.INTERNAL_ACTIVITY"
+        android:protectionLevel="signature" />
 
-    <uses-permission android:name="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT" />
+    <uses-permission android:name="com.github.quarck.kriptileto.INTERNAL_ACTIVITY" />
 
     <application
         android:allowBackup="false"
@@ -20,42 +20,81 @@
 
         <activity
             android:name=".ui.MainActivity"
-            android:launchMode="singleTask"
-            >
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- https://privmsg.space/ URL handler -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https" android:host="privmsg.space" />
+
+                <data
+                    android:host="privmsg.space"
+                    android:scheme="https" />
             </intent-filter>
 
+            <!-- "share to" text handled -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
 
+            <!-- Text selection contextual menu handler -->
             <intent-filter>
                 <action android:name="android.intent.action.PROCESS_TEXT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
-
         </activity>
 
         <activity
             android:name=".ui.TextViewActivity"
             android:parentActivityName=".ui.MainActivity"
-            android:permission="com.github.quarck.kriptileto.SHOW_DECRYPTED_TEXT">
+            android:permission="com.github.quarck.kriptileto.INTERNAL_ACTIVITY">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.quarck.kriptileto.ui.MainActivity" />
         </activity>
 
-        <activity android:name=".ui.KeysActivity"
-            android:parentActivityName=".ui.MainActivity"/>
+        <activity
+            android:name=".ui.KeysActivity"
+            android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.quarck.kriptileto.ui.MainActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.RandomKeyGenerationActivity"
+            android:label="@string/title_activity_random_key_generation"
+            android:parentActivityName=".ui.KeysActivity"
+            android:permission="com.github.quarck.kriptileto.INTERNAL_ACTIVITY">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.quarck.kriptileto.ui.KeysActivity" />
+        </activity>
+
+        <activity
+            android:name=".ui.RandomKeyScanActivity"
+            android:label="@string/title_activity_random_key_scan"
+            android:parentActivityName=".ui.KeysActivity"
+            android:permission="com.github.quarck.kriptileto.INTERNAL_ACTIVITY">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.github.quarck.kriptileto.ui.KeysActivity" />
+        </activity>
+
     </application>
 
 </manifest>

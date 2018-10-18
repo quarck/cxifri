@@ -29,4 +29,6 @@
     <string name="aks_comment">AndroidKeyStore is a secure storage backed by the device encryption hardware. Storing key with AndroidKeyStore is generally more secure, but on some devices you might loose access to stored keys if you change your device password (and possibly under other similar circumstancies)</string>
     <string name="generate_random_key">Gen. Random Key</string>
     <string name="scan_random_key">Scan random key</string>
+    <string name="title_activity_random_key_generation">Random Key</string>
+    <string name="title_activity_random_key_scan">Scan Random Key</string>
 </resources>
