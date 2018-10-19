@@ -146,11 +146,13 @@ class KeysActivity : Activity() {
     }
 
     private fun onButtonGenerateKey(v: View) {
-
+        val intent = Intent(this, RandomKeyGenerationActivity::class.java)
+        startActivity(intent)
     }
 
     private fun onButtonScanNewKey(v: View) {
-
+        val intent = Intent(this, RandomKeyScanActivity::class.java)
+        startActivity(intent)
     }
 
     private fun onButtonAddPasswordKeySave(v: View) {
