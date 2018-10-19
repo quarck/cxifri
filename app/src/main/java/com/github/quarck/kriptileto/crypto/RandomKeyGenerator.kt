@@ -2,7 +2,7 @@ package com.github.quarck.kriptileto.crypto
 
 import java.security.SecureRandom
 
-object RandomKeyGenerator {
+class RandomKeyGenerator {
     val random: SecureRandom by lazy { SecureRandom() }
 
     fun generate(lenBytes: Int): ByteArray {

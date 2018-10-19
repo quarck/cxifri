@@ -7,6 +7,9 @@ import org.bouncycastle.util.encoders.UrlBase64
 
 class KriptiletoMessage() {
 
+    // TODO: we certainly need "tryDecryt" method receiving an array of keys as an argument
+    // so to avoid repeated un-base64-ing of the message every time
+
     val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
     val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
 

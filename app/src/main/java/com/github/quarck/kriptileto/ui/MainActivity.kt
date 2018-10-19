@@ -137,6 +137,7 @@ class MainActivity : Activity() {
 
             val cryptoMessage = KriptiletoMessage()
 
+            // TODO: move this to a "worker" file
             for (key in keys) {
                 try {
                     val decrypted = cryptoMessage.decrypt(text, key)
