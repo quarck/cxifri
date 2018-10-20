@@ -13,25 +13,36 @@
         tools:context=".ui.RandomKeyGenerationActivity"
         android:orientation="vertical">
 
+        <!-- To catch focus -->
+        <LinearLayout
+            android:id="@+id/layout_focus_catcher"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:focusableInTouchMode="true"
+            android:layout_width="0px"
+            android:layout_height="0px"
+            tools:ignore="UselessLeaf" />
+
         <ImageView
             android:id="@+id/imageViewQR"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="0dp"
             android:scaleType="fitCenter"
-            android:src="@android:color/black" />
+            android:src="@android:color/black"
+            android:contentDescription="@string/qr_code" />
 
         <TextView
             android:id="@+id/textViewWarning"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Warning: after you hit 'save' you would not be able to see this QR code again" />
+            android:text="@string/qr_code_warning" />
 
         <TextView
             android:id="@+id/textViewKeyName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Enter Key Name:" />
+            android:text="@string/enter_key_name" />
 
         <EditText
             android:id="@+id/editTextKeyName"
@@ -39,7 +50,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:text="Name" />
+            android:text=""
+            android:hint="@string/key_name"/>
 
         <Button
             android:id="@+id/buttonSave"

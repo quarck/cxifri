@@ -8,6 +8,7 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.github.quarck.kriptileto.INTERNAL_ACTIVITY" />
+    <uses-permission android:name="android.permission.CAMERA" /> <!-- for QR-code based key sharing -->
 
     <application
         android:allowBackup="false"

@@ -31,4 +31,8 @@
     <string name="scan_random_key">Scan random key</string>
     <string name="title_activity_random_key_generation">Random Key</string>
     <string name="title_activity_random_key_scan">Scan Random Key</string>
+    <string name="qr_code">QR Code</string>
+    <string name="qr_code_warning">Warning: after you hit \'save\' you would not be able to see this QR code again</string>
+    <string name="enter_key_name">Enter Key Name:</string>
+    <string name="key_name">Key name</string>
 </resources>
