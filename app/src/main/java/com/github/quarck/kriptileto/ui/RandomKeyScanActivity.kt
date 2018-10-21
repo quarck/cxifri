@@ -39,6 +39,8 @@ import com.github.quarck.kriptileto.crypto.AESTwofishSerpentEngine
 import com.github.quarck.kriptileto.keysdb.KeyEntry
 import com.github.quarck.kriptileto.keysdb.KeysDatabase
 import com.github.quarck.kriptileto.ui.camera.CameraManager
+import com.github.quarck.kriptileto.utils.hasCameraPermission
+import com.github.quarck.kriptileto.utils.requestCameraPermission
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import org.bouncycastle.util.encoders.UrlBase64
@@ -308,9 +310,9 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
     override fun onResume() {
         super.onResume()
 
-//    // historyManager must be initialized here to update the history preference
-//    historyManager = HistoryManager(this)
-//    historyManager!!.trimHistory()
+        if (!this.hasCameraPermission) {
+            this.requestCameraPermission()
+        }
 
         // CameraManager must be initialized here, not in onCreate(). This is necessary because we don't
         // want to open the camera driver and measure the screen size if we're going to show the help on
