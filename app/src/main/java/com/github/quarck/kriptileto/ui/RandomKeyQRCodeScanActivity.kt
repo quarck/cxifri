@@ -17,10 +17,7 @@ package com.github.quarck.kriptileto.ui
  */
 
 import android.app.Activity
-import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.*
 import android.util.Log
 import android.view.SurfaceHolder
@@ -33,7 +30,9 @@ import android.widget.LinearLayout
 import com.github.quarck.kriptileto.R
 import com.github.quarck.kriptileto.aks.AndroidKeyStore
 import com.github.quarck.kriptileto.crypto.AESTwofishSerpentEngine
+import com.github.quarck.kriptileto.crypto.RandomKeyGenerator
 import com.github.quarck.kriptileto.keysdb.KeyEntry
+import com.github.quarck.kriptileto.keysdb.KeySaveHelper
 import com.github.quarck.kriptileto.keysdb.KeysDatabase
 import com.github.quarck.kriptileto.ui.camera.CameraManager
 import com.github.quarck.kriptileto.utils.hasCameraPermission
@@ -41,7 +40,6 @@ import com.github.quarck.kriptileto.utils.requestCameraPermission
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import org.bouncycastle.util.encoders.UrlBase64
-import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.CountDownLatch
@@ -56,10 +54,10 @@ import java.util.concurrent.CountDownLatch
  * @author Sean Owen
  */
 
-class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
+class RandomKeyQRCodeScanActivity : Activity(), SurfaceHolder.Callback {
 
 
-    internal class DecodeThread(val activity: RandomKeyScanActivity) : Thread() {
+    internal class DecodeThread(val activity: RandomKeyQRCodeScanActivity) : Thread() {
 
         private val hints: MutableMap<DecodeHintType, Any> =
                 EnumMap<DecodeHintType, Any>(DecodeHintType::class.java).apply {
@@ -87,7 +85,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
         }
     }
 
-    internal class DecodeHandler(private val activity: RandomKeyScanActivity, hints: kotlin.collections.Map<DecodeHintType, Any>) : Handler() {
+    internal class DecodeHandler(private val activity: RandomKeyQRCodeScanActivity, hints: kotlin.collections.Map<DecodeHintType, Any>) : Handler() {
         private val multiFormatReader: MultiFormatReader
         private var running = true
 
@@ -152,7 +150,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
     }
 
 
-    class CaptureActivityHandler(private val activity: RandomKeyScanActivity,
+    class CaptureActivityHandler(private val activity: RandomKeyQRCodeScanActivity,
                                  private val cameraManager: CameraManager?) : Handler() {
         private val decodeThread: DecodeThread
         private var state: State? = null
@@ -337,43 +335,19 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
 
         Log.e(TAG, "Result: ${rawResult.text}")
 
-        val rawKey = UrlBase64.decode(rawResult.text)
+        val rawKey = RandomKeyGenerator().verifyChecksum(UrlBase64.decode(rawResult.text))
 
-        if (rawKey.size == AESTwofishSerpentEngine.KEY_LENGTH_BYTES) {
+        if (rawKey != null && rawKey.size == AESTwofishSerpentEngine.KEY_LENGTH_BYTES) {
             shutdownScanning()
             findViewById<LinearLayout>(R.id.layoutKeyNameAndSave).visibility = View.VISIBLE
             findViewById<View>(R.id.fillWhiteView).visibility = View.VISIBLE
             findViewById<Button>(R.id.buttonSave)?.setOnClickListener {
                 val name = findViewById<EditText>(R.id.editTextKeyName).text.toString()
-                saveKey(name, rawKey)
+                KeySaveHelper().saveKey(this, name, rawKey, true)
                 finish()
             }
         }
     }
-
-    private fun saveKey(name: String, key: ByteArray) {
-        KeysDatabase(context = this).use {
-            db ->
-
-            val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
-
-            val updatedKeyEntry =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val aks = AndroidKeyStore()
-                        aks.createKey(id) // create matchng keystore key that would be encrypting this key in DB
-                        val encryptedKey = aks.encrypt(id, key)
-                        val encryptedBase64Key = UrlBase64.encode(encryptedKey)
-                        KeyEntry(id, name, encryptedBase64Key.toString(charset = Charsets.UTF_8), true)
-                    }
-                    else {
-                        val base64Key = UrlBase64.encode(key)
-                        KeyEntry(id, name, base64Key.toString(charset = Charsets.UTF_8), false)
-                    }
-
-            db.update(updatedKeyEntry)
-        }
-    }
-
 
     private fun initCamera(surfaceHolder: SurfaceHolder?) {
         if (surfaceHolder == null)
@@ -405,7 +379,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
 //    fun getViewfinderViewX() = viewfinderView
 
     companion object {
-        private val TAG = RandomKeyScanActivity::class.java.simpleName
+        private val TAG = RandomKeyQRCodeScanActivity::class.java.simpleName
 
         val BARCODE_BITMAP = "barcode_bitmap"
         val BARCODE_SCALED_FACTOR = "barcode_scaled_factor"

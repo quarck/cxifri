@@ -13,6 +13,7 @@ import com.github.quarck.kriptileto.aks.AndroidKeyStore
 import com.github.quarck.kriptileto.crypto.DerivedKeyGenerator
 import com.github.quarck.kriptileto.R
 import com.github.quarck.kriptileto.keysdb.KeyEntry
+import com.github.quarck.kriptileto.keysdb.KeySaveHelper
 import com.github.quarck.kriptileto.keysdb.KeysDatabase
 import org.bouncycastle.util.encoders.UrlBase64
 
@@ -92,6 +93,7 @@ class KeysActivity : Activity() {
     lateinit var buttonCancel: Button
     lateinit var textError: TextView
     lateinit var layoutAddNewKeyButtons: LinearLayout
+    lateinit var checkboxPreferAndroidKeyStore: CheckBox
 
     lateinit var keyStates: MutableList<KeyStateEntry>
 
@@ -112,6 +114,7 @@ class KeysActivity : Activity() {
         buttonCancel = findViewById(R.id.buttonCancel) ?: throw Exception("Layout error")
         textError = findViewById(R.id.textError) ?: throw Exception("Layout error")
         layoutAddNewKeyButtons = findViewById(R.id.layoutAddNewKeyButtons) ?: throw Exception("Layout error")
+        checkboxPreferAndroidKeyStore = findViewById(R.id.checkBoxPreferAndroidKeyStore) ?: throw Exception("Layout error")
 
         addKeyLayout.visibility = View.GONE
 
@@ -147,12 +150,12 @@ class KeysActivity : Activity() {
     }
 
     private fun onButtonGenerateKey(v: View) {
-        val intent = Intent(this, RandomKeyGenerationActivity::class.java)
+        val intent = Intent(this, RandomKeyQRCodeShareActivity::class.java)
         startActivity(intent)
     }
 
     private fun onButtonScanNewKey(v: View) {
-        val intent = Intent(this, RandomKeyScanActivity::class.java)
+        val intent = Intent(this, RandomKeyQRCodeScanActivity::class.java)
         startActivity(intent)
     }
 
@@ -186,32 +189,9 @@ class KeysActivity : Activity() {
         }
 
         val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
-
-        KeysDatabase(context = this).use {
-            db ->
-
-            val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
-
-            val updatedKeyEntry =
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        val aks = AndroidKeyStore()
-                        aks.createKey(id) // create matchng keystore key that would be encrypting this key in DB
-                        val encryptedKey = aks.encrypt(id, key)
-                        val encryptedBase64Key = UrlBase64.encode(encryptedKey)
-                        KeyEntry(id, name, encryptedBase64Key.toString(charset = Charsets.UTF_8), true)
-                    }
-                    else {
-                        val base64Key = UrlBase64.encode(key)
-                        KeyEntry(id, name, base64Key.toString(charset = Charsets.UTF_8), false)
-                    }
-
-            db.update(updatedKeyEntry)
-        }
+        KeySaveHelper().saveKey(this, name, key, checkboxPreferAndroidKeyStore.isChecked)
 
         reload()
-
-//            addNewPasswordKeyButton.visibility = View.VISIBLE
-//            addKeyLayout.visibility = View.GONE
     }
 
 

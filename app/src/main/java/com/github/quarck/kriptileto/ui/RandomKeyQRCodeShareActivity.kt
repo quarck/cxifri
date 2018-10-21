@@ -15,11 +15,9 @@ import com.github.quarck.kriptileto.dataprocessing.QREncoder
 import com.github.quarck.kriptileto.keysdb.KeyEntry
 import com.github.quarck.kriptileto.keysdb.KeysDatabase
 
-import kotlinx.android.synthetic.main.activity_random_key_generation.*
 import org.bouncycastle.util.encoders.UrlBase64
-import org.bouncycastle.util.encoders.UrlBase64Encoder
 
-class RandomKeyGenerationActivity : Activity() {
+class RandomKeyQRCodeShareActivity : Activity() {
 
     lateinit var key: ByteArray
 
@@ -32,8 +30,7 @@ class RandomKeyGenerationActivity : Activity() {
 
         val gen = QREncoder(512)
 
-        val keyGen = RandomKeyGenerator()
-        key = keyGen.generate(AESTwofishSerpentEngine.KEY_LENGTH_BYTES)
+        key = RandomKeyGenerator().generate(AESTwofishSerpentEngine.KEY_LENGTH_BYTES, withChecksum= true)
         val base64key = UrlBase64.encode(key).toString(charset = Charsets.UTF_8)
 
         val img = gen.encodeAsBitmap(base64key)
