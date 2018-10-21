@@ -61,29 +61,18 @@ import java.util.concurrent.CountDownLatch
 
 class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
 
-    internal class DecodeThread(private val activity: RandomKeyScanActivity,
-                                baseHints: kotlin.collections.Map<DecodeHintType, Any>?,
-                                characterSet: String?) : Thread() {
-        private val hints: MutableMap<DecodeHintType, Any>
+
+    internal class DecodeThread(val activity: RandomKeyScanActivity) : Thread() {
+
+        private val hints: MutableMap<DecodeHintType, Any> =
+                EnumMap<DecodeHintType, Any>(DecodeHintType::class.java).apply {
+                    this[DecodeHintType.POSSIBLE_FORMATS] = EnumSet.of(BarcodeFormat.QR_CODE)
+                }
+
         private var handler: Handler? = null
-        private val handlerInitLatch: CountDownLatch
+        private val handlerInitLatch = CountDownLatch(1)
 
-        init {
-            handlerInitLatch = CountDownLatch(1)
-
-            hints = EnumMap(DecodeHintType::class.java)
-            if (baseHints != null) {
-                hints.putAll(baseHints)
-            }
-            hints[DecodeHintType.POSSIBLE_FORMATS] = EnumSet.of(BarcodeFormat.QR_CODE)
-
-            if (characterSet != null) {
-                hints[DecodeHintType.CHARACTER_SET] = characterSet
-            }
-            //hints[DecodeHintType.NEED_RESULT_POINT_CALLBACK] = resultPointCallback
-        }
-
-        fun getHandlerW(): Handler {
+        fun getThreadHandler(): Handler {
             try {
                 handlerInitLatch.await()
             } catch (ie: InterruptedException) {
@@ -99,13 +88,6 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
             handlerInitLatch.countDown()
             Looper.loop()
         }
-
-        companion object {
-
-            val BARCODE_BITMAP = "barcode_bitmap"
-            val BARCODE_SCALED_FACTOR = "barcode_scaled_factor"
-        }
-
     }
 
     internal class DecodeHandler(private val activity: RandomKeyScanActivity, hints: kotlin.collections.Map<DecodeHintType, Any>) : Handler() {
@@ -122,10 +104,10 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
                 return
             }
             when (message.what) {
-                0 -> {
+                MSG_DECODER_HANDLER_DECODE -> {
                     decode(message.obj as ByteArray, message.arg1, message.arg2)
                 }
-                1 -> {
+                MSG_DECODER_HANDLER_QUIT -> {
                     running = false
                     Looper.myLooper()!!.quit()
                 }
@@ -141,9 +123,11 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
          * @param height The height of the preview frame.
          */
         private fun decode(data: ByteArray, width: Int, height: Int) {
-            val start = System.currentTimeMillis()
+
             var rawResult: Result? = null
+
             val source = activity.cameraManager()?.buildLuminanceSource(data, width, height)
+
             if (source != null) {
                 val bitmap = BinaryBitmap(HybridBinarizer(source))
                 try {
@@ -155,50 +139,24 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
                 }
             }
 
-            val handler = activity.getHandler()
-            if (rawResult != null) {
-                // Don't log the barcode contents for security.
-                val end = System.currentTimeMillis()
-                Log.d(TAG, "Found barcode in " + (end - start) + " ms")
-                if (handler != null) {
-                    val message = Message.obtain(handler, 1, rawResult)
-                    val bundle = Bundle()
-                    bundleThumbnail(source!!, bundle)
-                    message.data = bundle
+            activity.getHandler()?.let {
+                handler ->
+
+                if (rawResult != null) {
+                    val message = Message.obtain(handler, MSG_CAPTURE_HANDLER_DECODE_SUCCEEDED, rawResult)
+                    message.sendToTarget()
+                } else {
+                    val message = Message.obtain(handler, MSG_CAPTURE_HANDLER_FAILED)
                     message.sendToTarget()
                 }
-            } else {
-                if (handler != null) {
-                    val message = Message.obtain(handler, 2)
-                    message.sendToTarget()
-                }
-            }
-        }
-
-        companion object {
-
-            private val TAG = DecodeHandler::class.java.simpleName
-
-            private fun bundleThumbnail(source: PlanarYUVLuminanceSource, bundle: Bundle) {
-                val pixels = source.renderThumbnail()
-                val width = source.thumbnailWidth
-                val height = source.thumbnailHeight
-                val bitmap = Bitmap.createBitmap(pixels, 0, width, width, height, Bitmap.Config.ARGB_8888)
-                val out = ByteArrayOutputStream()
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 50, out)
-                bundle.putByteArray(DecodeThread.BARCODE_BITMAP, out.toByteArray())
-                bundle.putFloat(DecodeThread.BARCODE_SCALED_FACTOR, width.toFloat() / source.width)
             }
         }
 
     }
 
 
-    class CaptureActivityHandler internal constructor(private val activity: RandomKeyScanActivity,
-                                                      decodeFormats: MutableCollection<BarcodeFormat>,
-                                                      baseHints: kotlin.collections.Map<DecodeHintType, Any>?,
-                                                      characterSet: String?,
-                                                      private val cameraManager: CameraManager?) : Handler() {
+    class CaptureActivityHandler(private val activity: RandomKeyScanActivity,
+                                 private val cameraManager: CameraManager?) : Handler() {
         private val decodeThread: DecodeThread
         private var state: State? = null
 
@@ -209,7 +167,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
         }
 
         init {
-            decodeThread = DecodeThread(activity, baseHints, characterSet)
+            decodeThread = DecodeThread(activity)
             decodeThread.start()
             state = State.SUCCESS
             cameraManager?.startPreview()
@@ -217,44 +175,23 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
         }// Start ourselves capturing previews and decoding.
 
         override fun handleMessage(message: Message) {
-            when (message.what) {
-                0 // R.id.restart_preview:
-                -> restartPreviewAndDecode()
-                1 // R.id.decode_succeeded:
-                -> {
-                    state = State.SUCCESS
-                    val bundle = message.data
-                    var barcode: Bitmap? = null
-                    var scaleFactor = 1.0f
-                    if (bundle != null) {
-                        val compressedBitmap = bundle.getByteArray(DecodeThread.BARCODE_BITMAP)
-                        if (compressedBitmap != null) {
-                            barcode = BitmapFactory.decodeByteArray(compressedBitmap, 0, compressedBitmap.size, null)
-                            // Mutable copy:
-                            barcode = barcode!!.copy(Bitmap.Config.ARGB_8888, true)
-                        }
-                        scaleFactor = bundle.getFloat(DecodeThread.BARCODE_SCALED_FACTOR)
-                    }
-                    activity.handleDecode(message.obj as Result, barcode, scaleFactor)
-                }
-                2 //R.id.decode_failed:
-                -> {
-                    // We're decoding as fast as possible, so when one decode fails, start another.
-                    state = State.PREVIEW
-                    cameraManager?.requestPreviewFrame(decodeThread.getHandlerW(), 0)
-                }
-                3// R.id.return_scan_result:
-                -> {
-                    activity.setResult(Activity.RESULT_OK, message.obj as Intent)
-                    activity.finish()
-                }
+            if (message.what == MSG_CAPTURE_HANDLER_RESTART_PREVIEW) {
+                restartPreviewAndDecode()
+            } else if (message.what == MSG_CAPTURE_HANDLER_DECODE_SUCCEEDED) {
+                state = State.SUCCESS
+                activity.handleDecode(message.obj as Result)
+            }
+            else if (message.what == MSG_CAPTURE_HANDLER_FAILED) {
+                // We're decoding as fast as possible, so when one decode fails, start another.
+                state = State.PREVIEW
+                cameraManager?.requestPreviewFrame(decodeThread.getThreadHandler(), 0)
             }
         }
 
         fun quitSynchronously() {
             state = State.DONE
             cameraManager?.stopPreview()
-            val quit = Message.obtain(decodeThread.getHandlerW(), 1)
+            val quit = Message.obtain(decodeThread.getThreadHandler(), MSG_DECODER_HANDLER_QUIT)
             quit.sendToTarget()
             try {
                 // Wait at most half a second; should be enough time, and onPause() will timeout quickly
@@ -264,14 +201,14 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
             }
 
             // Be absolutely sure we don't send any queued up messages
-            removeMessages(1)
-            removeMessages(2)
+            removeMessages(MSG_CAPTURE_HANDLER_DECODE_SUCCEEDED)
+            removeMessages(MSG_CAPTURE_HANDLER_FAILED)
         }
 
         private fun restartPreviewAndDecode() {
             if (state == State.SUCCESS) {
                 state = State.PREVIEW
-                cameraManager?.requestPreviewFrame(decodeThread.getHandlerW(), 0)
+                cameraManager?.requestPreviewFrame(decodeThread.getThreadHandler(), MSG_DECODER_HANDLER_DECODE)
                 activity.drawViewfinder()
             }
         }
@@ -283,7 +220,6 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
     private lateinit var viewfinderView: ViewfinderView
     private var lastResult: Result? = null
     private var hasSurface: Boolean = false
-    private var copyToClipboard: Boolean = false
 
     private lateinit var inactivityTimer: InactivityTimer
 
@@ -329,8 +265,6 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
 
         inactivityTimer.onResume()
-
-        copyToClipboard = false
 
         val surfaceView = findViewById(R.id.preview_view) as SurfaceView
         val surfaceHolder = surfaceView.holder
@@ -400,7 +334,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
      * @param scaleFactor amount by which thumbnail was scaled
      * @param barcode   A greyscale bitmap of the camera data which was decoded.
      */
-    fun handleDecode(rawResult: Result, barcode: Bitmap?, scaleFactor: Float) {
+    fun handleDecode(rawResult: Result) {
         inactivityTimer.onActivity()
         lastResult = rawResult
 
@@ -457,7 +391,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
             cameraManager?.openDriver(surfaceHolder)
             // Creating the handler starts the preview, which can also throw a RuntimeException.
             if (handler == null) {
-                handler = CaptureActivityHandler(this, mutableSetOf(BarcodeFormat.QR_CODE), null, null, cameraManager)
+                handler = CaptureActivityHandler(this, cameraManager)
             }
         } catch (ioe: IOException) {
             Log.w(TAG, ioe)
@@ -475,6 +409,17 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
 
     companion object {
         private val TAG = RandomKeyScanActivity::class.java.simpleName
+
+        val BARCODE_BITMAP = "barcode_bitmap"
+        val BARCODE_SCALED_FACTOR = "barcode_scaled_factor"
+
+        val MSG_DECODER_HANDLER_DECODE = 0
+        val MSG_DECODER_HANDLER_QUIT = 1
+
+        val MSG_CAPTURE_HANDLER_RESTART_PREVIEW = 0
+        val MSG_CAPTURE_HANDLER_DECODE_SUCCEEDED = 1
+        val MSG_CAPTURE_HANDLER_FAILED = 2
     }
+
 }
 
