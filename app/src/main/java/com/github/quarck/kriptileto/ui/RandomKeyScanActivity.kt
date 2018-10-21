@@ -21,10 +21,7 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
+import android.os.*
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -361,7 +358,7 @@ class RandomKeyScanActivity : Activity(), SurfaceHolder.Callback {
             val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
 
             val updatedKeyEntry =
-                    if (AndroidKeyStore.isSupported) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         val aks = AndroidKeyStore()
                         aks.createKey(id) // create matchng keystore key that would be encrypting this key in DB
                         val encryptedKey = aks.encrypt(id, key)

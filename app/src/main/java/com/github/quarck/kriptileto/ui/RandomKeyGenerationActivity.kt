@@ -2,6 +2,7 @@ package com.github.quarck.kriptileto.ui
 
 import android.os.Bundle
 import android.app.Activity
+import android.os.Build
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -58,7 +59,7 @@ class RandomKeyGenerationActivity : Activity() {
             val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
 
             val updatedKeyEntry =
-                    if (AndroidKeyStore.isSupported) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         val aks = AndroidKeyStore()
                         aks.createKey(id) // create matchng keystore key that would be encrypting this key in DB
                         val encryptedKey = aks.encrypt(id, key)

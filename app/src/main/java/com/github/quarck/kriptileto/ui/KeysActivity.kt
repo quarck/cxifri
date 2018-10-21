@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -192,7 +193,7 @@ class KeysActivity : Activity() {
             val id = db.add(KeyEntry.forName("_")) // temp name to make sure it was updated
 
             val updatedKeyEntry =
-                    if (AndroidKeyStore.isSupported) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         val aks = AndroidKeyStore()
                         aks.createKey(id) // create matchng keystore key that would be encrypting this key in DB
                         val encryptedKey = aks.encrypt(id, key)
@@ -225,7 +226,7 @@ class KeysActivity : Activity() {
 
     private fun onDeleteKey(key: KeyEntry){
 
-        if (AndroidKeyStore.isSupported) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // this will render DB key useless - so do it first thing
             AndroidKeyStore().dropKey(key.id)
         }

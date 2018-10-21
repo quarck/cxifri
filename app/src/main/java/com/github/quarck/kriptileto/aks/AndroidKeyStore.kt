@@ -118,7 +118,7 @@ class AndroidKeyStore() {
         }
     }
 
-    companion object {
-        val isSupported: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-    }
+//    companion object {
+//        val isSupported: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+//    }
 }

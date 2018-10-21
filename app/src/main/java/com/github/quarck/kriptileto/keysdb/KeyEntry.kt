@@ -1,5 +1,6 @@
 package com.github.quarck.kriptileto.keysdb
 
+import android.os.Build
 import com.github.quarck.kriptileto.aks.AndroidKeyStore
 import org.bouncycastle.util.encoders.UrlBase64
 
@@ -21,7 +22,7 @@ data class KeyEntry(
 
     val asDecryptedBinary: ByteArray?
         get() {
-            if (encrypted && !AndroidKeyStore.isSupported) {
+            if (encrypted && (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
                 return null // no encryption is supported - can't decrypt
             }
             val unbase64 = UrlBase64.decode(value)
