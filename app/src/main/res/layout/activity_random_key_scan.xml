@@ -1,21 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
- Copyright (C) 2008 ZXing authors
+<?xml version="1.0" encoding="utf-8"?>
 
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
+<RelativeLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.RandomKeyGenerationActivity">
 
-      http://www.apache.org/licenses/LICENSE-2.0
-
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
- -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
 
     <SurfaceView android:id="@+id/preview_view"
         android:layout_width="fill_parent"
@@ -26,150 +17,40 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"/>
 
-    <LinearLayout android:id="@+id/result_view"
-        android:orientation="vertical"
+    <View android:id="@+id/fillWhiteView"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:background="@color/colorPrimary"
-        android:visibility="gone"
-        android:baselineAligned="false">
+        android:background="@android:color/background_light"
+        android:visibility="gone" />
 
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
+    <LinearLayout
+        android:id="@+id/layoutKeyNameAndSave"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textViewKeyName"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:padding="16dp">
+            android:text="@string/enter_key_name" />
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:gravity="right|center_vertical">
-
-                <ImageView android:id="@+id/barcode_image_view"
-                    android:layout_width="160dip"
-                    android:layout_height="wrap_content"
-                    android:maxWidth="160dip"
-                    android:maxHeight="160dip"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerInside"
-                    tools:ignore="ContentDescription"/>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold" />
-
-                    <TextView android:id="@+id/format_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-/>
-
-                    <TextView android:id="@+id/type_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
- />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-  />
-
-                    <TextView android:id="@+id/time_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-   />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:orientation="horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-                    <TextView android:id="@+id/meta_text_view_label"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textStyle="bold"
-   />
-
-                    <TextView android:id="@+id/meta_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-   />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
-            <ScrollView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView android:id="@+id/contents_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textSize="22sp"
-                        android:paddingLeft="12dip"
-                        android:autoLink="web"
-                        android:textIsSelectable="true"/>
-
-                    <TextView android:id="@+id/contents_supplement_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="12dip"
-                        android:autoLink="web"
-                        android:textIsSelectable="true"/>
-
-                </LinearLayout>
-
-            </ScrollView>
-
-        </LinearLayout>
-
-        <LinearLayout android:id="@+id/result_button_view"
-            android:layout_width="fill_parent"
+        <EditText
+            android:id="@+id/editTextKeyName"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text=""
+            android:hint="@string/key_name"/>
 
-        </LinearLayout>
+        <Button
+            android:id="@+id/buttonSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Save" />
 
     </LinearLayout>
 
-    <TextView android:id="@+id/status_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
- />
-
-</merge>
+</RelativeLayout>

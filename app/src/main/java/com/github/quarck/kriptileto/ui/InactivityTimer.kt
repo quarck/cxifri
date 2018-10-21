@@ -46,7 +46,7 @@ internal class InactivityTimer(private val activity: Activity) {
         cancel()
         inactivityTask = InactivityAsyncTask()
         try {
-            inactivityTask!!.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
+            inactivityTask?.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR)
         } catch (ree: RejectedExecutionException) {
             Log.w(TAG, "Couldn't schedule inactivity task; ignoring")
         }

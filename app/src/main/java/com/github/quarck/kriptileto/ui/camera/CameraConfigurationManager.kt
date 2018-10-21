@@ -143,8 +143,6 @@ class CameraConfigurationManager(private val context: Context) {
 
         val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 
-        initializeTorch(parameters, prefs, safeMode)
-
         CameraConfigurationUtils.setFocus(
                 parameters,
                 true,
@@ -196,11 +194,6 @@ class CameraConfigurationManager(private val context: Context) {
         val parameters = camera.parameters
         doSetTorch(parameters, newSetting, false)
         camera.parameters = parameters
-    }
-
-    private fun initializeTorch(parameters: Camera.Parameters, prefs: SharedPreferences, safeMode: Boolean) {
-        val currentSetting = FrontLightMode.readPref(prefs) == FrontLightMode.ON
-        doSetTorch(parameters, currentSetting, safeMode)
     }
 
     private fun doSetTorch(parameters: Camera.Parameters, newSetting: Boolean, safeMode: Boolean) {

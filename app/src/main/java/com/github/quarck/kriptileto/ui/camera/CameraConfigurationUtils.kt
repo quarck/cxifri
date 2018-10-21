@@ -371,43 +371,4 @@ object CameraConfigurationUtils {
         }
         return result.toString()
     }
-
-    fun collectStats(parameters: Camera.Parameters): String {
-        return collectStats(parameters.flatten())
-    }
-
-    fun collectStats(flattenedParams: CharSequence?): String {
-        val result = StringBuilder(1000)
-
-        result.append("BOARD=").append(Build.BOARD).append('\n')
-        result.append("BRAND=").append(Build.BRAND).append('\n')
-        result.append("CPU_ABI=").append(Build.CPU_ABI).append('\n')
-        result.append("DEVICE=").append(Build.DEVICE).append('\n')
-        result.append("DISPLAY=").append(Build.DISPLAY).append('\n')
-        result.append("FINGERPRINT=").append(Build.FINGERPRINT).append('\n')
-        result.append("HOST=").append(Build.HOST).append('\n')
-        result.append("ID=").append(Build.ID).append('\n')
-        result.append("MANUFACTURER=").append(Build.MANUFACTURER).append('\n')
-        result.append("MODEL=").append(Build.MODEL).append('\n')
-        result.append("PRODUCT=").append(Build.PRODUCT).append('\n')
-        result.append("TAGS=").append(Build.TAGS).append('\n')
-        result.append("TIME=").append(Build.TIME).append('\n')
-        result.append("TYPE=").append(Build.TYPE).append('\n')
-        result.append("USER=").append(Build.USER).append('\n')
-        result.append("VERSION.CODENAME=").append(Build.VERSION.CODENAME).append('\n')
-        result.append("VERSION.INCREMENTAL=").append(Build.VERSION.INCREMENTAL).append('\n')
-        result.append("VERSION.RELEASE=").append(Build.VERSION.RELEASE).append('\n')
-        result.append("VERSION.SDK_INT=").append(Build.VERSION.SDK_INT).append('\n')
-
-        if (flattenedParams != null) {
-            val params = SEMICOLON.split(flattenedParams)
-            Arrays.sort(params)
-            for (param in params) {
-                result.append(param).append('\n')
-            }
-        }
-
-        return result.toString()
-    }
-
 }
