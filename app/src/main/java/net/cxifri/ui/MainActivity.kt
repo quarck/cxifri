@@ -1,4 +1,20 @@
-package com.github.quarck.kriptileto.ui
+/*
+ * Copyright (C) 2018 Sergey Parshin (quarck@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.cxifri.ui
 
 import android.app.Activity
 import android.app.AlertDialog
@@ -13,11 +29,11 @@ import android.os.Build
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import com.github.quarck.kriptileto.crypto.KriptiletoMessage
-import com.github.quarck.kriptileto.R
-import com.github.quarck.kriptileto.keysdb.KeyEntry
-import com.github.quarck.kriptileto.keysdb.KeysDatabase
-import com.github.quarck.kriptileto.utils.background
+import net.cxifri.crypto.CxifriMessage
+import net.cxifri.R
+import net.cxifri.keysdb.KeyEntry
+import net.cxifri.keysdb.KeysDatabase
+import net.cxifri.utils.background
 
 
 class MainActivity : Activity() {
@@ -135,7 +151,7 @@ class MainActivity : Activity() {
             val keys = KeysDatabase(context = this).use { it.keys }
             var success = false
 
-            val cryptoMessage = KriptiletoMessage()
+            val cryptoMessage = CxifriMessage()
 
             // TODO: move this to a "worker" file
             for (key in keys) {
@@ -224,7 +240,7 @@ class MainActivity : Activity() {
 
             if (cKey != null) {
                 try {
-                    encrypted = KriptiletoMessage().encrypt(msg, cKey)
+                    encrypted = CxifriMessage().encrypt(msg, cKey)
                 } catch (ex: Exception) {
                     encrypted = null
                 }
@@ -240,7 +256,7 @@ class MainActivity : Activity() {
                         textViewError.visibility = View.VISIBLE
                     }
                 } else {
-                    encrypted = KriptiletoMessage().encrypt(msg, key)
+                    encrypted = CxifriMessage().encrypt(msg, key)
                 }
             }
 
@@ -265,9 +281,9 @@ class MainActivity : Activity() {
                 val cKey = currentKey
                 val decrypted =
                         if (cKey != null)
-                            KriptiletoMessage().decrypt(msg, cKey)
+                            CxifriMessage().decrypt(msg, cKey)
                         else
-                            KriptiletoMessage().decrypt(msg, key)
+                            CxifriMessage().decrypt(msg, key)
 
                 if (decrypted != null) {
                     isTextEncrypted = false

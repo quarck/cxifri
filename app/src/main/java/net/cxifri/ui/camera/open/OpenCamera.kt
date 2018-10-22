@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui.camera.open
+package net.cxifri.ui.camera.open
 
 import android.hardware.Camera
 

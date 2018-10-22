@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui.camera
+package net.cxifri.ui.camera
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Point
 import android.hardware.Camera
 import android.preference.PreferenceManager
 import android.util.Log
-import android.view.Display
 import android.view.Surface
 import android.view.WindowManager
 
-import com.github.quarck.kriptileto.ui.camera.open.CameraFacing
-import com.github.quarck.kriptileto.ui.camera.open.OpenCamera
+import net.cxifri.ui.camera.open.CameraFacing
+import net.cxifri.ui.camera.open.OpenCamera
 
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to

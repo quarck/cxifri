@@ -1,6 +1,6 @@
-package com.github.quarck.kriptileto
+package net.cxifri
 
-import com.github.quarck.kriptileto.dataprocessing.UrlWrapper
+import net.cxifri.dataprocessing.UrlWrapper
 import org.junit.Test
 
 import org.junit.Assert.*

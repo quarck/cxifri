@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui.camera
+package net.cxifri.ui.camera
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.Camera
 import android.os.AsyncTask
 import android.preference.PreferenceManager

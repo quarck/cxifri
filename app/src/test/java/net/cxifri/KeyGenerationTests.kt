@@ -1,7 +1,7 @@
-package com.github.quarck.kriptileto
+package net.cxifri
 
-import com.github.quarck.kriptileto.crypto.DerivedKeyGenerator
-import com.github.quarck.kriptileto.dataprocessing.GZipBlob
+import net.cxifri.crypto.DerivedKeyGenerator
+import net.cxifri.dataprocessing.GZipBlob
 import org.junit.Test
 
 import org.junit.Assert.*

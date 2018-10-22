@@ -1,11 +1,27 @@
-package com.github.quarck.kriptileto.crypto
+/*
+ * Copyright (C) 2018 Sergey Parshin (quarck@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.github.quarck.kriptileto.dataprocessing.GZipBlob
-import com.github.quarck.kriptileto.dataprocessing.UrlWrapper
-import com.github.quarck.kriptileto.keysdb.KeyEntry
+package net.cxifri.crypto
+
+import net.cxifri.dataprocessing.GZipBlob
+import net.cxifri.dataprocessing.UrlWrapper
+import net.cxifri.keysdb.KeyEntry
 import org.bouncycastle.util.encoders.UrlBase64
 
-class KriptiletoMessage() {
+class CxifriMessage() {
 
     // TODO: we certainly need "tryDecryt" method receiving an array of keys as an argument
     // so to avoid repeated un-base64-ing of the message every time

@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui.camera
+package net.cxifri.ui.camera
 
 import android.content.Context
-import android.graphics.Point
 import android.graphics.Rect
 import android.hardware.Camera
 import android.os.Handler
 import android.util.Log
 import android.view.SurfaceHolder
 
-import com.github.quarck.kriptileto.ui.camera.open.OpenCamera
-import com.github.quarck.kriptileto.ui.camera.open.OpenCameraInterface
+import net.cxifri.ui.camera.open.OpenCamera
+import net.cxifri.ui.camera.open.OpenCameraInterface
 import com.google.zxing.PlanarYUVLuminanceSource
 
 import java.io.IOException

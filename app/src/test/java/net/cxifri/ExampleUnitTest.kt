@@ -1,4 +1,4 @@
-package com.github.quarck.kriptileto
+package net.cxifri
 
 import org.junit.Test
 

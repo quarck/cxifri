@@ -1,6 +1,23 @@
-package com.github.quarck.kriptileto.crypto
+/*
+ * Copyright (C) 2018 Sergey Parshin (quarck@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-import com.github.quarck.kriptileto.utils.wipe
+
+package net.cxifri.crypto
+
+import net.cxifri.utils.wipe
 import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator
 import org.bouncycastle.crypto.params.KeyParameter
@@ -8,9 +25,9 @@ import org.bouncycastle.crypto.params.KeyParameter
 class DerivedKeyGenerator {
 
     val DEFAULT_NUM_ITERATIONS = 10000
-    val SALT_AES = "kriptileto-AES"
-    val SALT_TWOFISH = "kriptileto-Twofish"
-    val SALT_SERPENT = "kriptileto-Serpent"
+    val SALT_AES = "cxifri-AES"
+    val SALT_TWOFISH = "cxifri-Twofish"
+    val SALT_SERPENT = "cxifri-Serpent"
 
     fun generateForAES(password: String): ByteArray {
         val pGen = PKCS5S2ParametersGenerator(SHA256Digest())

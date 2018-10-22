@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui
+package net.cxifri.ui
 
-import com.github.quarck.kriptileto.R
-import com.github.quarck.kriptileto.ui.camera.CameraManager
-import com.google.zxing.ResultPoint
+import net.cxifri.R
+import net.cxifri.ui.camera.CameraManager
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Resources
-import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
-
-import java.util.ArrayList
 
 /**
  * This view is overlaid on top of the camera preview. It adds the viewfinder rectangle and partial

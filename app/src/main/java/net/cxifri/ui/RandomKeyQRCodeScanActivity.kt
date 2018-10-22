@@ -1,4 +1,18 @@
-package com.github.quarck.kriptileto.ui
+/*
+ * Copyright (C) 2018 Sergey Parshin (quarck@gmail.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 /*
  * Copyright (C) 2008 ZXing authors
@@ -16,6 +30,8 @@ package com.github.quarck.kriptileto.ui
  * limitations under the License.
  */
 
+package net.cxifri.ui
+
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.*
@@ -27,18 +43,15 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
-import com.github.quarck.kriptileto.R
-import com.github.quarck.kriptileto.aks.AndroidKeyStore
-import com.github.quarck.kriptileto.crypto.AESTwofishSerpentEngine
-import com.github.quarck.kriptileto.crypto.RandomKeyGenerator
-import com.github.quarck.kriptileto.keysdb.KeyEntry
-import com.github.quarck.kriptileto.keysdb.KeySaveHelper
-import com.github.quarck.kriptileto.keysdb.KeysDatabase
-import com.github.quarck.kriptileto.ui.camera.CameraManager
-import com.github.quarck.kriptileto.utils.hasCameraPermission
-import com.github.quarck.kriptileto.utils.requestCameraPermission
+import net.cxifri.R
+import net.cxifri.crypto.RandomKeyGenerator
+import net.cxifri.keysdb.KeySaveHelper
+import net.cxifri.ui.camera.CameraManager
+import net.cxifri.utils.hasCameraPermission
+import net.cxifri.utils.requestCameraPermission
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
+import net.cxifri.crypto.AESTwofishSerpentEngine
 import org.bouncycastle.util.encoders.UrlBase64
 import java.io.IOException
 import java.util.*
@@ -391,6 +404,5 @@ class RandomKeyQRCodeScanActivity : Activity(), SurfaceHolder.Callback {
         val MSG_CAPTURE_HANDLER_DECODE_SUCCEEDED = 1
         val MSG_CAPTURE_HANDLER_FAILED = 2
     }
-
 }
 

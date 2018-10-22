@@ -1,7 +1,7 @@
-package com.github.quarck.kriptileto
+package net.cxifri
 
-import com.github.quarck.kriptileto.crypto.AESTwofishSerpentEngine
-import com.github.quarck.kriptileto.crypto.CryptoBinaryMessage
+import net.cxifri.crypto.AESTwofishSerpentEngine
+import net.cxifri.crypto.CryptoBinaryMessage
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine

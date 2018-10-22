@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui
+package net.cxifri.ui
 
 import android.app.Activity
 import android.content.BroadcastReceiver

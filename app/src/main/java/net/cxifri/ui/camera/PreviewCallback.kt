@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.github.quarck.kriptileto.ui.camera
+package net.cxifri.ui.camera
 
-import android.graphics.Point
 import android.hardware.Camera
 import android.os.Handler
-import android.os.Message
 import android.util.Log
 
 internal// camera APIs
