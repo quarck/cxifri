@@ -1,14 +1,14 @@
 <resources>
-    <string name="app_name">Kriptileto</string> <!-- Cxu vi parolas Esperanton? -->
-    <string name="clipboard_clip_label">kript-il-et-o</string>
+    <string name="app_name">Ĉifri</string> <!-- Cxu vi parolas Esperanton? -->
+    <string name="clipboard_clip_label">cxifri</string>
     <string name="hint_password">Password</string>
     <string name="hint_privatemessage">Private message</string>
-    <string name="encrypt">ENCRYPT</string>
-    <string name="decrypt">DECRYPT</string>
-    <string name="copy">COPY</string>
-    <string name="paste">PASTE</string>
-    <string name="clear">CLEAR</string>
-    <string name="share">SHARE</string>
+    <string name="encrypt">Encrypt</string>
+    <string name="decrypt">Decrypt</string>
+    <string name="copy">Copy</string>
+    <string name="paste">Paste</string>
+    <string name="clear">Clear</string>
+    <string name="share">Share</string>
     <string name="share_using">Share using</string>
     <string name="manage_key_button_text">Manage</string>
     <string name="add_new_password_key_button_label">Add new password based key</string>
@@ -24,7 +24,7 @@
     <string name="reply">Reply</string>
     <string name="quote">Quote</string>
     <string name="add_a_new_key">Add a new key:</string>
-    <string name="encrypt_decrypt_activity_label">Kriptileto</string>
+    <string name="encrypt_decrypt_activity_label">cxifri</string>
     <string name="use_androidkeystore_if_supported">Store in AndroidKeyStore if supported</string>
     <string name="aks_comment">AndroidKeyStore is a secure storage backed by the device encryption hardware. Storing key with AndroidKeyStore is generally more secure, but on some devices you might loose access to stored keys if you change your device password (and possibly under other similar circumstancies)</string>
     <string name="generate_random_key">Gen. Random Key</string>
