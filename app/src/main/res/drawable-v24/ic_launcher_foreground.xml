@@ -102,7 +102,7 @@
       <path
           android:strokeWidth="1"
           android:pathData="M121.2,187.9L129.6,194.2L105.8,200.1L104.8,175.6L113.2,181.9"
-          android:strokeLineJoin="flat"
+          android:strokeLineJoin="round"
           android:fillColor="#00000000"
           android:strokeColor="#000000"/>
       <path
@@ -138,7 +138,7 @@
       <path
           android:strokeWidth="1"
           android:pathData="M26,229.5L26,219L45,234.5L26,250L26,239.5"
-          android:strokeLineJoin="flat"
+          android:strokeLineJoin="round"
           android:fillColor="#00000000"
           android:strokeColor="#000000"/>
       <path
@@ -189,7 +189,7 @@
       <path
           android:strokeWidth="1"
           android:pathData="M315.5,341L326,341L310.5,360L295,341L305.5,341"
-          android:strokeLineJoin="flat"
+          android:strokeLineJoin="round"
           android:fillColor="#00000000"
           android:strokeColor="#000000"/>
       <path
