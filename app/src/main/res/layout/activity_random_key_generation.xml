@@ -8,20 +8,11 @@
     tools:context=".ui.RandomKeyQRCodeShareActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/linearLayoutQRCodeShareMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context=".ui.RandomKeyQRCodeShareActivity"
         android:orientation="vertical">
 
-        <!-- To catch focus -->
-        <LinearLayout
-            android:id="@+id/layout_focus_catcher"
-            android:focusable="true"
-            android:orientation="horizontal"
-            android:focusableInTouchMode="true"
-            android:layout_width="0px"
-            android:layout_height="0px"
-            tools:ignore="UselessLeaf" />
 
         <ImageView
             android:id="@+id/imageViewQR"
@@ -43,6 +34,16 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/enter_key_name" />
+
+        <!-- To catch focus -->
+        <LinearLayout
+            android:id="@+id/layout_focus_catcher"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:focusableInTouchMode="true"
+            android:layout_width="0px"
+            android:layout_height="0px"
+            tools:ignore="UselessLeaf" />
 
         <EditText
             android:id="@+id/editTextKeyName"

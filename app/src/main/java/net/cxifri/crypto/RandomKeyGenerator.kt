@@ -28,25 +28,24 @@ class RandomKeyGenerator {
     // Mac is used as CRC for code transmission, thus no need for any secure key
     val crcKey = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    fun generate(lenBytes: Int, withChecksum: Boolean): ByteArray {
-        if (!withChecksum) {
-            val key = ByteArray(lenBytes)
-            random.nextBytes(key)
-            return key
-        }
-        else {
-            val key = ByteArray(lenBytes)
-            random.nextBytes(key)
-            val mac = CBCBlockCipherMac(AESEngine())
+    fun generate(lenBytes: Int): ByteArray {
+        val key = ByteArray(lenBytes)
+        random.nextBytes(key)
+        return key
+    }
 
-            mac.init(KeyParameter(crcKey))
-            mac.update(key, 0, key.size)
+    fun generateKeywithCSum(lenBytes: Int): Pair<ByteArray, ByteArray> {
+        val key = ByteArray(lenBytes)
+        random.nextBytes(key)
+        val mac = CBCBlockCipherMac(AESEngine())
 
-            val macResult = ByteArray(mac.macSize)
-            mac.doFinal(macResult, 0)
+        mac.init(KeyParameter(crcKey))
+        mac.update(key, 0, key.size)
 
-            return key + macResult
-        }
+        val macResult = ByteArray(mac.macSize)
+        mac.doFinal(macResult, 0)
+
+        return Pair(key, macResult)
     }
 
     fun verifyChecksum(keyIn: ByteArray): ByteArray? {
