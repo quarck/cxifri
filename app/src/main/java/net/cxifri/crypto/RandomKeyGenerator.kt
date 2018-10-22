@@ -3,7 +3,6 @@ package com.github.quarck.kriptileto.crypto
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.macs.CBCBlockCipherMac
 import org.bouncycastle.crypto.params.KeyParameter
-import org.bouncycastle.crypto.params.ParametersWithIV
 import java.security.SecureRandom
 
 class RandomKeyGenerator {
@@ -13,7 +12,7 @@ class RandomKeyGenerator {
     val crcKey = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
     fun generate(lenBytes: Int, withChecksum: Boolean): ByteArray {
-        if (withChecksum == false) {
+        if (!withChecksum) {
             val key = ByteArray(lenBytes)
             random.nextBytes(key)
             return key
