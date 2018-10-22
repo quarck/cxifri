@@ -1,0 +1,10 @@
+Purpose of Cxifi app is encryption and decryption of short text messages. 
+
+Application allows users to store encryption key in the app. This is the only information ever stored by the app. 
+Password-based keys are stored in form of SHA256 based hash, original password is never kept. 
+
+Absolutely no information is ever transmitted by the app itself to any clouds / 3rd party / any internet servers.
+
+Camera permission is used by the app to scan QR code with the key when sharing they encryption key with another participant. 
+No camera images are ever saved or transmitted to any destination.
+
