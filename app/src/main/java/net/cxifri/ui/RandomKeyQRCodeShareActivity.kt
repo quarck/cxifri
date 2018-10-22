@@ -50,7 +50,8 @@ class RandomKeyQRCodeShareActivity : Activity() {
 
         val gen = QREncoder(Math.max(imgDim, 512))
 
-        val (key, csum) = RandomKeyGenerator().generateKeywithCSum(AESTwofishSerpentEngine.KEY_LENGTH_BYTES)
+        val (keyBits, csum) = RandomKeyGenerator().generateKeywithCSum(AESTwofishSerpentEngine.KEY_LENGTH_BYTES)
+        key = keyBits
         val base64key = UrlBase64.encode(key + csum).toString(charset = Charsets.UTF_8)
 
         val img = gen.encodeAsBitmap(base64key)

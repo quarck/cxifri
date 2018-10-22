@@ -28,7 +28,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- https://privmsg.space/ URL handler -->
+            <!-- https://cxifri.net/ URL handler -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 
@@ -36,7 +36,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="privmsg.space"
+                    android:host="cxifri.net"
                     android:scheme="https" />
             </intent-filter>
 

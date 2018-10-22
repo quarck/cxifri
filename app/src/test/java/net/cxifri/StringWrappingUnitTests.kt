@@ -10,19 +10,19 @@ class StringWrappingUnitTests {
     fun stringWrappingIsCorrect() {
         val raw = "ABC"
         val wrapped = UrlWrapper.wrap(raw)
-        assertEquals(wrapped, "https://privmsg.space/ABC/")
+        assertEquals(wrapped, "https://cxifri.net/ABC/")
     }
 
     @Test
     fun stringUnwrappingIsCorrect() {
 
-        val raw1 = "https://privmsg.space/ABC/"
-        val raw2 = "Some Person:\nhttps://privmsg.space/ABC/ msg sent on: Today"
-        val raw22 = "Some Person:\nhttps://privmsg.space/ABC msg sent on: Today"
+        val raw1 = "https://cxifri.net/ABC/"
+        val raw2 = "Some Person:\nhttps://cxifri.net/ABC/ msg sent on: Today"
+        val raw22 = "Some Person:\nhttps://cxifri.net/ABC msg sent on: Today"
         val raw3 = "Some random text"
-        val raw4 = "https://privmsg.space" // without anything else
-        val raw41 = "https://privmsg.space/" // without anything else
-        val raw42 = "https://privmsg.space//" // without anything else
+        val raw4 = "https://cxifri.net" // without anything else
+        val raw41 = "https://cxifri.net/" // without anything else
+        val raw42 = "https://cxifri.net//" // without anything else
 
         val str1 = UrlWrapper.unwrap(raw1)
         val str2 = UrlWrapper.unwrap(raw2)
