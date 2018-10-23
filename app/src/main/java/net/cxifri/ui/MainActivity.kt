@@ -342,6 +342,10 @@ class MainActivity : Activity() {
             intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
             startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
         }
+
+
+//        val intent = Intent(this, EncryptDecryptActivity::class.java)
+//        startActivity(intent)
     }
 
     private fun onButtonManageKeys(v: View) {

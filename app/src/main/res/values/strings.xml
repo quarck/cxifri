@@ -35,4 +35,8 @@
     <string name="qr_code_warning">Warning: after you hit \'save\' you would not be able to see this QR code again</string>
     <string name="enter_key_name">Enter Key Name:</string>
     <string name="key_name">Key name</string>
+    <string name="title_activity_encrypt_decrypt">EncryptDecryptActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
 </resources>
