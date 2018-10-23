@@ -34,6 +34,9 @@ import net.cxifri.keysdb.KeySaveHelper
 import net.cxifri.keysdb.KeysDatabase
 
 import org.bouncycastle.util.encoders.UrlBase64
+import android.view.WindowManager
+
+
 
 class RandomKeyQRCodeShareActivity : Activity() {
 
@@ -43,6 +46,10 @@ class RandomKeyQRCodeShareActivity : Activity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_random_key_generation)
         actionBar?.setDisplayHomeAsUpEnabled(true)
+
+        this.window.attributes = this.window.attributes.apply {
+            screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+        }
 
         val imageView = findViewById<ImageView>(R.id.imageViewQR)
         val layout = findViewById<LinearLayout>(R.id.linearLayoutQRCodeShareMain)
@@ -59,6 +66,17 @@ class RandomKeyQRCodeShareActivity : Activity() {
         imageView.setImageBitmap(img)
 
         findViewById<Button>(R.id.buttonSave).setOnClickListener(this::onButtonSave)
+
+        val name = findViewById<EditText>(R.id.editTextKeyName)
+        name.setOnFocusChangeListener { _, hasFocus ->
+            this.window.attributes = this.window.attributes.apply {
+                screenBrightness =
+                        if (hasFocus)
+                            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE
+                        else
+                            WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
+            }
+        }
     }
 
     private fun onButtonSave(v: View) {

@@ -21,7 +21,8 @@
             android:layout_marginEnd="0dp"
             android:scaleType="fitCenter"
             android:src="@android:color/black"
-            android:contentDescription="@string/qr_code" />
+            android:contentDescription="@string/qr_code"
+            android:focusable="true" />
 
         <TextView
             android:id="@+id/textViewWarning"

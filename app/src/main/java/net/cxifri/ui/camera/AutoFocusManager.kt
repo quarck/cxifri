@@ -34,7 +34,6 @@ class AutoFocusManager(context: Context, private val camera: Camera) : Camera.Au
     private var outstandingTask: AsyncTask<*, *, *>? = null
 
     init {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         val currentFocusMode = camera.parameters.focusMode
         useAutoFocus = FOCUS_MODES_CALLING_AF.contains(currentFocusMode)
         Log.i(TAG, "Current focus mode '$currentFocusMode'; use auto focus? $useAutoFocus")

@@ -19,7 +19,6 @@ package net.cxifri.ui.camera
 import android.content.Context
 import android.graphics.Point
 import android.hardware.Camera
-import android.preference.PreferenceManager
 import android.util.Log
 import android.view.Surface
 import android.view.WindowManager
@@ -139,8 +138,6 @@ class CameraConfigurationManager(private val context: Context) {
             Log.w(TAG, "In camera config safe mode -- most settings will not be honored")
         }
 
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-
         CameraConfigurationUtils.setFocus(
                 parameters,
                 true,
@@ -196,7 +193,6 @@ class CameraConfigurationManager(private val context: Context) {
 
     private fun doSetTorch(parameters: Camera.Parameters, newSetting: Boolean, safeMode: Boolean) {
         CameraConfigurationUtils.setTorch(parameters, newSetting)
-        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
         if (!safeMode && !true) {
             CameraConfigurationUtils.setBestExposure(parameters, newSetting)
         }
