@@ -10,8 +10,8 @@ android {
         applicationId "net.cxifri"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.0b"
+        versionCode 4
+        versionName "1.0b.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
