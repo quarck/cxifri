@@ -80,7 +80,8 @@
             android:name=".ui.RandomKeyQRCodeShareActivity"
             android:label="@string/title_activity_random_key_generation"
             android:parentActivityName=".ui.KeysActivity"
-            android:permission="net.cxifri.INTERNAL_ACTIVITY">
+            android:permission="net.cxifri.INTERNAL_ACTIVITY"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.KeysActivity" />
@@ -90,7 +91,8 @@
             android:name=".ui.RandomKeyQRCodeScanActivity"
             android:label="@string/title_activity_random_key_scan"
             android:parentActivityName=".ui.KeysActivity"
-            android:permission="net.cxifri.INTERNAL_ACTIVITY">
+            android:permission="net.cxifri.INTERNAL_ACTIVITY"
+            android:screenOrientation="portrait" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.KeysActivity" />

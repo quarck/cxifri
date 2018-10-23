@@ -35,6 +35,14 @@ import net.cxifri.keysdb.KeysDatabase
 
 import org.bouncycastle.util.encoders.UrlBase64
 import android.view.WindowManager
+import android.content.ContentValues.TAG
+import android.R.attr.y
+import android.R.attr.x
+import android.graphics.Point
+import android.util.Log
+import android.view.Display
+
+
 
 
 
@@ -52,10 +60,7 @@ class RandomKeyQRCodeShareActivity : Activity() {
         }
 
         val imageView = findViewById<ImageView>(R.id.imageViewQR)
-        val layout = findViewById<LinearLayout>(R.id.linearLayoutQRCodeShareMain)
-        val imgDim = Math.min(layout.height, layout.width)
-
-        val gen = QREncoder(Math.max(imgDim, 512))
+        val gen = QREncoder(Math.max(getDimensions()*8/10, 512))
 
         val (keyBits, csum) = RandomKeyGenerator().generateKeywithCSum(AESTwofishSerpentEngine.KEY_LENGTH_BYTES)
         key = keyBits
@@ -77,6 +82,11 @@ class RandomKeyQRCodeShareActivity : Activity() {
                             WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
             }
         }
+    }
+
+    private fun getDimensions(): Int {
+        val display = windowManager.defaultDisplay
+        return Point().apply {display.getSize(this)}.x
     }
 
     private fun onButtonSave(v: View) {
