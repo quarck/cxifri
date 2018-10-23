@@ -38,40 +38,41 @@ object OpenCameraInterface {
      * camera is returned if possible or else any camera
      * @return handle to [OpenCamera] that was opened
      */
+    @Suppress("DEPRECATION")
     fun open(cameraId: Int): OpenCamera? {
-        var cameraId = cameraId
+        var camId = cameraId
 
         val numCameras = Camera.getNumberOfCameras()
         if (numCameras == 0) {
             Log.w(TAG, "No cameras!")
             return null
         }
-        if (cameraId >= numCameras) {
-            Log.w(TAG, "Requested camera does not exist: $cameraId")
+        if (camId >= numCameras) {
+            Log.w(TAG, "Requested camera does not exist: $camId")
             return null
         }
 
-        if (cameraId <= NO_REQUESTED_CAMERA) {
-            cameraId = 0
-            while (cameraId < numCameras) {
+        if (camId <= NO_REQUESTED_CAMERA) {
+            camId = 0
+            while (camId < numCameras) {
                 val cameraInfo = Camera.CameraInfo()
-                Camera.getCameraInfo(cameraId, cameraInfo)
+                Camera.getCameraInfo(camId, cameraInfo)
                 if (CameraFacing.values()[cameraInfo.facing] === CameraFacing.BACK) {
                     break
                 }
-                cameraId++
+                camId++
             }
-            if (cameraId == numCameras) {
+            if (camId == numCameras) {
                 Log.i(TAG, "No camera facing " + CameraFacing.BACK + "; returning camera #0")
-                cameraId = 0
+                camId = 0
             }
         }
 
-        Log.i(TAG, "Opening camera #$cameraId")
+        Log.i(TAG, "Opening camera #$camId")
         val cameraInfo = Camera.CameraInfo()
-        Camera.getCameraInfo(cameraId, cameraInfo)
-        val camera = Camera.open(cameraId) ?: return null
-        return OpenCamera(cameraId,
+        Camera.getCameraInfo(camId, cameraInfo)
+        val camera = Camera.open(camId) ?: return null
+        return OpenCamera(camId,
                 camera,
                 CameraFacing.values()[cameraInfo.facing],
                 cameraInfo.orientation)

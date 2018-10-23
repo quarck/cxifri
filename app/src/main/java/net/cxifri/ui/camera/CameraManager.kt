@@ -37,6 +37,7 @@ import java.io.IOException
  * @author dswitkin@google.com (Daniel Switkin)
  */
 // camera APIs
+@Suppress("DEPRECATION")
 class CameraManager(private val context: Context) {
     private val configManager: CameraConfigurationManager
     private var camera: OpenCamera? = null

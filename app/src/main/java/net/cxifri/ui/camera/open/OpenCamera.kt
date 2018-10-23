@@ -22,6 +22,7 @@ import android.hardware.Camera
  * Represents an open [Camera] and its metadata, like facing direction and orientation.
  */
 // camera APIs
+@Suppress("DEPRECATION")
 class OpenCamera(private val index: Int, val camera: Camera, val facing: CameraFacing, val orientation: Int) {
 
     override fun toString(): String {

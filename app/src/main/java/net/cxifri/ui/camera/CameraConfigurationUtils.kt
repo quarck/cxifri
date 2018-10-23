@@ -30,6 +30,7 @@ import java.util.regex.Pattern
  * @author Sean Owen
  */
 // camera APIs
+@Suppress("DEPRECATION")
 object CameraConfigurationUtils {
 
     private val TAG = "CameraConfiguration"
@@ -81,17 +82,17 @@ object CameraConfigurationUtils {
 
     fun setTorch(parameters: Camera.Parameters, on: Boolean) {
         val supportedFlashModes = parameters.supportedFlashModes
-        val flashMode: String?
-        if (on) {
-            flashMode = findSettableValue("flash mode",
-                    supportedFlashModes,
-                    Camera.Parameters.FLASH_MODE_TORCH,
-                    Camera.Parameters.FLASH_MODE_ON)
-        } else {
-            flashMode = findSettableValue("flash mode",
-                    supportedFlashModes,
-                    Camera.Parameters.FLASH_MODE_OFF)
-        }
+        val flashMode: String? =
+                if (on) {
+                    findSettableValue("flash mode",
+                            supportedFlashModes,
+                            Camera.Parameters.FLASH_MODE_TORCH,
+                            Camera.Parameters.FLASH_MODE_ON)
+                } else {
+                    findSettableValue("flash mode",
+                            supportedFlashModes,
+                            Camera.Parameters.FLASH_MODE_OFF)
+                }
         if (flashMode != null) {
             if (flashMode == parameters.flashMode) {
                 Log.i(TAG, "Flash mode already set to $flashMode")

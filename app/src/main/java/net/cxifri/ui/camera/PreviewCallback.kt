@@ -20,6 +20,8 @@ import android.hardware.Camera
 import android.os.Handler
 import android.util.Log
 
+@Suppress("DEPRECATION")
+
 internal// camera APIs
 class PreviewCallback(private val configManager: CameraConfigurationManager) : Camera.PreviewCallback {
     private var previewHandler: Handler? = null
