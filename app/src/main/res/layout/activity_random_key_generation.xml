@@ -1,68 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.RandomKeyQRCodeShareActivity">
+    android:orientation="vertical"
+    tools:context=".ui.MainActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/linearLayoutQRCodeShareMain"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:theme="@style/AppTheme.AppBarOverlay">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:titleTextAppearance="@style/ToolbarTitle"
+            android:elevation="10dp"
+            tools:targetApi="m"
+            />
 
-        <ImageView
-            android:id="@+id/imageViewQR"
+    </android.support.design.widget.AppBarLayout>
+
+    <ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.RandomKeyQRCodeShareActivity">
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutQRCodeShareMain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="0dp"
-            android:contentDescription="@string/qr_code"
-            android:focusable="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_launcher_foreground" />
-
-        <TextView
-            android:id="@+id/textViewWarning"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/qr_code_warning" />
-
-        <TextView
-            android:id="@+id/textViewKeyName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/enter_key_name" />
-
-        <!-- To catch focus -->
-        <LinearLayout
-            android:id="@+id/layout_focus_catcher"
-            android:focusable="true"
-            android:orientation="horizontal"
-            android:focusableInTouchMode="true"
-            android:layout_width="0px"
-            android:layout_height="0px"
-            tools:ignore="UselessLeaf" />
-
-        <EditText
-            android:id="@+id/editTextKeyName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:text=""
-            android:hint="@string/key_name"/>
-
-        <Button
-            android:id="@+id/buttonSave"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Save" />
+            android:orientation="vertical">
 
 
-    </LinearLayout>
+            <ImageView
+                android:id="@+id/imageViewQR"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="0dp"
+                android:contentDescription="@string/qr_code"
+                android:focusable="true"
+                android:scaleType="fitCenter"
+                 />
 
-</ScrollView>
+            <TextView
+                android:id="@+id/textViewWarning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/qr_code_warning" />
 
+            <TextView
+                android:id="@+id/textViewKeyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/enter_key_name" />
+
+            <!-- To catch focus -->
+            <LinearLayout
+                android:id="@+id/layout_focus_catcher"
+                android:focusable="true"
+                android:orientation="horizontal"
+                android:focusableInTouchMode="true"
+                android:layout_width="0px"
+                android:layout_height="0px"
+                tools:ignore="UselessLeaf" />
+
+            <EditText
+                android:id="@+id/editTextKeyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text=""
+                android:hint="@string/key_name"/>
+
+            <Button
+                android:id="@+id/buttonSave"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Save" />
+
+
+        </LinearLayout>
+
+    </ScrollView>
+
+
+</LinearLayout>
