@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
+        android:theme="@style/AppTheme.NoActionBar"
         >
         <activity
             android:name=".ui.MainActivity"
@@ -70,7 +70,7 @@
         <activity
             android:name=".ui.KeysActivity"
             android:parentActivityName=".ui.MainActivity"
-            android:theme="@style/AppTheme.ActionBar">
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.MainActivity" />
@@ -81,7 +81,7 @@
             android:parentActivityName=".ui.KeysActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" >
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.KeysActivity" />
@@ -92,16 +92,10 @@
             android:parentActivityName=".ui.KeysActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.KeysActivity" />
-        </activity>
-        <activity
-            android:name=".ui.EncryptDecryptActivity"
-            android:label="@string/title_activity_encrypt_decrypt"
-            android:theme="@style/AppTheme"
-            >
         </activity>
     </application>
 

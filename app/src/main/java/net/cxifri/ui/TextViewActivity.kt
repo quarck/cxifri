@@ -23,11 +23,12 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.TextView
 import net.cxifri.R
 
-class TextViewActivity : Activity() {
+class TextViewActivity : AppCompatActivity() {
 
     lateinit var textViewAuthStatus: TextView
     lateinit var textViewMessage: TextView
@@ -40,6 +41,8 @@ class TextViewActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_text_view)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         textViewAuthStatus = findViewById(R.id.textViewAuthStatus)
         textViewMessage = findViewById(R.id.textViewMessage)

@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
@@ -95,7 +96,7 @@ class KeyStateEntry(
     }
 }
 
-class KeysActivity : Activity() {
+class KeysActivity : AppCompatActivity() {
     lateinit var keysRoot: LinearLayout
     lateinit var addNewPasswordKeyButton: Button
     lateinit var genNewKeyButton: Button
@@ -116,6 +117,8 @@ class KeysActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_keys)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         keysRoot = findViewById(R.id.layoutExistingKeysRoot) ?: throw Exception("Layout error")
         addNewPasswordKeyButton = findViewById(R.id.buttonAddNewPasswordKey) ?: throw Exception("Layout error")

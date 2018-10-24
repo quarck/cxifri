@@ -39,6 +39,7 @@ import android.content.ContentValues.TAG
 import android.R.attr.y
 import android.R.attr.x
 import android.graphics.Point
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.Display
 
@@ -46,14 +47,16 @@ import android.view.Display
 
 
 
-class RandomKeyQRCodeShareActivity : Activity() {
+class RandomKeyQRCodeShareActivity : AppCompatActivity() {
 
     lateinit var key: ByteArray
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_random_key_generation)
-        actionBar?.setDisplayHomeAsUpEnabled(true)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
 
         this.window.attributes = this.window.attributes.apply {
             screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL

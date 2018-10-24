@@ -16,7 +16,6 @@
 
 package net.cxifri.ui
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.os.Bundle
 import android.widget.Button
@@ -26,6 +25,9 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
@@ -36,18 +38,14 @@ import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.utils.background
 
 
-class MainActivity : Activity() {
+class MainActivity : AppCompatActivity() {
 
     lateinit var buttonEncrypt: Button
     lateinit var buttonDecrypt: Button
-    lateinit var buttonShare: Button
-    lateinit var buttonPaste: Button
-    lateinit var buttonCopy: Button
-    lateinit var buttonClear: Button
+
     lateinit var message: EditText
     lateinit var buttonKeySelect: Button
     lateinit var password: EditText
-    lateinit var buttonManageKeys: Button
     lateinit var textViewError: TextView
 
     var isTextEncrypted = false
@@ -57,14 +55,12 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+
 
         buttonEncrypt = findViewById(R.id.buttonEncrypt)
         buttonDecrypt = findViewById(R.id.buttonDecrypt)
-        buttonShare = findViewById(R.id.buttonShare)
-        buttonCopy = findViewById(R.id.buttonCopy)
-        buttonPaste = findViewById(R.id.buttonPaste)
-        buttonClear = findViewById(R.id.buttonClear)
-        buttonManageKeys = findViewById(R.id.buttonManageKeys)
         buttonKeySelect = findViewById(R.id.buttonKeySelect)
         textViewError = findViewById(R.id.textViewError)
 
@@ -75,16 +71,40 @@ class MainActivity : Activity() {
         buttonEncrypt.setOnClickListener(this::onButtonEncrypt)
         buttonDecrypt.setOnClickListener(this::onButtonDecrypt)
 
-        buttonShare.setOnClickListener(this::onButtonShare)
-
-        buttonCopy.setOnClickListener(this::onButtonCopy)
-        buttonPaste.setOnClickListener(this::onButtonPaste)
-
-        buttonClear.setOnClickListener(this::onButtonClear)
-
-        buttonManageKeys.setOnClickListener(this::onButtonManageKeys)
-
         handleIntent(intent)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.main, menu)
+
+//        val menuShare = menu.findItem(R.id.menu_share)
+//        if (menuShare != null) {
+//            menuShare.isVisible = true
+//            menuShare.isEnabled = isTextEncrypted
+//        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.menu_clear ->
+                clearForm()
+
+            R.id.menu_copy ->
+                copyText()
+
+            R.id.menu_share ->
+                shareText()
+
+            R.id.menu_keys ->
+                startActivity(Intent(this, KeysActivity::class.java))
+
+            R.id.menu_about ->
+                Unit
+        }
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -101,13 +121,11 @@ class MainActivity : Activity() {
             if (intentTextExtra != null) {
                 message.setText(intentTextExtra)
                 isTextEncrypted = false
-                buttonShare.isEnabled = false
             }
         }
         else if (intentTextExtra != null) {
             message.setText(intentTextExtra)
             isTextEncrypted = false
-            buttonShare.isEnabled = false
         }
 //        else if (intent.action == Intent.ACTION_SEND) {
 //            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
@@ -136,9 +154,6 @@ class MainActivity : Activity() {
                     handleTextIntent(text.toString())
                 }
             }
-        }
-        else {
-            buttonShare.isEnabled = false
         }
     }
 
@@ -179,7 +194,6 @@ class MainActivity : Activity() {
                 isTextEncrypted = false // don't allow sharing
                 runOnUiThread {
                     message.setText(text)
-                    buttonShare.isEnabled = false
                 }
             }
         }
@@ -264,7 +278,6 @@ class MainActivity : Activity() {
                 isTextEncrypted = true
                 runOnUiThread {
                     message.setText(encrypted)
-                    buttonShare.isEnabled = isTextEncrypted
                 }
             }
         }
@@ -289,7 +302,6 @@ class MainActivity : Activity() {
                     isTextEncrypted = false
                     runOnUiThread {
                         message.setText(decrypted)
-                        buttonShare.isEnabled = isTextEncrypted
                     }
                 }
                 else
@@ -306,7 +318,7 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun onButtonCopy(v: View) {
+    private fun copyText() {
         val msg = message.text.toString()
         if (msg.length != 0) {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -315,42 +327,48 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun onButtonPaste(v: View) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = clipboard.getPrimaryClip()
-        if (clip != null) {
-            val item = clip.getItemAt(0)
-            if (item != null)
-                message.setText(item.text)
-        }
+//    private fun onButtonPaste(v: View) {
+//        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//        val clip = clipboard.getPrimaryClip()
+//        if (clip != null) {
+//            val item = clip.getItemAt(0)
+//            if (item != null)
+//                message.setText(item.text)
+//        }
+//
+//        isTextEncrypted = false
+//        buttonShare.isEnabled = isTextEncrypted
+//    }
 
-        isTextEncrypted = false
-        buttonShare.isEnabled = isTextEncrypted
-    }
-
-    private fun onButtonClear(v: View) {
+    private fun clearForm() {
         message.setText("")
         password.setText("")
         isTextEncrypted = false
-        buttonShare.isEnabled = isTextEncrypted
     }
 
-    private fun onButtonShare(v: View) {
+
+    private fun shareText() {
         if (isTextEncrypted) {
             val intent = Intent(android.content.Intent.ACTION_SEND)
             intent.type = "text/plain"
             intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
             startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
         }
+        else {
+            val builder = AlertDialog.Builder(this)
+            builder.setIcon(R.drawable.ic_launcher_foreground)
+            builder.setTitle("Share un-encrypted text?")
 
+            builder.setPositiveButton(android.R.string.ok) {
+                dialog, which ->
+                val intent = Intent(android.content.Intent.ACTION_SEND)
+                intent.type = "text/plain"
+                intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
+                startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
+            }
 
-//        val intent = Intent(this, EncryptDecryptActivity::class.java)
-//        startActivity(intent)
-    }
-
-    private fun onButtonManageKeys(v: View) {
-        val intent = Intent(this, KeysActivity::class.java)
-        startActivity(intent)
+            return builder.create().show()
+        }
     }
 }
 

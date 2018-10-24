@@ -35,6 +35,7 @@ package net.cxifri.ui
 import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.*
+import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
@@ -67,7 +68,7 @@ import java.util.concurrent.CountDownLatch
  * @author Sean Owen
  */
 
-class RandomKeyQRCodeScanActivity : Activity(), SurfaceHolder.Callback {
+class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback {
 
 
     internal class DecodeThread(val activity: RandomKeyQRCodeScanActivity) : Thread() {
@@ -241,9 +242,10 @@ class RandomKeyQRCodeScanActivity : Activity(), SurfaceHolder.Callback {
     public override fun onCreate(icicle: Bundle?) {
         super.onCreate(icicle)
 
-        val window = window
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_random_key_scan)
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayShowHomeEnabled(true)
 
         viewfinderView = findViewById(R.id.viewfinder_view) as ViewfinderView
 
