@@ -27,14 +27,15 @@ import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.TextView
 import net.cxifri.R
+import net.cxifri.utils.UIItem
 
 class TextViewActivity : AppCompatActivity() {
 
-    lateinit var textViewAuthStatus: TextView
-    lateinit var textViewMessage: TextView
-    lateinit var buttonReply: Button
-    lateinit var buttonQuote: Button
-    lateinit var buttonCopy: Button
+    val textViewAuthStatus by UIItem<TextView>(R.id.textViewAuthStatus)
+    val textViewMessage by UIItem<TextView>(R.id.textViewMessage)
+    val buttonReply by UIItem<Button>(R.id.buttonReply)
+    val buttonQuote by UIItem<Button>(R.id.buttonQuote)
+    val buttonCopy by UIItem<Button>(R.id.buttonCopy)
 
     var currentKeyId: Int = -1
 
@@ -44,12 +45,6 @@ class TextViewActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-
-        textViewAuthStatus = findViewById(R.id.textViewAuthStatus)
-        textViewMessage = findViewById(R.id.textViewMessage)
-        buttonReply = findViewById(R.id.buttonReply)
-        buttonQuote = findViewById(R.id.buttonQuote)
-        buttonCopy = findViewById(R.id.buttonCopy)
 
         buttonCopy.setOnClickListener(this::onButtonCopy)
         buttonReply.setOnClickListener(this::onButtonReply)

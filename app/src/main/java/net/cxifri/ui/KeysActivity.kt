@@ -16,7 +16,6 @@
 
 package net.cxifri.ui
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -32,6 +31,8 @@ import net.cxifri.R
 import net.cxifri.keysdb.KeyEntry
 import net.cxifri.keysdb.KeySaveHelper
 import net.cxifri.keysdb.KeysDatabase
+import net.cxifri.utils.UIItem
+import kotlin.reflect.KProperty
 
 class KeyStateEntry(
         var context: Context,
@@ -97,22 +98,23 @@ class KeyStateEntry(
 }
 
 class KeysActivity : AppCompatActivity() {
-    lateinit var keysRoot: LinearLayout
-    lateinit var addNewPasswordKeyButton: Button
-    lateinit var genNewKeyButton: Button
-    lateinit var scanNewKeyButton: Button
-    lateinit var addKeyLayout: LinearLayout
-    lateinit var keyName: EditText
-    lateinit var keyPassword: EditText
-    lateinit var keyPasswordConfirmation: EditText
-    lateinit var buttonSaveKey: Button
-    lateinit var buttonCancel: Button
-    lateinit var textError: TextView
-    lateinit var layoutAddNewKeyButtons: LinearLayout
-    lateinit var checkboxPreferAndroidKeyStore: CheckBox
+    val keysRoot by UIItem<LinearLayout>(R.id.layoutExistingKeysRoot)
+    val addNewPasswordKeyButton by UIItem<Button>(R.id.buttonAddNewPasswordKey)
+    val genNewKeyButton by UIItem<Button>(R.id.buttonGenerateRandomKey)
+    val scanNewKeyButton by UIItem<Button>(R.id.buttonScanRandomKey)
+    val addKeyLayout by UIItem<LinearLayout>(R.id.layoutAddKey)
+    val keyName by UIItem<EditText>(R.id.keyName)
+    val keyPassword by UIItem<EditText>(R.id.password)
+    val keyPasswordConfirmation by UIItem<EditText>(R.id.passwordConfirmation)
+    val buttonSaveKey by UIItem<Button>(R.id.buttonSaveKey)
+    val buttonCancel by UIItem<Button>(R.id.buttonCancel)
+    val textError by UIItem<TextView>(R.id.textError)
+    val layoutAddNewKeyButtons by UIItem<LinearLayout>(R.id.layoutAddNewKeyButtons)
+    val checkboxPreferAndroidKeyStore by UIItem<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)
 
     lateinit var keyStates: MutableList<KeyStateEntry>
 
+    val somethinb: Boolean by lazy { true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,20 +122,6 @@ class KeysActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-
-        keysRoot = findViewById(R.id.layoutExistingKeysRoot) ?: throw Exception("Layout error")
-        addNewPasswordKeyButton = findViewById(R.id.buttonAddNewPasswordKey) ?: throw Exception("Layout error")
-        genNewKeyButton = findViewById(R.id.buttonGenerateRandomKey) ?: throw Exception("Layout error")
-        scanNewKeyButton = findViewById(R.id.buttonScanRandomKey) ?: throw Exception("Layout error")
-        addKeyLayout = findViewById(R.id.layoutAddKey) ?: throw Exception("Layout error")
-        keyName = findViewById(R.id.keyName) ?: throw Exception("Layout error")
-        keyPassword = findViewById(R.id.password) ?: throw Exception("Layout error")
-        keyPasswordConfirmation = findViewById(R.id.passwordConfirmation) ?: throw Exception("Layout error")
-        buttonSaveKey = findViewById(R.id.buttonSaveKey) ?: throw Exception("Layout error")
-        buttonCancel = findViewById(R.id.buttonCancel) ?: throw Exception("Layout error")
-        textError = findViewById(R.id.textError) ?: throw Exception("Layout error")
-        layoutAddNewKeyButtons = findViewById(R.id.layoutAddNewKeyButtons) ?: throw Exception("Layout error")
-        checkboxPreferAndroidKeyStore = findViewById(R.id.checkBoxPreferAndroidKeyStore) ?: throw Exception("Layout error")
 
         addKeyLayout.visibility = View.GONE
 

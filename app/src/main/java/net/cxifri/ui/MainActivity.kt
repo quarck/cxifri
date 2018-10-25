@@ -35,18 +35,19 @@ import net.cxifri.crypto.CxifriMessage
 import net.cxifri.R
 import net.cxifri.keysdb.KeyEntry
 import net.cxifri.keysdb.KeysDatabase
+import net.cxifri.utils.UIItem
 import net.cxifri.utils.background
 
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var buttonEncrypt: Button
-    lateinit var buttonDecrypt: Button
+    val buttonEncrypt by UIItem<Button>(R.id.buttonEncrypt)
+    val buttonDecrypt by UIItem<Button>(R.id.buttonDecrypt)
 
-    lateinit var message: EditText
-    lateinit var buttonKeySelect: Button
-    lateinit var password: EditText
-    lateinit var textViewError: TextView
+    val message by UIItem<EditText>(R.id.message)
+    val buttonKeySelect by UIItem<Button>(R.id.buttonKeySelect)
+    val password by UIItem<EditText>(R.id.password)
+    val textViewError by UIItem<TextView>(R.id.textViewError)
 
     var isTextEncrypted = false
 
@@ -57,15 +58,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayShowHomeEnabled(true)
-
-
-        buttonEncrypt = findViewById(R.id.buttonEncrypt)
-        buttonDecrypt = findViewById(R.id.buttonDecrypt)
-        buttonKeySelect = findViewById(R.id.buttonKeySelect)
-        textViewError = findViewById(R.id.textViewError)
-
-        message = findViewById(R.id.message)
-        password = findViewById(R.id.password)
 
         buttonKeySelect.setOnClickListener(this::onButtonKeySelect)
         buttonEncrypt.setOnClickListener(this::onButtonEncrypt)
@@ -206,7 +198,7 @@ class MainActivity : AppCompatActivity() {
         builder.setIcon(R.drawable.ic_launcher_foreground)
         builder.setTitle("Pick a key")
 
-        val names = keys.map { it.name }.toList() + listOf<String>("Text password")
+        val names = keys.map { it.name }.toList() + listOf<String>(getString(R.string.text_password))
         val values = keys.map { it.id }.toList() + listOf<Long>(-1L)
 
         val arrayAdapter = ArrayAdapter<String>(this, android.R.layout.select_dialog_singlechoice, names)
@@ -231,11 +223,11 @@ class MainActivity : AppCompatActivity() {
         if (keyId != -1L) {
             password.visibility = View.GONE
             currentKey = KeysDatabase(context = this).use { it.getKey(keyId) }
-            buttonKeySelect.text = "key: ${currentKey?.name}"
+            buttonKeySelect.text = getString(R.string.key_format).format(currentKey?.name)
         }
         else {
             password.visibility = View.VISIBLE
-            buttonKeySelect.text = "key: type below"
+            buttonKeySelect.text = getString(R.string.key_type_below)
             currentKey = null
         }
     }
@@ -261,12 +253,12 @@ class MainActivity : AppCompatActivity() {
             } else {
                 if (key.isEmpty()) {
                     runOnUiThread {
-                        textViewError.setText("Key is empty")
+                        textViewError.setText(getString(R.string.key_is_empty))
                         textViewError.visibility = View.VISIBLE
                     }
                 } else if (key.length < 8) {
                     runOnUiThread {
-                        textViewError.setText("Key is too short (min 8 chars)")
+                        textViewError.setText(getString(R.string.key_is_too_short))
                         textViewError.visibility = View.VISIBLE
                     }
                 } else {
@@ -307,12 +299,12 @@ class MainActivity : AppCompatActivity() {
                 else
                     runOnUiThread {
                         textViewError.visibility = View.VISIBLE
-                        textViewError.setText("Failed to decrypt (wrong key?)")
+                        textViewError.setText(R.string.failed_to_decrypt)
                     }
             } catch (ex: Exception) {
                 runOnUiThread {
                     textViewError.visibility = View.VISIBLE
-                    textViewError.setText("Failed to decrypt (wrong key?)")
+                    textViewError.setText(R.string.failed_to_decrypt)
                 }
             }
         }
@@ -347,26 +339,23 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun doShareText() {
+        val intent = Intent(android.content.Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
+        startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
+    }
+
     private fun shareText() {
         if (isTextEncrypted) {
-            val intent = Intent(android.content.Intent.ACTION_SEND)
-            intent.type = "text/plain"
-            intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
-            startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
+            doShareText()
         }
         else {
             val builder = AlertDialog.Builder(this)
-            builder.setIcon(R.drawable.ic_launcher_foreground)
-            builder.setTitle("Share un-encrypted text?")
-
-            builder.setPositiveButton(android.R.string.ok) {
-                dialog, which ->
-                val intent = Intent(android.content.Intent.ACTION_SEND)
-                intent.type = "text/plain"
-                intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
-                startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
-            }
-
+                    .setIcon(R.drawable.ic_launcher_foreground)
+                    .setTitle(getString(R.string.share_non_encrypted_text_question_mark))
+                    .setPositiveButton(android.R.string.ok) { _, _ -> doShareText() }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
             return builder.create().show()
         }
     }
