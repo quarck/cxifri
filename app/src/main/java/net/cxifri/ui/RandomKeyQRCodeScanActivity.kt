@@ -245,6 +245,7 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         setContentView(R.layout.activity_random_key_scan)
         setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         viewfinderView = findViewById(R.id.viewfinder_view) as ViewfinderView

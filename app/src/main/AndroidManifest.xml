@@ -22,7 +22,8 @@
         >
         <activity
             android:name=".ui.MainActivity"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -59,28 +60,36 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".ui.TextViewActivity"
             android:parentActivityName=".ui.MainActivity"
-            android:permission="net.cxifri.INTERNAL_ACTIVITY">
+            android:permission="net.cxifri.INTERNAL_ACTIVITY"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:label="@string/encrypted_message">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.MainActivity" />
         </activity>
+
         <activity
+            android:label="@string/manage_keys"
             android:name=".ui.KeysActivity"
             android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.MainActivity" />
         </activity>
+
         <activity
             android:name=".ui.RandomKeyQRCodeShareActivity"
             android:label="@string/title_activity_random_key_generation"
             android:parentActivityName=".ui.KeysActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -92,6 +101,7 @@
             android:parentActivityName=".ui.KeysActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
             >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

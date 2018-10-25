@@ -118,6 +118,7 @@ class KeysActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_keys)
         setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
         keysRoot = findViewById(R.id.layoutExistingKeysRoot) ?: throw Exception("Layout error")
