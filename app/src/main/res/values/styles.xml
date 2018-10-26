@@ -35,4 +35,16 @@
         <item name="android:textSize">20sp</item>
     </style>
 
+    <style name="TextMedium" parent="@style/TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextLarge" parent="@style/TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
+    <style name="TextSmall" parent="@style/TextAppearance.AppCompat.Small">
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
 </resources>

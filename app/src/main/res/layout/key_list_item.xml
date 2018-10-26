@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:theme="@style/AppTheme.NoActionBar">
 
     <Button
         android:id="@+id/buttonDelete"
@@ -16,8 +17,9 @@
         android:layout_marginTop="16dp"
         android:padding="0dp"
         android:text="@string/big_x"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-        style="?android:attr/buttonStyle"/>
+        android:textAppearance="@style/TextMedium"
+        style="?android:attr/buttonStyle"
+        />
 
     <Button
         android:id="@+id/buttonReplace"
@@ -29,9 +31,9 @@
         android:layout_marginTop="16dp"
         android:padding="0dp"
         android:text="@string/big_r"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:layout_alignBaseline="@id/buttonDelete"
         android:layout_toStartOf="@id/buttonDelete"
+        android:textAppearance="@style/TextMedium"
         style="?android:attr/buttonStyle"
         />
 
@@ -47,7 +49,7 @@
         android:layout_toStartOf="@id/buttonReplace"
         android:ems="10"
         android:text="_key_name_placeholder_ some long long"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:textAppearance="@style/TextMedium"
         tools:ignore="HardcodedText" />
 
     <TextView
@@ -63,7 +65,7 @@
         android:layout_below="@id/textViewKeyName"
         android:ems="10"
         android:text="Some extra key details can be added here"
-        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small"
+        android:textAppearance="@style/TextSmall"
         tools:ignore="HardcodedText" />
 
 </RelativeLayout>
