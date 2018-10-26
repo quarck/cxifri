@@ -32,7 +32,6 @@ import net.cxifri.keysdb.KeyEntry
 import net.cxifri.keysdb.KeySaveHelper
 import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.utils.UIItem
-import kotlin.reflect.KProperty
 
 class KeyStateEntry(
         var context: Context,
@@ -41,7 +40,6 @@ class KeyStateEntry(
         val onReplaceKey: (KeyEntry) -> Unit,
         val onDeleteKey: (KeyEntry) -> Unit
 ) {
-
     val layout: RelativeLayout
     val keyName: TextView
     val keyDetails: TextView
@@ -114,8 +112,6 @@ class KeysActivity : AppCompatActivity() {
 
     lateinit var keyStates: MutableList<KeyStateEntry>
 
-    val somethinb: Boolean by lazy { true }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_keys)
@@ -125,23 +121,6 @@ class KeysActivity : AppCompatActivity() {
 
         addKeyLayout.visibility = View.GONE
 
-        val keys = KeysDatabase(context = this).use { it.keys }
-        keyStates = mutableListOf<KeyStateEntry>()
-
-        for (key in keys) {
-            val keyState = KeyStateEntry(
-                    context = this,
-                    inflater = layoutInflater,
-                    key = key,
-                    onReplaceKey = this::onReplaceKey,
-                    onDeleteKey = this::onDeleteKey
-            )
-
-            keyStates.add(keyState)
-            keysRoot.addView(keyState.layout)
-
-        }
-
         addNewPasswordKeyButton.setOnClickListener(this::onButtonAddPasswordKey)
         genNewKeyButton.setOnClickListener(this::onButtonGenerateKey)
         scanNewKeyButton.setOnClickListener(this::onButtonScanNewKey)
@@ -149,6 +128,11 @@ class KeysActivity : AppCompatActivity() {
         buttonSaveKey.setOnClickListener(this::onButtonAddPasswordKeySave)
 
         buttonCancel.setOnClickListener(this::onButtonAddPasswordKeyCancel)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        reloadKeys()
     }
 
     private fun onButtonAddPasswordKey(v: View) {
@@ -198,7 +182,9 @@ class KeysActivity : AppCompatActivity() {
         val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
         KeySaveHelper().saveKey(this, name, key, checkboxPreferAndroidKeyStore.isChecked)
 
-        reload()
+        layoutAddNewKeyButtons.visibility = View.GONE
+        addKeyLayout.visibility = View.VISIBLE
+        reloadKeys()
     }
 
 
@@ -222,11 +208,30 @@ class KeysActivity : AppCompatActivity() {
             db -> db.deleteKey(key.id)
         }
 
-        reload()
+        val matchingState = keyStates.find{ it.key.value == key.value }
+        if (matchingState != null) {
+            keysRoot.removeView(matchingState.layout)
+            keyStates.removeAll { it.key.value == key.value }
+        }
     }
 
-    fun reload() {
-        startActivity(Intent(this, KeysActivity::class.java))
-        finish()
+    fun reloadKeys() {
+        keysRoot.removeAllViews()
+
+        val keys = KeysDatabase(context = this).use { it.keys }
+        keyStates = mutableListOf<KeyStateEntry>()
+
+        for (key in keys) {
+            val keyState = KeyStateEntry(
+                    context = this,
+                    inflater = layoutInflater,
+                    key = key,
+                    onReplaceKey = this::onReplaceKey,
+                    onDeleteKey = this::onDeleteKey
+            )
+
+            keyStates.add(keyState)
+            keysRoot.addView(keyState.layout)
+        }
     }
 }
