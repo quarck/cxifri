@@ -55,8 +55,6 @@ class KeysDatabase(val context: Context)
 
     fun deleteKey(keyId: Long) = implApplyToWritable { deleteKey(it, keyId) }
 
-    fun deleteOldKeys(now: Long) = implApplyToWritable { deleteOldKeys(it, now) }
-
     fun getKey(keyId: Long) = implApplyToReadable { getKey(it, keyId)}
 
     val keys: List<KeyEntry>
