@@ -183,8 +183,9 @@ class KeysActivity : AppCompatActivity() {
         val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
         KeyHelper().saveKey(this, name, key, checkboxPreferAndroidKeyStore.isChecked)
 
-        layoutAddNewKeyButtons.visibility = View.GONE
-        addKeyLayout.visibility = View.VISIBLE
+        layoutAddNewKeyButtons.visibility = View.VISIBLE
+        addKeyLayout.visibility = View.GONE
+
         reloadKeys()
     }
 
