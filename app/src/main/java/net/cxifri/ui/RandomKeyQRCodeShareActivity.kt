@@ -17,34 +17,20 @@
 package net.cxifri.ui
 
 import android.os.Bundle
-import android.app.Activity
-import android.os.Build
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
-import android.widget.LinearLayout
 import net.cxifri.R
-import net.cxifri.aks.AndroidKeyStore
 import net.cxifri.crypto.AESTwofishSerpentEngine
 import net.cxifri.crypto.RandomKeyGenerator
 import net.cxifri.dataprocessing.QREncoder
-import net.cxifri.keysdb.KeyEntry
-import net.cxifri.keysdb.KeySaveHelper
-import net.cxifri.keysdb.KeysDatabase
+import net.cxifri.keysdb.KeyHelper
 
 import org.bouncycastle.util.encoders.UrlBase64
 import android.view.WindowManager
-import android.content.ContentValues.TAG
-import android.R.attr.y
-import android.R.attr.x
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
-import android.view.Display
-
-
-
 
 
 class RandomKeyQRCodeShareActivity : AppCompatActivity() {
@@ -97,7 +83,7 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
         val name = findViewById<EditText>(R.id.editTextKeyName)
 
         name?.text?.toString()?.let {
-            KeySaveHelper().saveKey(this, it, key, true)
+            KeyHelper().saveKey(this, it, key, true)
             finish()
         }
     }

@@ -1,7 +1,7 @@
 package net.cxifri
 
 import net.cxifri.crypto.AESTwofishSerpentEngine
-import net.cxifri.crypto.CryptoBinaryMessage
+import net.cxifri.crypto.BinaryMessageHandler
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine
@@ -21,9 +21,9 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = CryptoBinaryMessage { AESEngine() }.encrypt(dataIn, key)
+        val encrypted = BinaryMessageHandler { AESEngine() }.encrypt(dataIn, key)
 
-        val decrypted = CryptoBinaryMessage { AESEngine() }.decrypt(encrypted, key)
+        val decrypted = BinaryMessageHandler { AESEngine() }.decrypt(encrypted, key)
 
         assertNotNull(decrypted)
 
@@ -34,7 +34,7 @@ class EncryptionUnitTests {
         // deliberately destroy the key
         key[0] = 100
 
-        val decrypted2 = CryptoBinaryMessage { AESEngine() }.decrypt(encrypted, key)
+        val decrypted2 = BinaryMessageHandler { AESEngine() }.decrypt(encrypted, key)
         assertNull(decrypted2)
     }
 
@@ -54,9 +54,9 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = CryptoBinaryMessage { AESTwofishSerpentEngine() }.encrypt(dataIn, key)
+        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, key)
 
-        val decrypted = CryptoBinaryMessage { AESTwofishSerpentEngine() }.decrypt(encrypted, key)
+        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, key)
 
         assertNotNull(decrypted)
 
@@ -67,7 +67,7 @@ class EncryptionUnitTests {
         // deliberately destroy the key
         key[0] = 100
 
-        val decrypted2 = CryptoBinaryMessage { AESTwofishSerpentEngine() }.decrypt(encrypted, key)
+        val decrypted2 = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, key)
         assertNull(decrypted2)
     }
 

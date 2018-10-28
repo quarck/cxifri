@@ -32,7 +32,6 @@
 
 package net.cxifri.ui
 
-import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.os.*
 import android.support.v7.app.AppCompatActivity
@@ -46,7 +45,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import net.cxifri.R
 import net.cxifri.crypto.RandomKeyGenerator
-import net.cxifri.keysdb.KeySaveHelper
+import net.cxifri.keysdb.KeyHelper
 import net.cxifri.ui.camera.CameraManager
 import net.cxifri.utils.hasCameraPermission
 import net.cxifri.utils.requestCameraPermission
@@ -359,7 +358,7 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
             findViewById<View>(R.id.fillWhiteView).visibility = View.VISIBLE
             findViewById<Button>(R.id.buttonSave)?.setOnClickListener {
                 val name = findViewById<EditText>(R.id.editTextKeyName).text.toString()
-                KeySaveHelper().saveKey(this, name, rawKey, true)
+                KeyHelper().saveKey(this, name, rawKey, true)
                 finish()
             }
         }

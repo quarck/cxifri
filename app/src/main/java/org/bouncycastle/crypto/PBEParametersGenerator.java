@@ -21,8 +21,8 @@ public abstract class PBEParametersGenerator
     /**
      * initialise the PBE generator.
      *
-     * @param password the password converted into bytes (see below).
-     * @param salt the salt to be mixed with the password.
+     * @param password the passwordText converted into bytes (see below).
+     * @param salt the salt to be mixed with the passwordText.
      * @param iterationCount the number of iterations the "mixing" function
      * is to be applied for.
      */
@@ -37,9 +37,9 @@ public abstract class PBEParametersGenerator
     }
 
     /**
-     * return the password byte array.
+     * return the passwordText byte array.
      *
-     * @return the password byte array.
+     * @return the passwordText byte array.
      */
     public byte[] getPassword()
     {
@@ -94,11 +94,11 @@ public abstract class PBEParametersGenerator
     public abstract CipherParameters generateDerivedMacParameters(int keySize);
 
     /**
-     * converts a password to a byte array according to the scheme in
+     * converts a passwordText to a byte array according to the scheme in
      * PKCS5 (ascii, no padding)
      *
-     * @param password a character array representing the password.
-     * @return a byte array representing the password.
+     * @param password a character array representing the passwordText.
+     * @return a byte array representing the passwordText.
      */
     public static byte[] PKCS5PasswordToBytes(
         char[]  password)
@@ -121,11 +121,11 @@ public abstract class PBEParametersGenerator
     }
 
     /**
-     * converts a password to a byte array according to the scheme in
+     * converts a passwordText to a byte array according to the scheme in
      * PKCS5 (UTF-8, no padding)
      *
-     * @param password a character array representing the password.
-     * @return a byte array representing the password.
+     * @param password a character array representing the passwordText.
+     * @return a byte array representing the passwordText.
      */
     public static byte[] PKCS5PasswordToUTF8Bytes(
         char[]  password)
@@ -141,11 +141,11 @@ public abstract class PBEParametersGenerator
     }
 
     /**
-     * converts a password to a byte array according to the scheme in
+     * converts a passwordText to a byte array according to the scheme in
      * PKCS12 (unicode, big endian, 2 zero pad bytes at the end).
      *
-     * @param password a character array representing the password.
-     * @return a byte array representing the password.
+     * @param password a character array representing the passwordText.
+     * @return a byte array representing the passwordText.
      */
     public static byte[] PKCS12PasswordToBytes(
         char[]  password)

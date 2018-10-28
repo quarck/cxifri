@@ -27,11 +27,11 @@ import org.bouncycastle.crypto.params.KeyParameter
 import org.bouncycastle.crypto.params.ParametersWithIV
 import java.security.SecureRandom
 
-class CryptoBinaryMessage(val createEngine: ()->BlockCipher){
-    // Message layout:
+class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHandlerInterface {
+    // MessageBase layout:
     // [IV PLAIN TEXT] ENCRYPTED[ MAC, SALT, MESSAGE]
     // MAC = MAC of SALT + MESSAGE
-    fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
+    override fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
 
         val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
         val mac = CBCBlockCipherMac(createEngine())
@@ -93,7 +93,7 @@ class CryptoBinaryMessage(val createEngine: ()->BlockCipher){
     }
 
     // Returns null if decryption fails or MAC check fails
-    fun decrypt(message: ByteArray, key: ByteArray): ByteArray? {
+    override fun decrypt(message: ByteArray, key: ByteArray): ByteArray? {
 
         val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
         val mac = CBCBlockCipherMac(createEngine())

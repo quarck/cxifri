@@ -28,9 +28,10 @@ import android.widget.*
 import net.cxifri.aks.AndroidKeyStore
 import net.cxifri.crypto.DerivedKeyGenerator
 import net.cxifri.R
-import net.cxifri.keysdb.KeyEntry
-import net.cxifri.keysdb.KeySaveHelper
+import net.cxifri.crypto.KeyEntry
+import net.cxifri.keysdb.KeyHelper
 import net.cxifri.keysdb.KeysDatabase
+import net.cxifri.keysdb.toStringDetails
 import net.cxifri.utils.UIItem
 
 class KeyStateEntry(
@@ -58,7 +59,7 @@ class KeyStateEntry(
         buttonDelete.setOnClickListener(this::onButtonDelete)
 
         keyName.setText(key.name)
-        keyDetails.setText(key.toStringDetails())
+        keyDetails.setText(key.toStringDetails(context))
     }
 
     fun onButtonReplace(v: View) {
@@ -180,7 +181,7 @@ class KeysActivity : AppCompatActivity() {
         }
 
         val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
-        KeySaveHelper().saveKey(this, name, key, checkboxPreferAndroidKeyStore.isChecked)
+        KeyHelper().saveKey(this, name, key, checkboxPreferAndroidKeyStore.isChecked)
 
         layoutAddNewKeyButtons.visibility = View.GONE
         addKeyLayout.visibility = View.VISIBLE

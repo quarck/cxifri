@@ -20,6 +20,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
+import net.cxifri.crypto.KeyEntry
 import java.util.*
 
 class KeysDatabaseImpl {
@@ -35,9 +36,9 @@ class KeysDatabaseImpl {
                         "$KEY_NAME TEXT, " +
                         "$KEY_VALUE TEXT, " +
                         "$KEY_IS_ENCRYPTED INTEGER, " +
-                        "$KEY_IS_REPLACEMENT_REQUESTED INTEGER, " +
+                        "$KEY_IS_REVOKED INTEGER, " +
                         "$KEY_REPLACEMENT_KEY_ID INTEGER, " +
-                        "$KEY_DELETE_AFTER INTEGER" +
+                        "$KEY_RESERVED_FIELD INTEGER" +
                         " )"
 
         Log.d(LOG_TAG, "Creating DB TABLE using query: " + CREATE_PKG_TABLE)
@@ -69,20 +70,15 @@ class KeysDatabaseImpl {
         values.put(KEY_NAME, key.name)
         values.put(KEY_VALUE, key.value)
         values.put(KEY_IS_ENCRYPTED, if (key.encrypted) 1 else 0)
-        values.put(KEY_IS_REPLACEMENT_REQUESTED, if (key.replaceRequested) 1 else 0)
+        values.put(KEY_IS_REVOKED, if (key.revoked) 1 else 0)
         values.put(KEY_REPLACEMENT_KEY_ID, key.replacementKeyId)
-        values.put(KEY_DELETE_AFTER, key.deleteAfter)
+        values.put(KEY_RESERVED_FIELD, 0)
 
         return values
     }
 
     fun deleteKey(db: SQLiteDatabase, keyId: Long): Int {
         return db.delete(TABLE_NAME, " $KEY_ID = ?", arrayOf(keyId.toString()))
-    }
-
-    fun deleteOldKeys(db: SQLiteDatabase, now: Long): Int {
-        return db.delete(TABLE_NAME,
-                " $KEY_DELETE_AFTER > 0 AND $KEY_DELETE_AFTER < ?", arrayOf(now.toString()))
     }
 
     fun getKeys(db: SQLiteDatabase): List<KeyEntry> {
@@ -144,12 +140,10 @@ class KeysDatabaseImpl {
                         ?: throw Exception("Can't read key value"),
                 encrypted = ((cursor.getInt(PROJECTION_KEY_IS_ENCRYPTED) as Int?)
                         ?: throw Exception("Can't get isEncrypted flag")) != 0,
-                replaceRequested = ((cursor.getInt(PROJECTION_KEY_IS_REPLACEMENT_REQUESTED) as Int?)
+                revoked = ((cursor.getInt(PROJECTION_KEY_IS_REVOKED) as Int?)
                         ?: throw Exception("Can't get isReplacementRequested flag")) != 0,
                 replacementKeyId = (cursor.getLong(PROJECTION_KEY_REPLACEMENT_KEY_ID) as Long?)
-                        ?: throw Exception("Can't read key replacement ID"),
-                deleteAfter = (cursor.getLong(PROJECTION_KEY_DELETE_AFTER) as Long?)
-                        ?: throw Exception("Can't read key deleteAfter")
+                        ?: throw Exception("Can't read key replacement ID")
         )
     }
 
@@ -162,18 +156,18 @@ class KeysDatabaseImpl {
         private const val KEY_NAME = "b"
         private const val KEY_VALUE = "c"
         private const val KEY_IS_ENCRYPTED = "d"
-        private const val KEY_IS_REPLACEMENT_REQUESTED = "e"
+        private const val KEY_IS_REVOKED = "e"
         private const val KEY_REPLACEMENT_KEY_ID = "f"
-        private const val KEY_DELETE_AFTER = "h"
+        private const val KEY_RESERVED_FIELD = "h"
 
         private val SELECT_COLUMNS = arrayOf<String>(
                 KEY_ID,
                 KEY_NAME,
                 KEY_VALUE,
                 KEY_IS_ENCRYPTED,
-                KEY_IS_REPLACEMENT_REQUESTED,
+                KEY_IS_REVOKED,
                 KEY_REPLACEMENT_KEY_ID,
-                KEY_DELETE_AFTER
+                KEY_RESERVED_FIELD
         )
 
         const val PROJECTION_KEY_ID = 0
@@ -181,9 +175,9 @@ class KeysDatabaseImpl {
         const val PROJECTION_KEY_VALUE = 2
         const val PROJECTION_KEY_IS_ENCRYPTED = 3
 
-        const val PROJECTION_KEY_IS_REPLACEMENT_REQUESTED = 4
+        const val PROJECTION_KEY_IS_REVOKED = 4
         const val PROJECTION_KEY_REPLACEMENT_KEY_ID = 5
-        const val PROJECTION_KEY_DELETE_AFTER = 6
+        const val PROJECTION_RESERVED_FIELD = 6
 
     }
 }

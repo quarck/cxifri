@@ -49,4 +49,7 @@
     <string name="key_type_below">key: type below</string>
     <string name="key_format" formatted="false">key: %s</string>
     <string name="text_password">Text password</string>
+    <string name="revoked_key">REVOKED KEY!</string>
+    <string name="encrypted_by_aks_key">Encrypted by AndroidKeyStore</string>
+    <string name="stored_as_pt_key">Stored as Plain Text</string>
 </resources>

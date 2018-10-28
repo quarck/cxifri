@@ -20,6 +20,7 @@ import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
+import net.cxifri.crypto.KeyEntry
 import java.io.Closeable
 
 

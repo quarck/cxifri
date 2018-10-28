@@ -32,7 +32,7 @@ public class PKCS5S1ParametersGenerator
     }
 
     /**
-     * the derived key function, the ith hash of the password and the salt.
+     * the derived key function, the ith hash of the passwordText and the salt.
      */
     private byte[] generateDerivedKey()
     {
@@ -52,7 +52,7 @@ public class PKCS5S1ParametersGenerator
     }
 
     /**
-     * Generate a key parameter derived from the password, salt, and iteration
+     * Generate a key parameter derived from the passwordText, salt, and iteration
      * count we are currently initialised with.
      *
      * @param keySize the size of the key we want (in bits)
@@ -77,7 +77,7 @@ public class PKCS5S1ParametersGenerator
 
     /**
      * Generate a key with initialisation vector parameter derived from
-     * the password, salt, and iteration count we are currently initialised
+     * the passwordText, salt, and iteration count we are currently initialised
      * with.
      *
      * @param keySize the size of the key we want (in bits)
@@ -104,7 +104,7 @@ public class PKCS5S1ParametersGenerator
     }
 
     /**
-     * Generate a key parameter for use with a MAC derived from the password,
+     * Generate a key parameter for use with a MAC derived from the passwordText,
      * salt, and iteration count we are currently initialised with.
      *
      * @param keySize the size of the key we want (in bits)

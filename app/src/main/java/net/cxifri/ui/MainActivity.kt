@@ -31,12 +31,12 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.TextView
-import net.cxifri.crypto.CxifriMessage
 import net.cxifri.R
-import net.cxifri.keysdb.KeyEntry
+import net.cxifri.crypto.*
 import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.utils.UIItem
 import net.cxifri.utils.background
+import java.security.KeyRep
 
 
 class MainActivity : AppCompatActivity() {
@@ -44,9 +44,9 @@ class MainActivity : AppCompatActivity() {
     val buttonEncrypt by UIItem<Button>(R.id.buttonEncrypt)
     val buttonDecrypt by UIItem<Button>(R.id.buttonDecrypt)
 
-    val message by UIItem<EditText>(R.id.message)
+    val messageText by UIItem<EditText>(R.id.message)
     val buttonKeySelect by UIItem<Button>(R.id.buttonKeySelect)
-    val password by UIItem<EditText>(R.id.password)
+    val passwordText by UIItem<EditText>(R.id.password)
     val textViewError by UIItem<TextView>(R.id.textViewError)
 
     var isTextEncrypted = false
@@ -87,6 +87,9 @@ class MainActivity : AppCompatActivity() {
             R.id.menu_copy ->
                 copyText()
 
+            R.id.menu_paste ->
+                pasteText()
+
             R.id.menu_share ->
                 shareText()
 
@@ -111,12 +114,12 @@ class MainActivity : AppCompatActivity() {
         if (intentKeyIdExtra != -1L) {
             onKeySelected(intentKeyIdExtra)
             if (intentTextExtra != null) {
-                message.setText(intentTextExtra)
+                messageText.setText(intentTextExtra)
                 isTextEncrypted = false
             }
         }
         else if (intentTextExtra != null) {
-            message.setText(intentTextExtra)
+            messageText.setText(intentTextExtra)
             isTextEncrypted = false
         }
 //        else if (intent.action == Intent.ACTION_SEND) {
@@ -158,34 +161,33 @@ class MainActivity : AppCompatActivity() {
             val keys = KeysDatabase(context = this).use { it.keys }
             var success = false
 
-            val cryptoMessage = CxifriMessage()
+            val messageHandler = CryptoFactory.createMessageHandler()
 
-            // TODO: move this to a "worker" file
-            for (key in keys) {
-                try {
-                    val decrypted = cryptoMessage.decrypt(text, key)
-                    if (decrypted != null) {
+            val message = messageHandler.decrypt(text, keys)
+            if (message != null) {
+                when (message) {
+                    is TextMessage -> {
                         runOnUiThread {
                             val intent = Intent(this, TextViewActivity::class.java)
-                            intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, decrypted)
-                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, key.id)
-                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, key.name)
+                            intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, message.text)
+                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, message.key.id)
+                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, message.key.name)
                             startActivity(intent)
-//                            textViewMessage.setText(decrypted)
-//                            textViewAuthStatus.setText("Decrypted and valid, key: ${key.name}")
                         }
-                        currentKey = key
+                        currentKey = message.key
                         success = true
-                        break
                     }
-                } catch (ex: Exception) {
+
+                    is KeyReplacementMessage -> TODO("Not implemented")
+
+                    is KeyRevokeMessage -> TODO("Not implemented also")
                 }
             }
 
             if (!success) {
                 isTextEncrypted = false // don't allow sharing
                 runOnUiThread {
-                    message.setText(text)
+                    messageText.setText(text)
                 }
             }
         }
@@ -221,12 +223,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun onKeySelected(keyId: Long) {
         if (keyId != -1L) {
-            password.visibility = View.GONE
+            passwordText.visibility = View.GONE
             currentKey = KeysDatabase(context = this).use { it.getKey(keyId) }
             buttonKeySelect.text = getString(R.string.key_format).format(currentKey?.name)
         }
         else {
-            password.visibility = View.VISIBLE
+            passwordText.visibility = View.VISIBLE
             buttonKeySelect.text = getString(R.string.key_type_below)
             currentKey = null
         }
@@ -235,66 +237,74 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun onButtonEncrypt(v: View) {
-        val msg = message.text.toString()
-        val key = password.text.toString()
+        val msg = messageText.text.toString()
+        val password = passwordText.text.toString()
 
         textViewError.visibility = View.GONE
 
         background {
             var encrypted: String? = null
-            val cKey = currentKey
+            var cKey = currentKey //  ?: CryptoFactory.deriveKeyFromPassword(key)
+            if (cKey == null) {
 
-            if (cKey != null) {
-                try {
-                    encrypted = CxifriMessage().encrypt(msg, cKey)
-                } catch (ex: Exception) {
-                    encrypted = null
-                }
-            } else {
-                if (key.isEmpty()) {
+                if (password.isEmpty()) {
                     runOnUiThread {
                         textViewError.setText(getString(R.string.key_is_empty))
                         textViewError.visibility = View.VISIBLE
                     }
-                } else if (key.length < 8) {
+                    return@background
+                } else if (password.length < 8) {
                     runOnUiThread {
                         textViewError.setText(getString(R.string.key_is_too_short))
                         textViewError.visibility = View.VISIBLE
                     }
-                } else {
-                    encrypted = CxifriMessage().encrypt(msg, key)
+                    return@background
                 }
+
+                cKey = CryptoFactory.deriveKeyFromPassword(password)
             }
+
+            try {
+                encrypted = CryptoFactory.createMessageHandler().encrypt(TextMessage(cKey, msg), cKey)
+            } catch (ex: Exception) {
+                encrypted = null
+            }
+
 
             if (encrypted != null) {
                 isTextEncrypted = true
                 runOnUiThread {
-                    message.setText(encrypted)
+                    messageText.setText(encrypted)
                 }
             }
         }
     }
 
     private fun onButtonDecrypt(v: View) {
-        val msg = message.text.toString()
-        val key = password.text.toString()
+        val msg = messageText.text.toString()
+        val password = passwordText.text.toString()
 
         textViewError.visibility = View.GONE
 
         background {
             try {
-                val cKey = currentKey
+                val cKey = currentKey ?: CryptoFactory.deriveKeyFromPassword(password)
                 val decrypted =
-                        if (cKey != null)
-                            CxifriMessage().decrypt(msg, cKey)
-                        else
-                            CxifriMessage().decrypt(msg, key)
+                        CryptoFactory.createMessageHandler().decrypt(msg, cKey)
 
                 if (decrypted != null) {
                     isTextEncrypted = false
-                    runOnUiThread {
-                        message.setText(decrypted)
+
+                    when (decrypted) {
+                        is TextMessage ->
+                            runOnUiThread {
+                                messageText.setText(decrypted.text)
+                            }
+                        is KeyReplacementMessage -> TODO("Not implemented")
+
+                        is KeyRevokeMessage -> TODO("not impl allsss")
                     }
+
                 }
                 else
                     runOnUiThread {
@@ -311,7 +321,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun copyText() {
-        val msg = message.text.toString()
+        val msg = messageText.text.toString()
         if (msg.length != 0) {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clip = ClipData.newPlainText(getString(R.string.clipboard_clip_label), msg)
@@ -319,22 +329,21 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-//    private fun onButtonPaste(v: View) {
-//        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-//        val clip = clipboard.getPrimaryClip()
-//        if (clip != null) {
-//            val item = clip.getItemAt(0)
-//            if (item != null)
-//                message.setText(item.text)
-//        }
-//
-//        isTextEncrypted = false
-//        buttonShare.isEnabled = isTextEncrypted
-//    }
+    private fun pasteText() {
+        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = clipboard.getPrimaryClip()
+        if (clip != null) {
+            val item = clip.getItemAt(0)
+            if (item != null)
+                messageText.setText(item.text)
+        }
+
+        isTextEncrypted = false
+    }
 
     private fun clearForm() {
-        message.setText("")
-        password.setText("")
+        messageText.setText("")
+        passwordText.setText("")
         isTextEncrypted = false
     }
 
@@ -342,7 +351,7 @@ class MainActivity : AppCompatActivity() {
     private fun doShareText() {
         val intent = Intent(android.content.Intent.ACTION_SEND)
         intent.type = "text/plain"
-        intent.putExtra(android.content.Intent.EXTRA_TEXT, message.text.toString())
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, messageText.text.toString())
         startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
     }
 

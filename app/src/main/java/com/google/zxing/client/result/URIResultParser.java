@@ -56,7 +56,7 @@ public final class URIResultParser extends ResultParser {
   /**
    * @return true if the URI contains suspicious patterns that may suggest it intends to
    *  mislead the user about its true nature. At the moment this looks for the presence
-   *  of user/password syntax in the host/authority portion of a URI which may be used
+   *  of user/passwordText syntax in the host/authority portion of a URI which may be used
    *  in attempts to make the URI's host appear to be other than it is. Example:
    *  http://yourbank.com@phisher.com  This URI connects to phisher.com but may appear
    *  to connect to yourbank.com at first glance.
