@@ -36,7 +36,6 @@ import net.cxifri.crypto.*
 import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.utils.UIItem
 import net.cxifri.utils.background
-import java.security.KeyRep
 
 
 class MainActivity : AppCompatActivity() {
@@ -122,37 +121,86 @@ class MainActivity : AppCompatActivity() {
             messageText.setText(intentTextExtra)
             isTextEncrypted = false
         }
-//        else if (intent.action == Intent.ACTION_SEND) {
-//            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
-//            if (text != null) {
-//                message.setText(text)
-//                isTextEncrypted = false
-//                buttonShare.isEnabled = false
-//            }
-//        }
-        else if (intent.action == Intent.ACTION_VIEW) {
-            val uri = intent.data
-            if (uri != null) {
-                handleTextIntent(uri.toString())
-            }
-        }
-        else if (intent.action == Intent.ACTION_SEND) {
-            val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
-            if (text != null) {
-                handleTextIntent(text)
-            }
-        }
-        else if (intent.action == Intent.ACTION_PROCESS_TEXT) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                val text = intent.getCharSequenceExtra(android.content.Intent.EXTRA_PROCESS_TEXT)
-                if (text != null) {
-                    handleTextIntent(text.toString())
+        else when(intent.action) {
+            Intent.ACTION_VIEW -> {
+                val uri = intent.data
+                if (uri != null) {
+                    handleTextIntent(uri.toString())
                 }
             }
+            Intent.ACTION_SEND -> {
+                val text = intent.getStringExtra(android.content.Intent.EXTRA_TEXT)
+                if (text != null) {
+                    handleTextIntent(text)
+                }
+            }
+            Intent.ACTION_PROCESS_TEXT ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val text = intent.getCharSequenceExtra(android.content.Intent.EXTRA_PROCESS_TEXT)
+                    if (text != null) {
+                        handleTextIntent(text.toString())
+                    }
+                }
         }
     }
 
-    fun handleTextIntent(text: String) {
+    private fun onIntentMessageDecrypted(message: MessageBase): Boolean {
+        var success = false
+
+        when (message) {
+            is TextMessage -> {
+                runOnUiThread {
+                    val intent = Intent(this, TextViewActivity::class.java)
+                    intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, message.text)
+                            .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, message.key.id)
+                            .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, message.key.name)
+                    startActivity(intent)
+                }
+                currentKey = message.key
+                success = true
+            }
+
+            is KeyReplacementMessage -> TODO("Not implemented")
+
+            is KeyRevokeMessage -> TODO("Not implemented also")
+        }
+
+        return success
+    }
+
+    private fun onMessageDecrypted(message: MessageBase) {
+        when (message) {
+            is TextMessage ->
+                runOnUiThread {
+                    messageText.setText(message.text)
+                }
+            is KeyReplacementMessage -> TODO("Not implemented")
+
+            is KeyRevokeMessage -> TODO("not impl allsss")
+        }
+    }
+
+    private fun onMessageEncrypted(message: String) {
+        runOnUiThread {
+            messageText.setText(message)
+        }
+    }
+
+    private fun onDecryptFailed() {
+        runOnUiThread {
+            textViewError.visibility = View.VISIBLE
+            textViewError.setText(R.string.failed_to_decrypt)
+        }
+    }
+
+    private fun onEncryptFailed() {
+        runOnUiThread {
+            textViewError.visibility = View.VISIBLE
+            textViewError.setText(getString(R.string.failed_to_encrypt))
+        }
+    }
+
+    private fun handleTextIntent(text: String) {
 
         // Text can be either encrypted (user wants to decrypt it) or plaintext (user wants to
         // encrypt it). Attempt to decrypt using known keys, if success - show the activity
@@ -165,23 +213,7 @@ class MainActivity : AppCompatActivity() {
 
             val message = messageHandler.decrypt(text, keys)
             if (message != null) {
-                when (message) {
-                    is TextMessage -> {
-                        runOnUiThread {
-                            val intent = Intent(this, TextViewActivity::class.java)
-                            intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, message.text)
-                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, message.key.id)
-                                    .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, message.key.name)
-                            startActivity(intent)
-                        }
-                        currentKey = message.key
-                        success = true
-                    }
-
-                    is KeyReplacementMessage -> TODO("Not implemented")
-
-                    is KeyRevokeMessage -> TODO("Not implemented also")
-                }
+                success = onIntentMessageDecrypted(message)
             }
 
             if (!success) {
@@ -197,8 +229,8 @@ class MainActivity : AppCompatActivity() {
         val keys = KeysDatabase(context = this).use { it.keys }
 
         val builder = AlertDialog.Builder(this)
-        builder.setIcon(R.drawable.ic_launcher_foreground)
-        builder.setTitle("Pick a key")
+        builder.setIcon(android.R.drawable.ic_menu_directions)
+        builder.setTitle(getString(R.string.select_a_key))
 
         val names = keys.map { it.name }.toList() + listOf<String>(getString(R.string.text_password))
         val values = keys.map { it.id }.toList() + listOf<Long>(-1L)
@@ -243,7 +275,6 @@ class MainActivity : AppCompatActivity() {
         textViewError.visibility = View.GONE
 
         background {
-            var encrypted: String? = null
             var cKey = currentKey //  ?: CryptoFactory.deriveKeyFromPassword(key)
             if (cKey == null) {
 
@@ -265,17 +296,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             try {
-                encrypted = CryptoFactory.createMessageHandler().encrypt(TextMessage(cKey, msg), cKey)
-            } catch (ex: Exception) {
-                encrypted = null
-            }
-
-
-            if (encrypted != null) {
+                val encrypted = CryptoFactory.createMessageHandler().encrypt(TextMessage(cKey, msg), cKey)
                 isTextEncrypted = true
-                runOnUiThread {
-                    messageText.setText(encrypted)
-                }
+                onMessageEncrypted(encrypted)
+            } catch (ex: Exception) {
+                onEncryptFailed()
             }
         }
     }
@@ -289,33 +314,17 @@ class MainActivity : AppCompatActivity() {
         background {
             try {
                 val cKey = currentKey ?: CryptoFactory.deriveKeyFromPassword(password)
-                val decrypted =
-                        CryptoFactory.createMessageHandler().decrypt(msg, cKey)
+                val decrypted = CryptoFactory.createMessageHandler().decrypt(msg, cKey)
 
                 if (decrypted != null) {
                     isTextEncrypted = false
-
-                    when (decrypted) {
-                        is TextMessage ->
-                            runOnUiThread {
-                                messageText.setText(decrypted.text)
-                            }
-                        is KeyReplacementMessage -> TODO("Not implemented")
-
-                        is KeyRevokeMessage -> TODO("not impl allsss")
-                    }
-
+                    onMessageDecrypted(decrypted)
                 }
-                else
-                    runOnUiThread {
-                        textViewError.visibility = View.VISIBLE
-                        textViewError.setText(R.string.failed_to_decrypt)
-                    }
+                else {
+                    onDecryptFailed()
+                }
             } catch (ex: Exception) {
-                runOnUiThread {
-                    textViewError.visibility = View.VISIBLE
-                    textViewError.setText(R.string.failed_to_decrypt)
-                }
+                onDecryptFailed()
             }
         }
     }

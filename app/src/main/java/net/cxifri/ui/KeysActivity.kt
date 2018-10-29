@@ -99,6 +99,7 @@ class KeyStateEntry(
 class KeysActivity : AppCompatActivity() {
     val keysRoot by UIItem<LinearLayout>(R.id.layoutExistingKeysRoot)
     val addNewPasswordKeyButton by UIItem<Button>(R.id.buttonAddNewPasswordKey)
+    val deleteAllKeysButton by UIItem<Button>(R.id.buttonDeleteAllKeys)
     val genNewKeyButton by UIItem<Button>(R.id.buttonGenerateRandomKey)
     val scanNewKeyButton by UIItem<Button>(R.id.buttonScanRandomKey)
     val addKeyLayout by UIItem<LinearLayout>(R.id.layoutAddKey)
@@ -127,8 +128,9 @@ class KeysActivity : AppCompatActivity() {
         scanNewKeyButton.setOnClickListener(this::onButtonScanNewKey)
 
         buttonSaveKey.setOnClickListener(this::onButtonAddPasswordKeySave)
-
         buttonCancel.setOnClickListener(this::onButtonAddPasswordKeyCancel)
+
+        deleteAllKeysButton.setOnClickListener(this::onButtonDeleteAllKeys)
     }
 
     override fun onResume() {
@@ -185,6 +187,9 @@ class KeysActivity : AppCompatActivity() {
 
         layoutAddNewKeyButtons.visibility = View.VISIBLE
         addKeyLayout.visibility = View.GONE
+        keyName.setText("")
+        keyPassword.setText("")
+        keyPasswordConfirmation.setText("")
 
         reloadKeys()
     }
@@ -193,6 +198,9 @@ class KeysActivity : AppCompatActivity() {
     private fun onButtonAddPasswordKeyCancel(v: View) {
         layoutAddNewKeyButtons.visibility = View.VISIBLE
         addKeyLayout.visibility = View.GONE
+        keyName.setText("")
+        keyPassword.setText("")
+        keyPasswordConfirmation.setText("")
     }
 
     private fun onReplaceKey(key: KeyEntry){
@@ -215,6 +223,45 @@ class KeysActivity : AppCompatActivity() {
             keysRoot.removeView(matchingState.layout)
             keyStates.removeAll { it.key.value == key.value }
         }
+    }
+
+    private fun onButtonDeleteAllKeys(v: View) {
+        val builder = AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getString(R.string.delete_all_keys_question))
+                .setMessage(getString(R.string.delete_all_keys_can_be_undone))
+                .setPositiveButton(android.R.string.ok) { _, _ -> deleteAllKeysSecondConfirmation() }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+        return builder.create().show()
+    }
+
+    private fun deleteAllKeysSecondConfirmation() {
+        val builder = AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(getString(R.string.delete_all_keys_second_confirmation_question))
+                .setPositiveButton(android.R.string.ok) { _, _ -> doDeleteAllKeys() }
+                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+        return builder.create().show()
+    }
+
+    private fun doDeleteAllKeys() {
+        val keys = KeysDatabase(context = this).use { it.keys }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // this will render DB key useless - so do it first thing
+            AndroidKeyStore().let {
+                for (key in keys)
+                    it.dropKey(key.id)
+            }
+        }
+
+        KeysDatabase(context = this).use {
+            db ->
+            for (key in keys)
+                db.deleteKey(key.id)
+        }
+
+        reloadKeys()
     }
 
     fun reloadKeys() {

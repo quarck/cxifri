@@ -52,4 +52,10 @@
     <string name="revoked_key">REVOKED KEY!</string>
     <string name="encrypted_by_aks_key">Encrypted by AndroidKeyStore</string>
     <string name="stored_as_pt_key">Stored as Plain Text</string>
+    <string name="select_a_key">Select a key</string>
+    <string name="failed_to_encrypt">Failed to encrypt - Android Key Store error? (did you recently change your device password?)</string>
+    <string name="delete_all_keys">DELETE ALL KEYS</string>
+    <string name="delete_all_keys_question">Delete All Keys?</string>
+    <string name="delete_all_keys_can_be_undone">This can\'t be undone</string>
+    <string name="delete_all_keys_second_confirmation_question">Delete all keys? Last chance to cancel</string>
 </resources>
