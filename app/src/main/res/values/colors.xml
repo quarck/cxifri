@@ -5,4 +5,7 @@
     <color name="colorPrimaryLight">#39796b</color>
     <color name="colorAccent">#39796b</color>
     <color name="primaryTextColor">#000000</color>
+
+    <color name="errorTextColor">#bf3030</color>
+    <color name="colorTextAccent">#39796b</color>
 </resources>

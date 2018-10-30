@@ -29,11 +29,11 @@
     </android.support.design.widget.AppBarLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayoutButtons"
+        android:id="@+id/layoutKeyEntry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@id/appBarLayout"
         >
 
         <Button
@@ -42,8 +42,11 @@
             android:layout_height="wrap_content"
             android:text="@string/key_choose"
             android:layout_margin="5dp"
-            android:layout_gravity="center"
-            style="?android:attr/buttonStyle"
+            android:layout_gravity="start"
+            android:textAlignment="textStart"
+            android:textAppearance="@style/TextLargeAccent"
+            style="?attr/borderlessButtonStyle"
+            android:padding="10dp"
             />
 
         <EditText
@@ -55,6 +58,8 @@
             android:hint="@string/hint_password"
             android:visibility="gone"
             android:importantForAutofill="no"
+            android:layout_margin="5dp"
+            android:padding="10dp"
             tools:targetApi="o"
             />
 
@@ -62,45 +67,49 @@
             android:id="@+id/textViewError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:layout_marginEnd="2dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_margin="5dp"
             android:ems="10"
-            android:text="_key_name_placeholder_ some long long"
-            android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+            android:text="Some encryption error text would be here"
+            android:textAppearance="@style/TextError"
             tools:ignore="HardcodedText"
-            android:visibility="gone" />
+            android:visibility="gone"
+            android:padding="10dp"/>
 
-        <LinearLayout
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutEncryptDecryptButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:visibility="visible"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/buttonEncrypt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center">
+            android:text="@string/encrypt"
+            android:layout_margin="5sp"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextLargeAccent"
+            style="?attr/borderlessButtonStyle"
+            android:layout_weight="1"
+            />
 
-            <Button
-                android:id="@+id/buttonEncrypt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/encrypt"
-                android:layout_margin="5sp"
-                android:layout_gravity="center"
-                style="?android:attr/buttonStyle"
-                android:layout_weight="1"
-                />
-
-            <Button
-                android:id="@+id/buttonDecrypt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/decrypt"
-                android:layout_margin="5sp"
-                android:layout_gravity="center"
-                style="?android:attr/buttonStyle"
-                android:layout_weight="1"
-                />
-
-        </LinearLayout>
+        <Button
+            android:id="@+id/buttonDecrypt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/decrypt"
+            android:layout_margin="5sp"
+            android:layout_gravity="center"
+            android:textAppearance="@style/TextLargeAccent"
+            style="?attr/borderlessButtonStyle"
+            android:layout_weight="1"
+            />
 
     </LinearLayout>
 
@@ -115,9 +124,12 @@
         android:hint="@string/hint_privatemessage"
         android:importantForAutofill="no"
         tools:targetApi="o"
-        android:layout_below="@id/appBarLayout"
-        android:layout_above="@id/linearLayoutButtons"
+        android:layout_above="@id/layoutEncryptDecryptButtons"
+        android:layout_below="@id/layoutKeyEntry"
         android:gravity="top|start"
+        android:visibility="visible"
+        android:padding="10dp"
+        android:layout_margin="5dp"
         />
 
 

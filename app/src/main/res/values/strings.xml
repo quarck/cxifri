@@ -40,7 +40,7 @@
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
     <string name="about">About</string>
-    <string name="key_choose">key: choose</string>
+    <string name="key_choose">Key: &lt;choose&gt;</string>
     <string name="encrypted_message">Encrypted message</string>
     <string name="share_non_encrypted_text_question_mark">Share non-encrypted text?</string>
     <string name="failed_to_decrypt">Failed to decrypt: wrong key or message corrupted</string>

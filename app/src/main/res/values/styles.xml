@@ -47,4 +47,16 @@
         <item name="android:textColor">@color/primaryTextColor</item>
     </style>
 
+    <style name="TextError" parent="@style/TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/errorTextColor</item>
+    </style>
+
+    <style name="TextMediumAccent" parent="@style/TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/colorTextAccent</item>
+    </style>
+
+    <style name="TextLargeAccent" parent="@style/TextAppearance.AppCompat.Large">
+        <item name="android:textColor">@color/colorTextAccent</item>
+    </style>
+
 </resources>
