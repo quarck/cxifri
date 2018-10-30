@@ -25,13 +25,10 @@ class MessageHandler(
         private val binaryCryptor: BinaryMessageHandlerInterface
 ): MessageHandlerInterface {
 
-    // TODO: we certainly need "tryDecryt" method receiving an array of keys as an argument
-    // so to avoid repeated un-base64-ing of the message every time
-
     val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
     val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
-    val MESSAGE_FORMAT_REPLACEMENT_KEY: Byte = 2
-    val MESSAGE_FORMAT_KEY_IS_NO_LONGER_SECURE: Byte = 3
+    val MESSAGE_FORMAT_KEY_REPLACEMENT: Byte = 2
+    val MESSAGE_FORMAT_KEY_REVOKE: Byte = 3
 
     private fun packMessageForEncryption(message: MessageBase): ByteArray {
 
@@ -71,11 +68,19 @@ class MessageHandler(
     }
 
     private fun packKeyReplacementMessage(message: KeyReplacementMessage): ByteArray {
-        TODO("packKeyReplacementMessage is not implemented")
+        val newBinaryKey = message.newKey.asDecryptedBinary
+        if (newBinaryKey == null)
+            throw Exception("Key cannot be accessed")
+        val binaryMessage = ByteArray(2 + newBinaryKey.size)
+        binaryMessage[0] = MESSAGE_FORMAT_KEY_REPLACEMENT
+        binaryMessage[1] = if (message.receiverMustDeleteOldKey) 1 else 0
+        System.arraycopy(newBinaryKey, 0, binaryMessage, 2, newBinaryKey.size)
+        return binaryMessage
     }
 
     private fun packKeyIsNoLongerSecureMessage(message: KeyRevokeMessage): ByteArray {
-        TODO("packKeyIsNoLongerSecureMessage is not implemented")
+        // just a single byte - message code for this one
+        return byteArrayOf(MESSAGE_FORMAT_KEY_REVOKE)
     }
 
 
@@ -88,9 +93,9 @@ class MessageHandler(
         return when (blob[0]) {
             MESSAGE_FORMAT_PLAINTEXT, MESSAGE_FORMAT_GZIP_PLAINTEXT ->
                 unpackTextMessage(key, blob)
-            MESSAGE_FORMAT_REPLACEMENT_KEY ->
+            MESSAGE_FORMAT_KEY_REPLACEMENT ->
                 unpackReplacementKeyMessage(key, blob)
-            MESSAGE_FORMAT_KEY_IS_NO_LONGER_SECURE ->
+            MESSAGE_FORMAT_KEY_REVOKE ->
                 unpackKeyRevokeMessage(key, blob)
             else ->
                 null
@@ -114,11 +119,20 @@ class MessageHandler(
     }
 
     private fun unpackReplacementKeyMessage(key: KeyEntry, blob: ByteArray): KeyReplacementMessage? {
-        TODO("NOt implemented")
+
+        if (blob.size <= 2)
+            return null
+
+        val receiverMustDeleteOldKey = blob[1] != 0.toByte()
+        val binaryKey = ByteArray(blob.size - 2)
+        System.arraycopy(blob, 2, binaryKey, 0, binaryKey.size)
+
+        return KeyReplacementMessage(key, KeyEntry(binaryKey), receiverMustDeleteOldKey)
     }
 
     private fun unpackKeyRevokeMessage(key: KeyEntry, blob: ByteArray): KeyRevokeMessage? {
-        TODO("NOt Implemented")
+        // nothing to unpack and first byte was already verified
+        return KeyRevokeMessage(key)
     }
 
     override fun encrypt(message: MessageBase, key: KeyEntry): String {

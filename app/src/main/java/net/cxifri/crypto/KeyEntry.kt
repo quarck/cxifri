@@ -16,6 +16,8 @@
 
 package net.cxifri.crypto
 
+import org.bouncycastle.util.encoders.UrlBase64
+
 data class KeyEntry(
         val id: Long,
         var name: String,
@@ -23,4 +25,12 @@ data class KeyEntry(
         var encrypted: Boolean,
         var replacementKeyId: Long = 0,
         var revoked: Boolean = false
-)
+) {
+    constructor(value: ByteArray)
+            : this(
+            id = -1,
+            name = "",
+            value = UrlBase64.encode(value).toString(charset = Charsets.UTF_8),
+            encrypted = false
+    )
+}
