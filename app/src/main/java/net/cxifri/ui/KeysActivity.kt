@@ -160,6 +160,9 @@ class KeysActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        viewKeysLayout.visibility = View.VISIBLE
+        addKeyOptionsLayout.visibility = View.GONE
+        addPasswordKeyLayout.visibility = View.GONE
         reloadKeys()
     }
 

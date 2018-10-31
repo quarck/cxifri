@@ -178,8 +178,10 @@ class MessageHandler(
             try {
                 decryptedBinary = binaryCryptor.decrypt(unbase64, key.asDecryptedBinary
                         ?: throw Exception("Key failed"))
-                matchedKey = key
-                break
+                if (decryptedBinary != null) {
+                    matchedKey = key
+                    break
+                }
             } catch (ex: Exception) {
                 decryptedBinary = null
             }
