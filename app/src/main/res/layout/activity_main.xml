@@ -44,7 +44,7 @@
             android:layout_margin="5dp"
             android:layout_gravity="start"
             android:textAlignment="textStart"
-            android:textAppearance="@style/TextLargeAccent"
+            android:textAppearance="@style/TextMediumAccent"
             style="?attr/borderlessButtonStyle"
             android:padding="10dp"
             />
@@ -94,7 +94,7 @@
             android:text="@string/encrypt"
             android:layout_margin="5sp"
             android:layout_gravity="center"
-            android:textAppearance="@style/TextLargeAccent"
+            android:textAppearance="@style/TextMediumAccent"
             style="?attr/borderlessButtonStyle"
             android:layout_weight="1"
             />
@@ -106,7 +106,7 @@
             android:text="@string/decrypt"
             android:layout_margin="5sp"
             android:layout_gravity="center"
-            android:textAppearance="@style/TextLargeAccent"
+            android:textAppearance="@style/TextMediumAccent"
             style="?attr/borderlessButtonStyle"
             android:layout_weight="1"
             />

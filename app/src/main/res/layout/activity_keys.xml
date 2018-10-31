@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,6 +10,7 @@
     tools:context=".ui.MainActivity">
 
     <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay">
@@ -27,12 +28,14 @@
 
     </android.support.design.widget.AppBarLayout>
 
-
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
+        android:id="@+id/scrollViewKeys"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:layout_below="@id/appBarLayout"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -46,7 +49,7 @@
                 android:layout_margin="10sp"
                 android:ems="10"
                 android:text="@string/existing_keys"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Large" />
+                android:textAppearance="@style/TextLarge" />
 
             <LinearLayout
                 android:id="@+id/layoutExistingKeysRoot"
@@ -56,173 +59,306 @@
 
             </LinearLayout>
 
-
-            <LinearLayout
-                android:id="@+id/layoutAddNewKeyButtons"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-
-                <Button
-                    android:id="@+id/buttonAddNewPasswordKey"
-                    style="?android:attr/buttonStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/add_new_password_key_button_label"
-                    android:visibility="visible" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/buttonGenerateRandomKey"
-                        style="?android:attr/buttonStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_weight="1"
-                        android:text="@string/generate_random_key"
-                        android:visibility="visible" />
-
-
-                    <Button
-                        android:id="@+id/buttonScanRandomKey"
-                        style="?android:attr/buttonStyle"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="10dp"
-                        android:layout_marginEnd="5dp"
-                        android:layout_marginStart="5dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_weight="1"
-                        android:text="@string/scan_random_key"
-                        android:visibility="visible" />
-                </LinearLayout>
-
-                <Button
-                    android:id="@+id/buttonDeleteAllKeys"
-                    style="?android:attr/buttonStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_marginTop="10dp"
-                    android:text="@string/delete_all_keys"
-                    android:background="#ffff0000"
-                    android:visibility="visible" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/layoutAddKey"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="visible">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10sp"
-                    android:ems="10"
-                    android:text="@string/add_a_new_key"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
-
-                <EditText
-                    android:id="@+id/keyName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/key_name_hint"
-                    android:inputType="text"
-                    android:importantForAutofill="no"
-                    tools:targetApi="o" />
-
-                <EditText
-                    android:id="@+id/password"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/hint_password"
-                    android:inputType="textPassword|textNoSuggestions"
-                    android:importantForAutofill="no"
-                    tools:targetApi="o" />
-
-                <EditText
-                    android:id="@+id/passwordConfirmation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="@string/confirm_password_hint"
-                    android:inputType="textPassword|textNoSuggestions"
-                    android:importantForAutofill="no"
-                    tools:targetApi="o" />
-
-                <CheckBox
-                    android:id="@+id/checkBoxPreferAndroidKeyStore"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="@string/use_androidkeystore_if_supported"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium" />
-
-                <TextView
-                    android:id="@+id/textAndroidKeyStoreComment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10sp"
-                    android:ems="10"
-                    android:text="@string/aks_comment"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Small" />
-
-
-                <TextView
-                    android:id="@+id/textError"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16sp"
-                    android:ems="10"
-                    android:text="__ERROR_MSG__"
-                    android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
-                    android:visibility="gone"
-                    tools:ignore="HardcodedText" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <Button
-                        android:id="@+id/buttonSaveKey"
-                        style="?android:attr/buttonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/button_save_title" />
-
-                    <Button
-                        android:id="@+id/buttonCancel"
-                        style="?android:attr/buttonStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/button_cancel_title" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </ScrollView>
 
-</LinearLayout>
+    <!-- layout with add new keys buttons etc -->
+    <ScrollView
+        android:id="@+id/layoutAddNewKeyButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:layout_below="@id/appBarLayout"
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line0"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line01"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line1"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line11"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line12"
+                android:textAppearance="@style/TextSmallWarning" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:autoLink="web"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line13"
+                android:textAppearance="@style/TextSmallWarning" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line2"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line3"
+                android:textAppearance="@style/TextMedium" />
+            <TextView
+                android:layout_width="match_parent"  android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line4"
+                android:textAppearance="@style/TextMedium" />
+            <TextView
+                android:layout_width="match_parent"  android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line5"
+                android:textAppearance="@style/TextSmallWarning" />
+            <TextView
+                android:layout_width="match_parent"  android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="5dp"
+                android:ems="10"
+                android:text="@string/sevaral_options_available_for_creating_a_new_key_line6"
+                android:textAppearance="@style/TextMedium" />
+
+            <Button
+                android:id="@+id/buttonAddNewPasswordKey"
+                android:textAppearance="@style/TextMediumAccent"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/add_new_password_key_button_label"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/buttonGenerateRandomKey"
+                android:textAppearance="@style/TextMediumAccent"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:text="@string/generate_random_key"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/buttonScanRandomKey"
+                android:textAppearance="@style/TextMediumAccent"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:text="@string/scan_random_key"
+                android:visibility="visible" />
+
+            <Button
+                android:id="@+id/buttonCancelCreatingNewKey"
+                android:textAppearance="@style/TextMediumAccent"
+                style="?attr/borderlessButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/button_cancel_title"
+                android:visibility="visible" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <!-- layout add password key -->
+    <ScrollView
+        android:id="@+id/layoutAddKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appBarLayout"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:ems="10"
+                android:text="@string/add_a_new_key"
+                android:textAppearance="@style/TextMedium" />
+
+            <EditText
+                android:id="@+id/keyName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/key_name_hint"
+                android:importantForAutofill="no"
+                android:inputType="text"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/hint_password"
+                android:importantForAutofill="no"
+                android:inputType="textPassword|textNoSuggestions"
+                tools:targetApi="o" />
+
+            <EditText
+                android:id="@+id/passwordConfirmation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="@string/confirm_password_hint"
+                android:importantForAutofill="no"
+                android:inputType="textPassword|textNoSuggestions"
+                tools:targetApi="o" />
+
+            <CheckBox
+                android:id="@+id/checkBoxPreferAndroidKeyStore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/use_androidkeystore_if_supported"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:id="@+id/textAndroidKeyStoreComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:ems="10"
+                android:text="@string/aks_comment"
+                android:textAppearance="@style/TextSmall" />
+
+
+            <TextView
+                android:id="@+id/textError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16sp"
+                android:ems="10"
+                android:text="__ERROR_MSG__"
+                android:textAppearance="@style/TextError"
+                android:visibility="gone"
+                tools:ignore="HardcodedText" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/buttonSaveKey"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_save_title"
+                    android:textAppearance="@style/TextMediumAccent" />
+
+                <Button
+                    android:id="@+id/buttonCancel"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/button_cancel_title"
+                    android:textAppearance="@style/TextMediumAccent" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+
+</RelativeLayout>

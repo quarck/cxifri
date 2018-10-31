@@ -23,6 +23,8 @@ import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import net.cxifri.aks.AndroidKeyStore
@@ -98,19 +100,26 @@ class KeyStateEntry(
 
 class KeysActivity : AppCompatActivity() {
     val keysRoot by UIItem<LinearLayout>(R.id.layoutExistingKeysRoot)
+
     val addNewPasswordKeyButton by UIItem<Button>(R.id.buttonAddNewPasswordKey)
-    val deleteAllKeysButton by UIItem<Button>(R.id.buttonDeleteAllKeys)
     val genNewKeyButton by UIItem<Button>(R.id.buttonGenerateRandomKey)
     val scanNewKeyButton by UIItem<Button>(R.id.buttonScanRandomKey)
-    val addKeyLayout by UIItem<LinearLayout>(R.id.layoutAddKey)
+    val cancelNewKeyCreationButton by UIItem<Button>(R.id.buttonCancelCreatingNewKey)
+
+    val viewKeysLayout by UIItem<ScrollView>(R.id.scrollViewKeys)
+    val addKeyOptionsLayout by UIItem<ScrollView>(R.id.layoutAddNewKeyButtons)
+    val addPasswordKeyLayout by UIItem<ScrollView>(R.id.layoutAddKey)
+
     val keyName by UIItem<EditText>(R.id.keyName)
     val keyPassword by UIItem<EditText>(R.id.password)
     val keyPasswordConfirmation by UIItem<EditText>(R.id.passwordConfirmation)
-    val buttonSaveKey by UIItem<Button>(R.id.buttonSaveKey)
-    val buttonCancel by UIItem<Button>(R.id.buttonCancel)
-    val textError by UIItem<TextView>(R.id.textError)
-    val layoutAddNewKeyButtons by UIItem<LinearLayout>(R.id.layoutAddNewKeyButtons)
-    val checkboxPreferAndroidKeyStore by UIItem<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)
+
+    val passwordKeyButtonSaveKey by UIItem<Button>(R.id.buttonSaveKey)
+    val passwordKeyButtonCancel by UIItem<Button>(R.id.buttonCancel)
+    val passwordKeyErrorText by UIItem<TextView>(R.id.textError)
+    val passwordKeyCBPreferAndroidKeyStore by UIItem<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)
+
+//    val layoutAddNewKeyButtons by UIItem<LinearLayout>(R.id.layoutAddNewKeyButtons)
 
     lateinit var keyStates: MutableList<KeyStateEntry>
 
@@ -121,26 +130,49 @@ class KeysActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        addKeyLayout.visibility = View.GONE
-
         addNewPasswordKeyButton.setOnClickListener(this::onButtonAddPasswordKey)
         genNewKeyButton.setOnClickListener(this::onButtonGenerateKey)
         scanNewKeyButton.setOnClickListener(this::onButtonScanNewKey)
+        cancelNewKeyCreationButton.setOnClickListener(this::onButtonCancelNewKey)
 
-        buttonSaveKey.setOnClickListener(this::onButtonAddPasswordKeySave)
-        buttonCancel.setOnClickListener(this::onButtonAddPasswordKeyCancel)
-
-        deleteAllKeysButton.setOnClickListener(this::onButtonDeleteAllKeys)
+        passwordKeyButtonSaveKey.setOnClickListener(this::onButtonAddPasswordKeySave)
+        passwordKeyButtonCancel.setOnClickListener(this::onButtonAddPasswordKeyCancel)
     }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_keys_activity, menu)
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.menu_add_key ->
+                onAddKey()
+
+            R.id.menu_remove_all ->
+                onDeleteAllKeys()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
 
     override fun onResume() {
         super.onResume()
         reloadKeys()
     }
 
+    private fun onAddKey() {
+        viewKeysLayout.visibility = View.GONE
+        addKeyOptionsLayout.visibility = View.VISIBLE
+        addPasswordKeyLayout.visibility = View.GONE
+    }
+
     private fun onButtonAddPasswordKey(v: View) {
-        layoutAddNewKeyButtons.visibility = View.GONE
-        addKeyLayout.visibility = View.VISIBLE
+        viewKeysLayout.visibility = View.GONE
+        addKeyOptionsLayout.visibility = View.GONE
+        addPasswordKeyLayout.visibility = View.VISIBLE
     }
 
     private fun onButtonGenerateKey(v: View) {
@@ -153,6 +185,12 @@ class KeysActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
+    private fun onButtonCancelNewKey(v: View) {
+        viewKeysLayout.visibility = View.VISIBLE
+        addKeyOptionsLayout.visibility = View.GONE
+        addPasswordKeyLayout.visibility = View.GONE
+    }
+
     private fun onButtonAddPasswordKeySave(v: View) {
 
         val name = keyName.text.toString()
@@ -161,8 +199,8 @@ class KeysActivity : AppCompatActivity() {
 
         val onError = {
             text: String ->
-            textError.setText(text)
-            textError.visibility = View.VISIBLE
+            passwordKeyErrorText.setText(text)
+            passwordKeyErrorText.visibility = View.VISIBLE
         }
 
         if (name.isEmpty()) {
@@ -183,10 +221,11 @@ class KeysActivity : AppCompatActivity() {
         }
 
         val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
-        KeyHelper().saveKey(this, name, key, checkboxPreferAndroidKeyStore.isChecked)
+        KeyHelper().saveKey(this, name, key, passwordKeyCBPreferAndroidKeyStore.isChecked)
 
-        layoutAddNewKeyButtons.visibility = View.VISIBLE
-        addKeyLayout.visibility = View.GONE
+        viewKeysLayout.visibility = View.VISIBLE
+        addKeyOptionsLayout.visibility = View.GONE
+        addPasswordKeyLayout.visibility = View.GONE
         keyName.setText("")
         keyPassword.setText("")
         keyPasswordConfirmation.setText("")
@@ -196,8 +235,9 @@ class KeysActivity : AppCompatActivity() {
 
 
     private fun onButtonAddPasswordKeyCancel(v: View) {
-        layoutAddNewKeyButtons.visibility = View.VISIBLE
-        addKeyLayout.visibility = View.GONE
+        viewKeysLayout.visibility = View.VISIBLE
+        addKeyOptionsLayout.visibility = View.GONE
+        addPasswordKeyLayout.visibility = View.GONE
         keyName.setText("")
         keyPassword.setText("")
         keyPasswordConfirmation.setText("")
@@ -225,7 +265,7 @@ class KeysActivity : AppCompatActivity() {
         }
     }
 
-    private fun onButtonDeleteAllKeys(v: View) {
+    private fun onDeleteAllKeys() {
         val builder = AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(getString(R.string.delete_all_keys_question))

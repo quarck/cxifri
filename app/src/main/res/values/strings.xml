@@ -23,12 +23,13 @@
     <string name="require_device_password_or_fingerprint">Require device password or fingerprint</string>
     <string name="reply">Reply</string>
     <string name="quote">Quote</string>
-    <string name="add_a_new_key">Add a new key:</string>
+    <string name="add_a_new_key">Add a new password based key:</string>
+    <string name="add_a_new_key_menu_item">Add a new key</string>
     <string name="encrypt_decrypt_activity_label">cxifri</string>
     <string name="use_androidkeystore_if_supported">Store in AndroidKeyStore if supported</string>
     <string name="aks_comment">AndroidKeyStore is a secure storage backed by the device encryption hardware. Storing key with AndroidKeyStore is generally more secure, but on some devices you might loose access to stored keys if you change your device password (and possibly under other similar circumstancies)</string>
-    <string name="generate_random_key">Gen. Random Key</string>
-    <string name="scan_random_key">Scan random key</string>
+    <string name="generate_random_key">Generate Random Key (QR code)</string>
+    <string name="scan_random_key">Scan a random key (QR code)</string>
     <string name="title_activity_random_key_generation">Random Key</string>
     <string name="title_activity_random_key_scan">Scan Random Key</string>
     <string name="qr_code">QR Code</string>
@@ -46,16 +47,28 @@
     <string name="failed_to_decrypt">Failed to decrypt: wrong key or message corrupted</string>
     <string name="key_is_empty">Key is empty</string>
     <string name="key_is_too_short">Key is too short (min 8 chars, recommended 14)</string>
-    <string name="key_type_below">key: type below</string>
-    <string name="key_format" formatted="false">key: %s</string>
+    <string name="key_type_below">Key: type below</string>
+    <string name="key_format" formatted="false">Key: %s</string>
     <string name="text_password">Text password</string>
     <string name="revoked_key">REVOKED KEY!</string>
     <string name="encrypted_by_aks_key">Encrypted by AndroidKeyStore</string>
     <string name="stored_as_pt_key">Stored as Plain Text</string>
     <string name="select_a_key">Select a key</string>
     <string name="failed_to_encrypt">Failed to encrypt - Android Key Store error? (did you recently change your device password?)</string>
-    <string name="delete_all_keys">DELETE ALL KEYS</string>
+    <string name="delete_all_keys">Remove all keys</string>
     <string name="delete_all_keys_question">Delete All Keys?</string>
     <string name="delete_all_keys_can_be_undone">This can\'t be undone</string>
     <string name="delete_all_keys_second_confirmation_question">Delete all keys? Last chance to cancel</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line0">Please read:</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line01">Options for creating a new key:</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line1">- Create a password based key</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line11">* You and other person should enter the same password</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line12">Use a strong password to make it really secure:</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line13">14 symbols minimum, including lower and upper case, digits and special symbols is recommended; alternatively use a long random phrase containing 6–7 words, relevant xkcd: https://xkcd.com/936/</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line2">- Generate a fully random encryption key:</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line3">* First person generates random key and shows a QR code to another</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line4">* Second person scans generated QR code to read the key off the first device</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line5">Note: once first person (with QR code) saves the key, there is no way to show QR code again: you cannot be forced to share the encryption key as it is no longer possible</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line6">Please choose from the following options: </string>
+
 </resources>

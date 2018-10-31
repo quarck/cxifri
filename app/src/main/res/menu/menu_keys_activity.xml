@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@android:drawable/ic_menu_add"
+        android:id="@+id/menu_add_key"
+        android:title="@string/add_a_new_key_menu_item"
+        app:showAsAction="ifRoom"
+        />
+    <item
+        android:id="@+id/menu_remove_all"
+        android:title="@string/delete_all_keys"
+        app:showAsAction="never"
+        />
+</menu>
