@@ -10,8 +10,8 @@ android {
         applicationId "net.cxifri"
         minSdkVersion 17
         targetSdkVersion 28
-        versionCode 9
-        versionName "1.0b.7"
+        versionCode 10
+        versionName "1.0b.8"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
     }
