@@ -63,12 +63,12 @@
     <string name="sevaral_options_available_for_creating_a_new_key_line01">Options for creating a new key:</string>
     <string name="sevaral_options_available_for_creating_a_new_key_line1">- Create a password based key</string>
     <string name="sevaral_options_available_for_creating_a_new_key_line11">* You and other person should enter the same password</string>
-    <string name="sevaral_options_available_for_creating_a_new_key_line12">Use a strong password to make it really secure:</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line12">Use a strong password to make it secure:</string>
     <string name="sevaral_options_available_for_creating_a_new_key_line13">14 symbols minimum, including lower and upper case, digits and special symbols is recommended; alternatively use a long random phrase containing 6–7 words, relevant xkcd: https://xkcd.com/936/</string>
-    <string name="sevaral_options_available_for_creating_a_new_key_line2">- Generate a fully random encryption key:</string>
-    <string name="sevaral_options_available_for_creating_a_new_key_line3">* First person generates random key and shows a QR code to another</string>
-    <string name="sevaral_options_available_for_creating_a_new_key_line4">* Second person scans generated QR code to read the key off the first device</string>
-    <string name="sevaral_options_available_for_creating_a_new_key_line5">Note: once first person (with QR code) saves the key, there is no way to show QR code again: you cannot be forced to share the encryption key as it is no longer possible</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line2">- Generate a fully random 768-bit key:</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line3">* First person generates random key and shows the QR code to a second person</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line4">* Second person scans the QR code to read the key off the first device</string>
+    <string name="sevaral_options_available_for_creating_a_new_key_line5">Note: after random key is saved, there is no way to show QR code again or retrieve the key in any other way, this is done on purpose so you cannot be forced to share the key: app knows the key, it can encrypt and decrypt messages, but key cannot leave the app</string>
     <string name="sevaral_options_available_for_creating_a_new_key_line6">Please choose from the following options: </string>
 
 </resources>
