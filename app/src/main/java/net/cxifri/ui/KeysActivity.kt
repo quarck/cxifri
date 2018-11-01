@@ -40,6 +40,7 @@ class KeyStateEntry(
         var context: Context,
         inflater: LayoutInflater,
         val key: KeyEntry,
+        isEven: Boolean,
         val onReplaceKey: (KeyEntry) -> Unit,
         val onDeleteKey: (KeyEntry) -> Unit
 ) {
@@ -313,14 +314,17 @@ class KeysActivity : AppCompatActivity() {
         val keys = KeysDatabase(context = this).use { it.keys }
         keyStates = mutableListOf<KeyStateEntry>()
 
+        var idx = 0
         for (key in keys) {
             val keyState = KeyStateEntry(
                     context = this,
                     inflater = layoutInflater,
                     key = key,
+                    isEven = idx % 2 == 0,
                     onReplaceKey = this::onReplaceKey,
                     onDeleteKey = this::onDeleteKey
             )
+            idx += 1
 
             keyStates.add(keyState)
             keysRoot.addView(keyState.layout)
