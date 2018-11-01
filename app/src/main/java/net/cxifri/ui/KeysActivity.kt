@@ -43,14 +43,14 @@ class KeyStateEntry(
         val onReplaceKey: (KeyEntry) -> Unit,
         val onDeleteKey: (KeyEntry) -> Unit
 ) {
-    val layout: RelativeLayout
+    val layout: LinearLayout
     val keyName: TextView
     val keyDetails: TextView
     val buttonActions: Button
     val buttonDelete: Button
 
     init {
-        layout = inflater.inflate(R.layout.key_list_item, null) as RelativeLayout? ?: throw Exception("Layout error")
+        layout = inflater.inflate(R.layout.key_list_item, null) as LinearLayout? ?: throw Exception("Layout error")
 
         keyName = layout.findViewById<TextView>(R.id.textViewKeyName) ?: throw Exception("Layout error")
         keyDetails = layout.findViewById<TextView>(R.id.textViewKeyDetails) ?: throw Exception("Layout error")
