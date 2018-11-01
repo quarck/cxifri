@@ -46,7 +46,7 @@ class KeyStateEntry(
     val layout: RelativeLayout
     val keyName: TextView
     val keyDetails: TextView
-    val buttonReplace: Button
+    val buttonActions: Button
     val buttonDelete: Button
 
     init {
@@ -54,20 +54,20 @@ class KeyStateEntry(
 
         keyName = layout.findViewById<TextView>(R.id.textViewKeyName) ?: throw Exception("Layout error")
         keyDetails = layout.findViewById<TextView>(R.id.textViewKeyDetails) ?: throw Exception("Layout error")
-        buttonReplace = layout.findViewById(R.id.buttonReplace)
+        buttonActions = layout.findViewById(R.id.buttonActions)
         buttonDelete = layout.findViewById(R.id.buttonDelete)
 
-        buttonReplace.setOnClickListener(this::onButtonReplace)
+        buttonActions.setOnClickListener(this::onButtonActions)
         buttonDelete.setOnClickListener(this::onButtonDelete)
 
         keyName.setText(key.name)
         keyDetails.setText(key.toStringDetails(context))
     }
 
-    fun onButtonReplace(v: View) {
+    fun onButtonActions(v: View) {
 
         AlertDialog.Builder(context)
-                .setMessage("Key replacement is not implemented yet!")
+                .setMessage("No button actions are currently supported (YET!)!")
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok) {
                     _, _ ->

@@ -1,71 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:theme="@style/AppTheme.NoActionBar">
+    android:layout_height="wrap_content"
+    android:theme="@style/AppTheme.NoActionBar"
+    android:orientation="vertical">
 
-    <Button
-        android:id="@+id/buttonDelete"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="16dp"
-        android:padding="0dp"
-        android:text="@string/big_x"
-        android:textAppearance="@style/TextMedium"
-        style="?android:attr/buttonStyle"
-        />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/buttonReplace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="16dp"
-        android:padding="0dp"
-        android:text="@string/big_r"
-        android:layout_alignBaseline="@id/buttonDelete"
-        android:layout_toStartOf="@id/buttonDelete"
-        android:textAppearance="@style/TextMedium"
-        style="?android:attr/buttonStyle"
-        />
+        <Button
+            android:id="@+id/buttonActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/key_actions"
 
-    <TextView
-        android:id="@+id/textViewKeyName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="8dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_toStartOf="@id/buttonReplace"
-        android:ems="10"
-        android:text="_key_name_placeholder_ some long long"
-        android:textAppearance="@style/TextMedium"
-        tools:ignore="HardcodedText" />
+            android:textAppearance="@style/TextMediumAccent"
+            style="?attr/borderlessButtonStyle"
+            android:background="@color/buttonBackgroundColor"
 
-    <TextView
-        android:id="@+id/textViewKeyDetails"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="0dp"
-        android:layout_toStartOf="@id/buttonReplace"
-        android:layout_below="@id/textViewKeyName"
-        android:ems="10"
-        android:text="Some extra key details can be added here"
-        android:textAppearance="@style/TextSmall"
-        tools:ignore="HardcodedText" />
+            />
 
-</RelativeLayout>
+        <Button
+            android:id="@+id/buttonDelete"
+            style="?attr/borderlessButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/buttonActions"
+            android:layout_alignStart="@id/buttonActions"
+            android:layout_alignParentEnd="true"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:background="@color/deleteButtonBackgroundColor"
+            android:padding="0dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="@string/delete_key"
+            android:textAppearance="@style/TextMediumAccent" />
+
+
+        <TextView
+            android:id="@+id/textViewKeyName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_toStartOf="@id/buttonActions"
+            android:ems="10"
+            android:text="_key_name_placeholder_ some long long"
+            android:textAppearance="@style/TextMedium"
+            tools:ignore="HardcodedText" />
+
+        <TextView
+            android:id="@+id/textViewKeyDetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="0dp"
+            android:layout_toStartOf="@id/buttonActions"
+            android:layout_below="@id/textViewKeyName"
+            android:ems="10"
+            android:text="Some extra key details can be added here"
+            android:textAppearance="@style/TextSmall"
+            tools:ignore="HardcodedText" />
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/verticalLineSeparator" />
+
+</LinearLayout>

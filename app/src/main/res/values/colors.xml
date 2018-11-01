@@ -8,4 +8,9 @@
 
     <color name="errorTextColor">#bf3030</color>
     <color name="colorTextAccent">#39796b</color>
+
+    <color name="buttonBackgroundColor">#ddeedd</color>
+    <color name="deleteButtonBackgroundColor">#eedddd</color>
+
+    <color name="verticalLineSeparator">#7f7f7f</color>
 </resources>
