@@ -29,7 +29,7 @@ import java.security.SecureRandom
 
 class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHandlerInterface {
     // MessageBase layout:
-    // [IV PLAIN TEXT] ENCRYPTED[ MAC, SALT, MESSAGE]
+    // [IV PLAIN TEXT] ENCRYPTED[ MAC, MESSAGE]
     // MAC = MAC of SALT + MESSAGE
     override fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
 
@@ -41,13 +41,10 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
         val random = SecureRandom()
         random.nextBytes(iv)
 
-        val salt = ByteArray(mac.macSize)
-        random.nextBytes(salt)
-
         val params = ParametersWithIV(KeyParameter(key), iv)
         cipher.init(true, params)
 
-        val outputSize = iv.size + cipher.getOutputSize(mac.macSize + salt.size +  message.size) // IV goes un-encrypted
+        val outputSize = iv.size + cipher.getOutputSize(mac.macSize + message.size) // IV goes un-encrypted
 
         val output = ByteArray(outputSize)
 
@@ -58,17 +55,12 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
         var remSize = outputSize - iv.size
 
         mac.init(KeyParameter(key))
-        mac.update(salt, 0, salt.size)
         mac.update(message, 0, message.size)
 
         val macResult = ByteArray(mac.macSize)
         mac.doFinal(macResult, 0)
 
         var outL = cipher.processBytes(macResult, 0, macResult.size, output, wPos)
-        wPos += outL
-        remSize -= outL
-
-        outL = cipher.processBytes(salt, 0, salt.size, output, wPos)
         wPos += outL
         remSize -= outL
 
@@ -124,9 +116,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
             val macCalculated = ByteArray(mac.macSize)
             val macMessage = ByteArray(mac.macSize)
 
-            val salt = ByteArray(mac.macSize)
-
-            if (salt.size + macMessage.size > decryptedRawL)
+            if (macMessage.size > decryptedRawL)
                 return null
 
             System.arraycopy(decryptedRaw, 0, macMessage, 0, macMessage.size)
@@ -141,8 +131,8 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
             if (matchedBytes != macCalculated.size)
                 return null
 
-            val decrypted = ByteArray(decryptedRawL - salt.size - macMessage.size)
-            System.arraycopy(decryptedRaw, salt.size + macMessage.size, decrypted, 0, decrypted.size)
+            val decrypted = ByteArray(decryptedRawL - macMessage.size)
+            System.arraycopy(decryptedRaw, macMessage.size, decrypted, 0, decrypted.size)
 
             return decrypted
         }
