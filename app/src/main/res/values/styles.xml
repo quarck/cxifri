@@ -51,6 +51,10 @@
         <item name="android:textColor">@color/errorTextColor</item>
     </style>
 
+    <style name="TextWarning" parent="@style/TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/errorTextColor</item>
+    </style>
+
     <style name="TextSmallWarning" parent="@style/TextAppearance.AppCompat.Small">
         <item name="android:textColor">@color/errorTextColor</item>
     </style>

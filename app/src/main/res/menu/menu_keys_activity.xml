@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:icon="@android:drawable/ic_menu_add"
+        android:icon="@drawable/outline_add_circle_outline_24"
         android:id="@+id/menu_add_key"
         android:title="@string/add_a_new_key_menu_item"
         app:showAsAction="ifRoom"

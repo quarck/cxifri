@@ -12,5 +12,5 @@
     <color name="buttonBackgroundColor">#eef0ee</color>
     <color name="deleteButtonBackgroundColor">#f0eeee</color>
 
-    <color name="verticalLineSeparator">#7f7f7f</color>
+    <color name="verticalLineSeparator">#efefef</color>
 </resources>

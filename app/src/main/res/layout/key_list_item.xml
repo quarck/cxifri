@@ -49,7 +49,7 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="@string/delete_key"
-            android:textAppearance="@style/TextMediumAccent" />
+            android:textAppearance="@style/TextWarning" />
 
 
         <TextView
