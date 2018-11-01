@@ -97,48 +97,51 @@ class MessageHandler(
 
 
     private fun unpackDecryptedMessage(key: KeyEntry, blob: ByteArray?): MessageBase? {
-        if (blob == null)
-            return null
-        if (blob.size < 1)
+        if (blob == null || blob.size < 1)
             return null
 
         return when (blob[0]) {
             MESSAGE_FORMAT_PLAINTEXT, MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES,
             MESSAGE_FORMAT_GZIP_PLAINTEXT ->
                 unpackTextMessage(key, blob)
+
             MESSAGE_FORMAT_KEY_REPLACEMENT ->
                 unpackReplacementKeyMessage(key, blob)
+
             MESSAGE_FORMAT_KEY_REVOKE ->
                 unpackKeyRevokeMessage(key, blob)
+
             else ->
                 null
         }
     }
 
     private fun unpackTextMessage(key: KeyEntry, blob: ByteArray): TextMessage? {
-        if (blob[0] == MESSAGE_FORMAT_PLAINTEXT) {
-            return TextMessage(key, String(blob, 1, blob.size - 1, Charsets.UTF_8))
-        }
-        else if (blob[0] == MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES) {
-            if (blob.size < 9)
-                return null
 
-            for (i in 1 until 9) {
-                if (blob[i] != 0.toByte())
-                    return null
+        when (blob[0]) {
+            MESSAGE_FORMAT_PLAINTEXT -> {
+                return TextMessage(key, String(blob, 1, blob.size - 1, Charsets.UTF_8))
             }
 
-            return TextMessage(key, String(blob, 9, blob.size - 9, Charsets.UTF_8))
-        }
-        else if (blob[0] == MESSAGE_FORMAT_GZIP_PLAINTEXT) {
-            val ungzip = GZipBlob().inflate(blob, 1, blob.size-1)
-            return if (ungzip != null)
-                TextMessage(key, ungzip.toString(charset=Charsets.UTF_8))
-            else
-                null
-        }
-        else {
-            return null
+            MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES -> {
+                if (blob.size < 9)
+                    return null
+
+                for (i in 1 until 9) {
+                    if (blob[i] != 0.toByte())
+                        return null
+                }
+
+                return TextMessage(key, String(blob, 9, blob.size - 9, Charsets.UTF_8))
+            }
+
+            MESSAGE_FORMAT_GZIP_PLAINTEXT -> {
+                val ungzip = GZipBlob().inflate(blob, 1, blob.size-1)
+                return ungzip?.let { TextMessage(key, ungzip.toString(charset=Charsets.UTF_8)) }
+            }
+
+            else ->
+                return null
         }
     }
 
