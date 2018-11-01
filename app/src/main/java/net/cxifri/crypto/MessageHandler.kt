@@ -18,6 +18,7 @@ package net.cxifri.crypto
 
 import net.cxifri.dataprocessing.GZipBlob
 import net.cxifri.keysdb.asDecryptedBinary
+import net.cxifri.utils.wipe
 import org.bouncycastle.util.encoders.UrlBase64
 
 
@@ -26,9 +27,12 @@ class MessageHandler(
 ): MessageHandlerInterface {
 
     val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
-    val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
-    val MESSAGE_FORMAT_KEY_REPLACEMENT: Byte = 2
-    val MESSAGE_FORMAT_KEY_REVOKE: Byte = 3
+    // why?? to make very short texts (less than 7chrs) to occupy one extra cipher block, thus it is harder
+    // to reveal that message was less than 7 chrs
+    val MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES: Byte = 1
+    val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 2
+    val MESSAGE_FORMAT_KEY_REPLACEMENT: Byte = 3
+    val MESSAGE_FORMAT_KEY_REVOKE: Byte = 4
 
     private fun packMessageForEncryption(message: MessageBase): ByteArray {
 
@@ -51,6 +55,14 @@ class MessageHandler(
 
         val utf8 = message.text.toByteArray(charset = Charsets.UTF_8)
 
+        if (utf8.size <= 7) {
+            val binaryMessage = ByteArray(1 + 8 + utf8.size)
+            binaryMessage.wipe()
+            binaryMessage[0] = MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES
+            System.arraycopy(utf8, 0, binaryMessage, 1 + 8, utf8.size)
+            return binaryMessage
+        }
+
         val gzipUtf8 = GZipBlob().deflate(utf8)
 
         if (utf8.size < gzipUtf8.size) {
@@ -59,12 +71,12 @@ class MessageHandler(
             System.arraycopy(utf8, 0, binaryMessage, 1, utf8.size)
             return binaryMessage
         }
-        else {
-            val binaryMessage = ByteArray(1 + gzipUtf8.size)
-            binaryMessage[0] = MESSAGE_FORMAT_GZIP_PLAINTEXT
-            System.arraycopy(gzipUtf8, 0, binaryMessage, 1, gzipUtf8.size)
-            return binaryMessage
-        }
+
+        val binaryMessage = ByteArray(1 + gzipUtf8.size)
+        binaryMessage[0] = MESSAGE_FORMAT_GZIP_PLAINTEXT
+        System.arraycopy(gzipUtf8, 0, binaryMessage, 1, gzipUtf8.size)
+        return binaryMessage
+
     }
 
     private fun packKeyReplacementMessage(message: KeyReplacementMessage): ByteArray {
@@ -91,7 +103,8 @@ class MessageHandler(
             return null
 
         return when (blob[0]) {
-            MESSAGE_FORMAT_PLAINTEXT, MESSAGE_FORMAT_GZIP_PLAINTEXT ->
+            MESSAGE_FORMAT_PLAINTEXT, MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES,
+            MESSAGE_FORMAT_GZIP_PLAINTEXT ->
                 unpackTextMessage(key, blob)
             MESSAGE_FORMAT_KEY_REPLACEMENT ->
                 unpackReplacementKeyMessage(key, blob)
@@ -105,6 +118,17 @@ class MessageHandler(
     private fun unpackTextMessage(key: KeyEntry, blob: ByteArray): TextMessage? {
         if (blob[0] == MESSAGE_FORMAT_PLAINTEXT) {
             return TextMessage(key, String(blob, 1, blob.size - 1, Charsets.UTF_8))
+        }
+        else if (blob[0] == MESSAGE_FORMAT_PLAINTEXT_WITH_8_ZEROES) {
+            if (blob.size < 9)
+                return null
+
+            for (i in 1 until 9) {
+                if (blob[i] != 0.toByte())
+                    return null
+            }
+
+            return TextMessage(key, String(blob, 9, blob.size - 9, Charsets.UTF_8))
         }
         else if (blob[0] == MESSAGE_FORMAT_GZIP_PLAINTEXT) {
             val ungzip = GZipBlob().inflate(blob, 1, blob.size-1)
