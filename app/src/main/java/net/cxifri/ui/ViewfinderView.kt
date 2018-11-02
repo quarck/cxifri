@@ -45,7 +45,7 @@ class ViewfinderView(context: Context, attrs: AttributeSet) : View(context, attr
         // Initialize these once for performance rather than calling them every time in onDraw().
         paint = Paint(Paint.ANTI_ALIAS_FLAG)
         val resources = resources
-        maskColor = resources.getColor(R.color.colorPrimary)
+        maskColor = resources.getColor(R.color.colorCameraBlackout)
 
     }
 

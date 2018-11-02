@@ -13,4 +13,6 @@
     <color name="deleteButtonBackgroundColor">#f0eeee</color>
 
     <color name="verticalLineSeparator">#efefef</color>
+
+    <color name="colorCameraBlackout">#7f1f3f1f</color>
 </resources>

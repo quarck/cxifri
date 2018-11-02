@@ -29,6 +29,7 @@ import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import net.cxifri.R
@@ -61,6 +62,8 @@ class MainActivity : AppCompatActivity() {
         buttonKeySelect.setOnClickListener(this::onButtonKeySelect)
         buttonEncrypt.setOnClickListener(this::onButtonEncrypt)
         buttonDecrypt.setOnClickListener(this::onButtonDecrypt)
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
         handleIntent(intent)
     }

@@ -72,6 +72,8 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
                             WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_FULL
             }
         }
+
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE) // sorry users.. take a photo ;)
     }
 
     private fun getDimensions(): Int {
