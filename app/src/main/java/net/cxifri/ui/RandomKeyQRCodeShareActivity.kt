@@ -31,6 +31,7 @@ import org.bouncycastle.util.encoders.UrlBase64
 import android.view.WindowManager
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 
 
 class RandomKeyQRCodeShareActivity : AppCompatActivity() {
@@ -86,6 +87,7 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
 
         name?.text?.toString()?.let {
             KeyHelper().saveKey(this, it, key, true)
+            Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
             finish()
         }
     }

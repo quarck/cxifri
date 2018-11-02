@@ -43,6 +43,7 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
+import android.widget.Toast
 import net.cxifri.R
 import net.cxifri.crypto.RandomKeyGenerator
 import net.cxifri.keysdb.KeyHelper
@@ -359,6 +360,7 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
             findViewById<Button>(R.id.buttonSave)?.setOnClickListener {
                 val name = findViewById<EditText>(R.id.editTextKeyName).text.toString()
                 KeyHelper().saveKey(this, name, rawKey, true)
+                Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
                 finish()
             }
         }

@@ -195,35 +195,7 @@ class KeysActivity : AppCompatActivity() {
         addPasswordKeyLayout.visibility = View.GONE
     }
 
-    private fun onButtonAddPasswordKeySave(v: View) {
-
-        val name = keyName.text.toString()
-        val password = keyPassword.text.toString()
-        val passwordConfirm = keyPasswordConfirmation.text.toString()
-
-        val onError = {
-            text: String ->
-            passwordKeyErrorText.setText(text)
-            passwordKeyErrorText.visibility = View.VISIBLE
-        }
-
-        if (name.isEmpty()) {
-            onError("Name is empty!")
-            return
-        }
-        else if (password != passwordConfirm) {
-            onError("Passwords didn't match!")
-            return
-        }
-        else if (password.isEmpty()) {
-            onError("Password is empty")
-            return
-        }
-        else if (password.length < 8) {
-            onError("Password is way too short - 8 chars min")
-            return
-        }
-
+    private fun doSave(name: String, password: String) {
         val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
         KeyHelper().saveKey(this, name, key, passwordKeyCBPreferAndroidKeyStore.isChecked)
 
@@ -234,6 +206,44 @@ class KeysActivity : AppCompatActivity() {
         keyPassword.setText("")
         keyPasswordConfirmation.setText("")
 
+        Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
+    }
+
+    private fun onButtonAddPasswordKeySave(v: View) {
+
+        val name = keyName.text.toString()
+        val password = keyPassword.text.toString()
+        val passwordConfirm = keyPasswordConfirmation.text.toString()
+
+        if (name.isEmpty()) {
+            Toast.makeText(this, R.string.key_name_is_empty, Toast.LENGTH_LONG).show()
+            return
+        }
+        else if (password != passwordConfirm) {
+            Toast.makeText(this, R.string.passwords_didnt_match, Toast.LENGTH_LONG).show()
+            return
+        }
+        else if (password.isEmpty()) {
+            Toast.makeText(this, R.string.password_is_empty, Toast.LENGTH_LONG).show()
+            return
+        }
+        else if (password.length < 14) {
+
+            val builder = AlertDialog.Builder(this)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle(getString(R.string.password_is_too_short))
+                    .setMessage(getString(R.string.still_proceed_question))
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        doSave(name, password)
+                        reloadKeys()
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
+
+            builder.create().show()
+            return
+        }
+
+        doSave(name, password)
         reloadKeys()
     }
 

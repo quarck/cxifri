@@ -43,7 +43,6 @@
     <string name="encrypted_message">Message</string>
     <string name="share_non_encrypted_text_question_mark">Share non-encrypted text?</string>
     <string name="failed_to_decrypt">Failed to decrypt: wrong key or message corrupted</string>
-    <string name="key_is_empty">Key is empty</string>
     <string name="key_is_too_short">Key is too short (min 8 chars, recommended 14)</string>
     <string name="key_type_below">Key: type below</string>
     <string name="key_format" formatted="false">Key: %s</string>
@@ -76,5 +75,12 @@
     <string name="text_cleared">Cleared</string>
     <string name="text_pasted">Pasted</string>
     <string name="text_didnt_match_keys">No matching keys found to decrypt</string>
+    <string name="key_saved">Saved</string>
+    <string name="key_name_is_empty">Key name is empty</string>
+    <string name="passwords_didnt_match">Passwords didn\'t match!</string>
+    <string name="password_is_empty">Password is empty</string>
+    <string name="password_is_too_short">Insecure password</string>
+    <string name="still_proceed_question">Password is too short to be considered secure (14 symbols recommended). Continue?</string>
+
 
 </resources>

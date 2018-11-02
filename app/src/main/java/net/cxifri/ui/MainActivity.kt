@@ -261,6 +261,15 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    private fun doEncrypt(key: KeyEntry, msg: String) {
+        try {
+            val encrypted = CryptoFactory.createMessageHandler().encrypt(TextMessage(key, msg), key)
+            isTextEncrypted = true
+            onMessageEncrypted(encrypted)
+        } catch (ex: Exception) {
+            onEncryptFailed()
+        }
+    }
 
     private fun onButtonEncrypt(v: View) {
         val msg = messageText.text.toString()
@@ -274,14 +283,24 @@ class MainActivity : AppCompatActivity() {
 
                 if (password.isEmpty()) {
                     runOnUiThread {
-                        textViewError.setText(getString(R.string.key_is_empty))
-                        textViewError.visibility = View.VISIBLE
+                        Toast.makeText(this@MainActivity, R.string.password_is_empty, Toast.LENGTH_LONG).show()
                     }
                     return@background
-                } else if (password.length < 8) {
+                } else if (password.length < 14) {
                     runOnUiThread {
-                        textViewError.setText(getString(R.string.key_is_too_short))
-                        textViewError.visibility = View.VISIBLE
+
+                        val builder = AlertDialog.Builder(this)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setTitle(getString(R.string.password_is_too_short))
+                                .setMessage(getString(R.string.still_proceed_question))
+                                .setPositiveButton(android.R.string.ok) { _, _ ->
+                                    background {
+                                        doEncrypt(CryptoFactory.deriveKeyFromPassword(password), msg)
+                                    }
+                                }
+                                .setNegativeButton(android.R.string.cancel) { _, _ -> }
+
+                        builder.create().show()
                     }
                     return@background
                 }
@@ -289,13 +308,7 @@ class MainActivity : AppCompatActivity() {
                 cKey = CryptoFactory.deriveKeyFromPassword(password)
             }
 
-            try {
-                val encrypted = CryptoFactory.createMessageHandler().encrypt(TextMessage(cKey, msg), cKey)
-                isTextEncrypted = true
-                onMessageEncrypted(encrypted)
-            } catch (ex: Exception) {
-                onEncryptFailed()
-            }
+            doEncrypt(cKey, msg)
         }
     }
 
