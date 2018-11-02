@@ -72,5 +72,9 @@
     <string name="key_actions">Actions</string>
     <string name="message_auth_status_is_valid">Message Auth Status: valid</string>
     <string name="matched_key" formatted="false">Matched key: %s</string>
+    <string name="text_copied">Copied</string>
+    <string name="text_cleared">Cleared</string>
+    <string name="text_pasted">Pasted</string>
+    <string name="text_didnt_match_keys">No matching keys found to decrypt</string>
 
 </resources>

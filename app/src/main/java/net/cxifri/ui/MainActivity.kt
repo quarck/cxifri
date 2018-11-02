@@ -18,8 +18,6 @@ package net.cxifri.ui
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -30,8 +28,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
-import android.widget.ArrayAdapter
-import android.widget.TextView
+import android.widget.*
 import net.cxifri.R
 import net.cxifri.crypto.*
 import net.cxifri.keysdb.KeysDatabase
@@ -70,13 +67,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main, menu)
-
-//        val menuShare = menu.findItem(R.id.menu_share)
-//        if (menuShare != null) {
-//            menuShare.isVisible = true
-//            menuShare.isEnabled = isTextEncrypted
-//        }
-
         return true
     }
 
@@ -223,6 +213,7 @@ class MainActivity : AppCompatActivity() {
                 isTextEncrypted = false // don't allow sharing
                 runOnUiThread {
                     messageText.setText(text)
+                    Toast.makeText(this, R.string.text_didnt_match_keys, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -339,6 +330,8 @@ class MainActivity : AppCompatActivity() {
             val clip = ClipData.newPlainText(getString(R.string.clipboard_clip_label), msg)
             clipboard.setPrimaryClip(clip)
         }
+
+        Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show()
     }
 
     private fun pasteText() {
@@ -351,12 +344,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         isTextEncrypted = false
+
+        Toast.makeText(this, R.string.text_pasted, Toast.LENGTH_SHORT).show()
     }
 
     private fun clearForm() {
         messageText.setText("")
         passwordText.setText("")
         isTextEncrypted = false
+        Toast.makeText(this, R.string.text_cleared, Toast.LENGTH_SHORT).show()
     }
 
 

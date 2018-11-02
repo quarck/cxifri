@@ -29,6 +29,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.TextView
+import android.widget.Toast
 import net.cxifri.R
 import net.cxifri.utils.UIItem
 
@@ -79,10 +80,10 @@ class TextViewActivity : AppCompatActivity() {
                 onMenuCopy()
 
             R.id.menu_quote ->
-                onMenuReply()
+                onMenuQuote()
 
             R.id.menu_reply ->
-                onMenuQuote()
+                onMenuReply()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -96,11 +97,14 @@ class TextViewActivity : AppCompatActivity() {
             val clip = ClipData.newPlainText(getString(R.string.clipboard_clip_label), msg)
             clipboard.setPrimaryClip(clip)
         }
+
+        Toast.makeText(this, R.string.text_copied, Toast.LENGTH_SHORT).show()
     }
 
     private fun onMenuReply() {
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_ID, currentKeyId)
+        intent.putExtra(INTENT_EXTRA_TEXT, "")
         startActivity(intent)
         finish()
     }
