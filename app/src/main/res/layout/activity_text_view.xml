@@ -43,76 +43,51 @@
             >
 
             <TextView
-                android:id="@+id/textViewAuthStatus"
+                android:id="@+id/textViewMatchedKey"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
                 android:ems="10"
-                android:text="_key_name_placeholder_ some long long"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:text="Matched key: ABC"
+                android:textAppearance="@style/TextSmall"
                 tools:ignore="HardcodedText"
-                android:background="#ff77ff77"/>
+                android:textColor="@color/colorPrimary"
+                />
+
 
             <TextView
                 android:id="@+id/textViewMessage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:layout_marginBottom="15dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginStart="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
                 android:layout_marginTop="5dp"
                 android:autoLink="web|email|phone|map"
                 android:ems="10"
                 android:text="_key_name_placeholder_ some long long  some long long  some long\nlong  some long long\nsome long long  some long long "
                 android:background="@android:drawable/editbox_dropdown_light_frame"
-                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+                android:textAppearance="@style/TextMedium"
                 android:textIsSelectable="true"
                 tools:ignore="HardcodedText" />
 
-            <LinearLayout
+            <TextView
+                android:id="@+id/textViewAuthStatusValid"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/buttonReply"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/reply"
-                    android:layout_margin="5dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    style="?android:attr/buttonStyle"
-                    />
-
-                <Button
-                    android:id="@+id/buttonQuote"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/quote"
-                    android:layout_margin="5dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    style="?android:attr/buttonStyle"
-                    />
-
-                <Button
-                    android:id="@+id/buttonCopy"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/copy"
-                    android:layout_margin="5dp"
-                    android:layout_gravity="center"
-                    android:layout_weight="1"
-                    style="?android:attr/buttonStyle"
-                    />
-
-            </LinearLayout>
-
+                android:layout_marginBottom="6dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:ems="10"
+                android:text="@string/message_auth_status_is_valid"
+                android:textAppearance="@style/TextSmall"
+                android:textColor="@color/colorPrimary"
+                android:visibility="gone"
+                />
 
         </LinearLayout>
 

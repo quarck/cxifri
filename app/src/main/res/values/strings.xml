@@ -40,7 +40,7 @@
     <string name="title_notifications">Notifications</string>
     <string name="about">About</string>
     <string name="key_choose">Key: &lt;choose&gt;</string>
-    <string name="encrypted_message">Encrypted message</string>
+    <string name="encrypted_message">Message</string>
     <string name="share_non_encrypted_text_question_mark">Share non-encrypted text?</string>
     <string name="failed_to_decrypt">Failed to decrypt: wrong key or message corrupted</string>
     <string name="key_is_empty">Key is empty</string>
@@ -70,5 +70,7 @@
     <string name="sevaral_options_available_for_creating_a_new_key_line6">Please choose from the following options: </string>
     <string name="delete_key">Delete</string>
     <string name="key_actions">Actions</string>
+    <string name="message_auth_status_is_valid">Message Auth Status: valid</string>
+    <string name="matched_key" formatted="false">Matched key: %s</string>
 
 </resources>

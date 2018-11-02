@@ -24,18 +24,19 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager
 import android.widget.TextView
 import net.cxifri.R
 import net.cxifri.utils.UIItem
 
 class TextViewActivity : AppCompatActivity() {
 
-    val textViewAuthStatus by UIItem<TextView>(R.id.textViewAuthStatus)
+    val textViewMatchedKey by UIItem<TextView>(R.id.textViewMatchedKey)
+    val textViewAuthStatusValid by UIItem<TextView>(R.id.textViewAuthStatusValid)
     val textViewMessage by UIItem<TextView>(R.id.textViewMessage)
-    val buttonReply by UIItem<Button>(R.id.buttonReply)
-    val buttonQuote by UIItem<Button>(R.id.buttonQuote)
-    val buttonCopy by UIItem<Button>(R.id.buttonCopy)
 
     var currentKeyId: Int = -1
 
@@ -46,9 +47,7 @@ class TextViewActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 
-        buttonCopy.setOnClickListener(this::onButtonCopy)
-        buttonReply.setOnClickListener(this::onButtonReply)
-        buttonQuote.setOnClickListener(this::onButtonQuote)
+        window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
 
         handleIntent(intent)
     }
@@ -59,16 +58,38 @@ class TextViewActivity : AppCompatActivity() {
     }
 
     fun handleIntent(intent: Intent) {
-
         val text = intent.getStringExtra(INTENT_EXTRA_TEXT) ?: throw Exception("Must give text")
         currentKeyId = intent.getIntExtra(INTENT_EXTRA_KEY_ID, -1)
         val keyName = intent.getStringExtra(INTENT_EXTRA_KEY_NAME) ?: throw Exception("Must give key name")
 
-        textViewMessage.setText(text)
-        textViewAuthStatus.setText("Decrypted and valid, key: ${keyName}")
+        textViewMessage.text = text
+        textViewAuthStatusValid.text = getString(R.string.matched_key).format(keyName)
+        textViewAuthStatusValid.visibility = View.VISIBLE
     }
 
-    private fun onButtonCopy(v: View) {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_view_text, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        when (item.itemId) {
+            R.id.menu_copy ->
+                onMenuCopy()
+
+            R.id.menu_quote ->
+                onMenuReply()
+
+            R.id.menu_reply ->
+                onMenuQuote()
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
+
+    private fun onMenuCopy() {
         val msg = textViewMessage.text.toString()
         if (msg.length != 0) {
             val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -77,14 +98,14 @@ class TextViewActivity : AppCompatActivity() {
         }
     }
 
-    private fun onButtonReply(v: View) {
+    private fun onMenuReply() {
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_ID, currentKeyId)
         startActivity(intent)
         finish()
     }
 
-    private fun onButtonQuote(v: View) {
+    private fun onMenuQuote() {
         val intent = Intent(this, MainActivity::class.java)
         intent.putExtra(INTENT_EXTRA_KEY_ID, currentKeyId)
         val text =

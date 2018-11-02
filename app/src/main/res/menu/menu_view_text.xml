@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_copy"
+        android:icon="@drawable/outline_file_copy_24"
+        android:title="@string/copy"
+        app:showAsAction="always" />
+
+    <item
+        android:icon="@drawable/baseline_format_quote_24"
+        android:id="@+id/menu_quote"
+        android:title="@string/quote"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:icon="@drawable/baseline_reply_24"
+        android:id="@+id/menu_reply"
+        android:title="@string/reply"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
+</menu>
