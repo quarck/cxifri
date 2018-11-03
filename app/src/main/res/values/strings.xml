@@ -79,8 +79,8 @@
     <string name="key_name_is_empty">Key name is empty</string>
     <string name="passwords_didnt_match">Passwords didn\'t match!</string>
     <string name="password_is_empty">Password is empty</string>
-    <string name="password_is_too_short">Insecure password</string>
-    <string name="still_proceed_question">Password is too short to be considered secure (14 symbols recommended). Continue?</string>
+    <string name="password_is_too_short">Possible weak password</string>
+    <string name="still_proceed_question" formatted="false">It is estimated that given password can be bruteforced on a single PC in %1.1f years, on a big cluster in %1.1f years.\nContinue?</string>
 
 
 </resources>

@@ -32,6 +32,7 @@ import android.widget.*
 import net.cxifri.R
 import net.cxifri.crypto.*
 import net.cxifri.keysdb.KeysDatabase
+import net.cxifri.utils.StringEntropyEstimator
 import net.cxifri.utils.UIItem
 import net.cxifri.utils.background
 
@@ -284,13 +285,17 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(this@MainActivity, R.string.password_is_empty, Toast.LENGTH_LONG).show()
                     }
                     return@background
-                } else if (password.length < 14) {
+                }
+
+                val (estSinglePc, estCluster) = StringEntropyEstimator.getYearsToBruteforce(password)
+
+                if (estCluster < 100) {
                     runOnUiThread {
 
                         val builder = AlertDialog.Builder(this)
                                 .setIcon(android.R.drawable.ic_dialog_alert)
                                 .setTitle(getString(R.string.password_is_too_short))
-                                .setMessage(getString(R.string.still_proceed_question))
+                                .setMessage(getString(R.string.still_proceed_question).format(estSinglePc, estCluster))
                                 .setPositiveButton(android.R.string.ok) { _, _ ->
                                     background {
                                         doEncrypt(CryptoFactory.deriveKeyFromPassword(password), msg)
