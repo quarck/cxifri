@@ -46,7 +46,7 @@ object StringEntropyEstimator {
 
     fun getYearsToBruteforce(string: String): Pair<Double, Double> {
         val iters = getBruteforceNumIterations(string)
-        val secondsSinglePc = iters / ESTIMATE_RATE_CLUSTER
+        val secondsSinglePc = iters / ESTIMATE_RATE_SINGLE_PC
         val secondsCluster = iters / ESTIMATE_RATE_CLUSTER
         return Pair(secondsSinglePc / SECONDS_IN_YEAR, secondsCluster / SECONDS_IN_YEAR)
     }
