@@ -64,7 +64,7 @@ class TextViewActivity : AppCompatActivity() {
         val keyName = intent.getStringExtra(INTENT_EXTRA_KEY_NAME) ?: throw Exception("Must give key name")
 
         textViewMessage.text = text
-        textViewAuthStatusValid.text = getString(R.string.matched_key).format(keyName)
+        textViewMatchedKey.text = getString(R.string.matched_key).format(keyName)
         textViewAuthStatusValid.visibility = View.VISIBLE
     }
 

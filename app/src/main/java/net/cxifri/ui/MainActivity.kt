@@ -181,15 +181,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun onDecryptFailed() {
         runOnUiThread {
-            textViewError.visibility = View.VISIBLE
-            textViewError.setText(R.string.failed_to_decrypt)
+            Toast.makeText(this, R.string.failed_to_decrypt, Toast.LENGTH_LONG).show()
         }
     }
 
     private fun onEncryptFailed() {
         runOnUiThread {
-            textViewError.visibility = View.VISIBLE
-            textViewError.setText(getString(R.string.failed_to_encrypt))
+            Toast.makeText(this, R.string.failed_to_encrypt, Toast.LENGTH_LONG).show()
         }
     }
 
