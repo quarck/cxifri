@@ -46,10 +46,13 @@
                 android:id="@+id/textViewKeyName"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10sp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
                 android:ems="10"
                 android:text="@string/existing_keys"
-                android:textAppearance="@style/TextLarge" />
+                android:textAppearance="@style/TextMedium" />
 
             <LinearLayout
                 android:id="@+id/layoutExistingKeysRoot"
@@ -194,7 +197,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/add_new_password_key_button_label"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:background="@color/buttonBackgroundColor"/>
 
             <Button
                 android:id="@+id/buttonGenerateRandomKey"
@@ -207,7 +211,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/generate_random_key"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:background="@color/buttonBackgroundColor"/>
 
             <Button
                 android:id="@+id/buttonScanRandomKey"
@@ -220,7 +225,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/scan_random_key"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:background="@color/buttonBackgroundColor"/>
 
             <Button
                 android:id="@+id/buttonCancelCreatingNewKey"
@@ -233,7 +239,8 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="10dp"
                 android:text="@string/button_cancel_title"
-                android:visibility="visible" />
+                android:visibility="visible"
+                android:background="@color/buttonBackgroundColor"/>
 
         </LinearLayout>
     </ScrollView>
@@ -307,7 +314,7 @@
                 android:layout_margin="10sp"
                 android:ems="10"
                 android:text="@string/aks_comment"
-                android:textAppearance="@style/TextSmall" />
+                android:textAppearance="@style/TextSmallWarning" />
 
 
             <TextView
@@ -332,7 +339,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/button_save_title"
-                    android:textAppearance="@style/TextMediumAccent" />
+                    android:textAppearance="@style/TextMediumAccent"
+                    android:background="@color/buttonBackgroundColor"/>
 
                 <Button
                     android:id="@+id/buttonCancel"
@@ -340,7 +348,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/button_cancel_title"
-                    android:textAppearance="@style/TextMediumAccent" />
+                    android:textAppearance="@style/TextMediumAccent"
+                    android:background="@color/buttonBackgroundColor"/>
 
             </LinearLayout>
 
