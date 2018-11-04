@@ -32,9 +32,7 @@ import android.widget.*
 import net.cxifri.R
 import net.cxifri.crypto.*
 import net.cxifri.keysdb.KeysDatabase
-import net.cxifri.utils.StringEntropyEstimator
-import net.cxifri.utils.UIItem
-import net.cxifri.utils.background
+import net.cxifri.utils.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -90,7 +88,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(this, KeysActivity::class.java))
 
             R.id.menu_about ->
-                Unit
+                startActivity(Intent(this, AboutActivity::class.java))
         }
         return super.onOptionsItemSelected(item)
     }
@@ -287,15 +285,18 @@ class MainActivity : AppCompatActivity() {
                     return@background
                 }
 
-                val (estSinglePc, estCluster) = StringEntropyEstimator.getYearsToBruteforce(password)
+                val complexity  = PasswordComplexityEstimator.getExhaustiveSearchComplexity(password)
+                if (!complexity.isSecure) {
 
-                if (estCluster < 100) {
                     runOnUiThread {
-
                         val builder = AlertDialog.Builder(this)
                                 .setIcon(android.R.drawable.ic_dialog_alert)
-                                .setTitle(getString(R.string.password_is_too_short))
-                                .setMessage(getString(R.string.still_proceed_question).format(estSinglePc, estCluster))
+                                .setTitle(getString(R.string.password_stength_notice))
+                                .setMessage(getString(R.string.still_proceed_question).format(
+                                        complexity.formatPc(this),
+                                        complexity.formatGpu(this),
+                                        complexity.formatCluster(this)
+                                ))
                                 .setPositiveButton(android.R.string.ok) { _, _ ->
                                     background {
                                         doEncrypt(CryptoFactory.deriveKeyFromPassword(password), msg)

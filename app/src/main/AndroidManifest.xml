@@ -19,15 +19,13 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme.NoActionBar"
-        >
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".ui.MainActivity"
             android:launchMode="singleTask"
-            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize"
-            >
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -64,41 +62,35 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.TextViewActivity"
+            android:autoRemoveFromRecents="true"
+            android:label="@string/encrypted_message"
             android:parentActivityName=".ui.MainActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:theme="@style/AppTheme.NoActionBar"
-            android:label="@string/encrypted_message"
-            android:autoRemoveFromRecents="true"
-
             tools:targetApi="lollipop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.MainActivity" />
         </activity>
-
         <activity
-            android:label="@string/manage_keys"
             android:name=".ui.KeysActivity"
+            android:label="@string/manage_keys"
             android:parentActivityName=".ui.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.MainActivity" />
         </activity>
-
         <activity
             android:name=".ui.RandomKeyQRCodeShareActivity"
             android:label="@string/title_activity_random_key_generation"
             android:parentActivityName=".ui.KeysActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.KeysActivity" />
@@ -109,11 +101,19 @@
             android:parentActivityName=".ui.KeysActivity"
             android:permission="net.cxifri.INTERNAL_ACTIVITY"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar"
-            >
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.cxifri.ui.KeysActivity" />
+        </activity>
+        <activity
+            android:name=".ui.AboutActivity"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".ui.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="net.cxifri.ui.MainActivity" />
         </activity>
     </application>
 

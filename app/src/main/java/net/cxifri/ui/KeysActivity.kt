@@ -34,7 +34,7 @@ import net.cxifri.crypto.KeyEntry
 import net.cxifri.keysdb.KeyHelper
 import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.keysdb.toStringDetails
-import net.cxifri.utils.StringEntropyEstimator
+import net.cxifri.utils.PasswordComplexityEstimator
 import net.cxifri.utils.UIItem
 
 class KeyStateEntry(
@@ -229,14 +229,17 @@ class KeysActivity : AppCompatActivity() {
             return
         }
 
-        val (estSinglePc, estCluster) = StringEntropyEstimator.getYearsToBruteforce(password)
-
-        if (estCluster < 100) {
+        val complexity  = PasswordComplexityEstimator.getExhaustiveSearchComplexity(password)
+        if (!complexity.isSecure) {
 
             val builder = AlertDialog.Builder(this)
                     .setIcon(android.R.drawable.ic_dialog_alert)
-                    .setTitle(getString(R.string.password_is_too_short))
-                    .setMessage(getString(R.string.still_proceed_question).format(estSinglePc, estCluster))
+                    .setTitle(getString(R.string.password_stength_notice))
+                    .setMessage(getString(R.string.still_proceed_question).format(
+                            complexity.formatPc(this),
+                            complexity.formatGpu(this),
+                            complexity.formatCluster(this)
+                    ))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         doSave(name, password)
                         reloadKeys()
