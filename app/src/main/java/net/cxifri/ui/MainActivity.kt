@@ -290,7 +290,7 @@ class MainActivity : AppCompatActivity() {
 
                     runOnUiThread {
                         val builder = AlertDialog.Builder(this)
-                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .setIcon(R.drawable.ic_launcher_foreground)
                                 .setTitle(getString(R.string.password_stength_notice))
                                 .setMessage(getString(R.string.still_proceed_question).format(
                                         complexity.formatPc(this),

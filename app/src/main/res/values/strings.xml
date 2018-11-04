@@ -44,7 +44,7 @@
     <string name="share_non_encrypted_text_question_mark">Share non-encrypted text?</string>
     <string name="failed_to_decrypt">Failed to decrypt: wrong key or message corrupted</string>
     <string name="key_is_too_short">Key is too short (min 8 chars, recommended 14)</string>
-    <string name="key_type_below">Key: type below</string>
+    <string name="key_type_below">Key: </string>
     <string name="key_format" formatted="false">Key: %s</string>
     <string name="text_password">Text password</string>
     <string name="revoked_key">REVOKED KEY!</string>
