@@ -85,9 +85,7 @@
     <string name="title_activity_about">AboutActivity</string>
 
     <string name="format_days"  formatted="false">%.0f days</string>
-    <string name="format_weeks"  formatted="false">%.0f weeks</string>
-    <string name="format_months"  formatted="false">%.0f months</string>
-    <string name="format_years"  formatted="false">%.0f years</string>
-
-
+    <string name="format_weeks" formatted="false">%.0f weeks</string>
+    <string name="format_months" formatted="false">%.0f months</string>
+    <string name="format_years" formatted="false">%.0f years</string>
 </resources>

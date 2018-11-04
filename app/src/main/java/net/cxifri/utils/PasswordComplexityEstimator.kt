@@ -9,7 +9,11 @@ data class ExhaustiveSearchComplexity(
         val clusterDays: Double
 ) {
     val isSecure: Boolean
-        get() = pcDays >= SECURE_DAYS && gpuDays >= SECURE_DAYS && clusterDays >= SECURE_DAYS
+        get() = isSecureAgainstPc && isSecureAgainstGpu && isSecureAgainstCluster
+
+    val isSecureAgainstPc get() = pcDays >= SECURE_DAYS
+    val isSecureAgainstGpu get() = gpuDays >= SECURE_DAYS
+    val isSecureAgainstCluster get() = clusterDays >= SECURE_DAYS
 
     fun formatPc(ctx: Context) = formatComplexity(ctx, pcDays)
     fun formatGpu(ctx: Context) = formatComplexity(ctx, gpuDays)
@@ -34,14 +38,93 @@ data class ExhaustiveSearchComplexity(
     }
 }
 
-
+/*
+Diceware Words List               7,776
+*/
 object PasswordComplexityEstimator {
 
-    private fun exhaustiveSearchIterations(string: String): Double {
-        val entropy = EntrophyCalculator.getEntropyBits(string)
-        if (entropy > 0)
-            return Math.pow(2.0, entropy)
-        return 0.0
+    val LOWER_CASE = "[a-z]".toRegex()  // 26 total
+    val UPPER_CASE = "[A-Z]".toRegex()   // 26 total
+    val NUMBERS = "\\d".toRegex()       // 10
+    val SYMBOLS = "[.,!?@#$%^&*_+\\-=]".toRegex() // 15
+    val SYMBOLS_EXTRA = "[\\\\/()\\[\\]<>{}\"'|;:~`]".toRegex() // 18
+
+    val NON_BASIC_TXT_SYMBOLS = "[@#$%^&*_+\\-=]".toRegex()
+
+    val NUM_LOWER_CASE = 26
+    val NUM_UPPER_CASE = 26
+    val NUM_NUMBERS = 10
+    val NUM_SYMBOLS = 15
+    val NUM_EXTRA_SYMBOLS = 18
+
+    val FAILBACK_NON_ASCII_NUM_CHARS = 255
+
+    val NUM_COMMOM_ENGLISH_WORDS = 7776
+    val AVERAGE_ENGLISH_WORD_LENGTH = 5.1
+
+    val ENGLISH_LETTER_FREQS = hashMapOf(
+            'E' to	0.1202, 'T' to	0.091  , 'A' to	0.0812 , 'O' to	0.0768 ,
+            'I' to	0.0731 , 'N' to	0.0695 , 'S' to	0.0628 , 'R' to	0.0602 ,
+            'H' to	0.0592 , 'D' to	0.0432 , 'L' to	0.0398 , 'U' to	0.0288 ,
+            'C' to	0.0271 , 'M' to	0.0261 , 'F' to	0.023  , 'Y' to	0.0211 ,
+            'W' to	0.0209 , 'G' to	0.0203 , 'P' to	0.0182 , 'B' to	0.0149 ,
+            'V' to	0.0111 , 'K' to	0.0069 , 'X' to	0.0017 , 'Q' to	0.0011 ,
+            'J' to	0.001  , 'Z' to	0.0007
+            )
+
+    fun isEnglishText(string: String): Boolean {
+        if (string.contains(SYMBOLS_EXTRA))
+            return false
+        if (string.contains(NON_BASIC_TXT_SYMBOLS))
+            return false
+        if (string.contains(NUMBERS))
+            return false
+        if (!string.contains(LOWER_CASE) && !string.contains(UPPER_CASE))
+            return false
+
+        val counters = mutableMapOf<Char, Int>()
+
+        for (chr in string) {
+            val upChr = chr.toUpperCase()
+            counters[upChr] = counters.getOrPut(upChr, { -> 0 }) + 1
+        }
+
+        var distanceSqr = 0.0
+        for (chr in ENGLISH_LETTER_FREQS.keys) {
+            val observedFreq = (counters.get(chr) ?: 0) / string.length.toDouble()
+            val expectedFreq = ENGLISH_LETTER_FREQS[chr] ?: 0.0
+            distanceSqr += Math.pow(observedFreq - expectedFreq, 2.0)
+        }
+
+        return Math.sqrt(distanceSqr) < 0.05
+    }
+
+    fun exhaustiveSearchIterationsForEnglishText(string: String): Double {
+        val numWords = string.length / AVERAGE_ENGLISH_WORD_LENGTH
+        return Math.pow(NUM_COMMOM_ENGLISH_WORDS.toDouble(), numWords)
+    }
+
+    fun exhaustiveSearchIterations(string: String): Double {
+
+        if (isEnglishText(string))
+            return exhaustiveSearchIterationsForEnglishText(string)
+
+        var charsPosible = 0
+        if (string.contains(LOWER_CASE))
+            charsPosible += NUM_LOWER_CASE
+        if (string.contains(UPPER_CASE))
+            charsPosible += NUM_UPPER_CASE
+        if (string.contains(NUMBERS))
+            charsPosible += NUM_NUMBERS
+        if (string.contains(SYMBOLS))
+            charsPosible += NUM_SYMBOLS
+        if (string.contains(SYMBOLS_EXTRA))
+            charsPosible += NUM_EXTRA_SYMBOLS
+
+        if (charsPosible == 0)
+            charsPosible = FAILBACK_NON_ASCII_NUM_CHARS // not an ASCII password - treat as a random sequence of bytes
+
+        return Math.pow(charsPosible.toDouble(), string.length.toDouble())
     }
 
     fun getExhaustiveSearchComplexity(string: String): ExhaustiveSearchComplexity {
