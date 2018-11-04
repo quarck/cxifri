@@ -137,7 +137,7 @@ object PasswordComplexityEstimator {
             distanceSqr += Math.pow(observedFreq - expectedFreq, 2.0)
         }
 
-        return Math.sqrt(distanceSqr) < 0.05
+        return Math.sqrt(distanceSqr) < 0.15
     }
 
     fun exhaustiveSearchIterationsForEnglishText(string: String): Double {

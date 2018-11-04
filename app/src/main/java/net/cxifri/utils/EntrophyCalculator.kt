@@ -34,4 +34,10 @@ object EntrophyCalculator {
 
         return -entropy
     }
+
+    fun getEntropyPerSymbolBits(string: String): Double {
+        if (string.isEmpty())
+            return 0.0
+        return getEntropyBits(string) / string.length
+    }
 }
