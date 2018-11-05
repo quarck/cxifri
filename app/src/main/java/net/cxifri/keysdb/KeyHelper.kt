@@ -18,28 +18,41 @@ package net.cxifri.keysdb
 
 import android.content.Context
 import android.os.Build
+import android.util.Log
 import net.cxifri.R
 import net.cxifri.aks.AndroidKeyStore
 import net.cxifri.crypto.KeyEntry
 import org.bouncycastle.util.encoders.UrlBase64
 
-val KeyEntry.asDecryptedBinary: ByteArray?
+val KeyEntry.binaryKey: Pair<ByteArray, ByteArray>?
     get() {
+        var ret: Pair<ByteArray, ByteArray>? = null
+
         if (encrypted && (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
             return null // no encryption is supported - can't decrypt
         }
-        val unbase64 = UrlBase64.decode(value)
+
+        val binaryTextKey = UrlBase64.decode(textKey)
+        val binaryAuthKey = UrlBase64.decode(authKey)
+
         if (encrypted) {
             try {
                 val aks = AndroidKeyStore()
-                return aks.decrypt(id, unbase64)
+                val binaryPTTextKey = aks.decrypt(id, binaryTextKey)
+                val binaryPTAuthKey = aks.decrypt(id, binaryAuthKey)
+
+                if (binaryPTTextKey != null && binaryPTAuthKey != null) {
+                    ret = Pair(binaryPTTextKey, binaryPTAuthKey)
+                }
             }
             catch (ex: Exception) {
-                return null
+                Log.e("KeyHelper", "exception decrypting key: ${ex}, ${ex.stackTrace}")
             }
         } else {
-            return unbase64
+            ret = Pair(binaryTextKey, binaryAuthKey)
         }
+
+        return ret
     }
 
 fun KeyEntry.toStringDetails(context: Context): String {
@@ -55,29 +68,36 @@ fun KeyEntry.toStringDetails(context: Context): String {
 
 class KeyHelper {
 
-    fun saveKey(context: Context, name: String, key: ByteArray, preferAndroidKeyStore: Boolean) {
+    fun saveKey(context: Context,
+                keyEntryIn: KeyEntry,
+                preferAndroidKeyStore: Boolean
+    ) {
+        val (textKey, authKey) = keyEntryIn.binaryKey ?: throw Exception("Can't read binary key")
+
         KeysDatabase(context).use {
             db ->
 
-            // temp name to make sure it was updated
-            val keyForName = KeyEntry(-1, "_", "", false)
-            val id = db.add(keyForName)
+            val id = db.add(KeyEntry())
 
             val updatedKeyEntry =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && preferAndroidKeyStore) {
                         val aks = AndroidKeyStore()
-                        aks.createKey(id) // create matching keystore key that would be encrypting this key in DB
-                        val encryptedKey = aks.encrypt(id, key)
-                        val encryptedBase64Key = UrlBase64.encode(encryptedKey)
-                        KeyEntry(id, name, encryptedBase64Key.toString(charset = Charsets.UTF_8), true)
+                        aks.createKey(id, force=true) // create matching keystore key that would be encrypting this key in DB
+                        val encryptedTextKey = aks.encrypt(id, textKey)
+                        val encryptedAuthKey = aks.encrypt(id, authKey)
+                        val encryptedBase64TextKey = UrlBase64.encode(encryptedTextKey)
+                        val encryptedBase64AuthKey = UrlBase64.encode(encryptedAuthKey)
+                        KeyEntry(id,
+                                keyEntryIn.name,
+                                encryptedBase64TextKey.toString(charset = Charsets.UTF_8),
+                                encryptedBase64AuthKey.toString(charset = Charsets.UTF_8),
+                                true)
                     }
                     else {
-                        val base64Key = UrlBase64.encode(key)
-                        KeyEntry(id, name, base64Key.toString(charset = Charsets.UTF_8), false)
+                        keyEntryIn.copy(id = id)
                     }
 
             db.update(updatedKeyEntry)
         }
     }
-
 }

@@ -23,7 +23,7 @@ import android.widget.EditText
 import android.widget.ImageView
 import net.cxifri.R
 import net.cxifri.crypto.AESTwofishSerpentEngine
-import net.cxifri.crypto.RandomKeyGenerator
+import net.cxifri.crypto.RandomSharedSecretGenerator
 import net.cxifri.dataprocessing.QREncoder
 import net.cxifri.keysdb.KeyHelper
 
@@ -32,11 +32,12 @@ import android.view.WindowManager
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
+import net.cxifri.crypto.DerivedKeyGenerator
 
 
 class RandomKeyQRCodeShareActivity : AppCompatActivity() {
 
-    lateinit var key: ByteArray
+    lateinit var sharedSecret: ByteArray
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +54,9 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
         val imageView = findViewById<ImageView>(R.id.imageViewQR)
         val gen = QREncoder(Math.max(getDimensions()*8/10, 512))
 
-        val (keyBits, csum) = RandomKeyGenerator().generateKeywithCSum(AESTwofishSerpentEngine.KEY_LENGTH_BYTES)
-        key = keyBits
-        val base64key = UrlBase64.encode(key + csum).toString(charset = Charsets.UTF_8)
+        val (secretBits, csum) = RandomSharedSecretGenerator().generateKeywithCSum()
+        sharedSecret = secretBits
+        val base64key = UrlBase64.encode(sharedSecret + csum).toString(charset = Charsets.UTF_8)
 
         val img = gen.encodeAsBitmap(base64key)
 
@@ -86,7 +87,10 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
         val name = findViewById<EditText>(R.id.editTextKeyName)
 
         name?.text?.toString()?.let {
-            KeyHelper().saveKey(this, it, key, true)
+            KeyHelper().saveKey(
+                    this,
+                    DerivedKeyGenerator().generateFromSharedSecret(sharedSecret, name = name.text.toString()),
+                    true)
             Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
             finish()
         }

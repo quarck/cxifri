@@ -22,20 +22,20 @@ import org.bouncycastle.crypto.macs.CBCBlockCipherMac
 import org.bouncycastle.crypto.params.KeyParameter
 import java.security.SecureRandom
 
-class RandomKeyGenerator {
+class RandomSharedSecretGenerator {
     val random: SecureRandom by lazy { SecureRandom() }
 
     // Mac is used as CRC for code transmission, thus no need for any secure key
     val crcKey = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    fun generate(lenBytes: Int): ByteArray {
-        val key = ByteArray(lenBytes)
+    fun generate(): ByteArray {
+        val key = ByteArray(SHARED_SECRET_LEN)
         random.nextBytes(key)
         return key
     }
 
-    fun generateKeywithCSum(lenBytes: Int): Pair<ByteArray, ByteArray> {
-        val key = ByteArray(lenBytes)
+    fun generateKeywithCSum(): Pair<ByteArray, ByteArray> {
+        val key = ByteArray(SHARED_SECRET_LEN)
         random.nextBytes(key)
         val mac = CBCBlockCipherMac(AESEngine())
 
@@ -71,5 +71,9 @@ class RandomKeyGenerator {
         val key = ByteArray(keyLen)
         System.arraycopy(keyIn, 0, key, 0, keyLen)
         return key
+    }
+
+    companion object {
+        const val SHARED_SECRET_LEN = 80
     }
 }

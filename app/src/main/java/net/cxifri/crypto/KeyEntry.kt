@@ -21,16 +21,20 @@ import org.bouncycastle.util.encoders.UrlBase64
 data class KeyEntry(
         val id: Long,
         var name: String,
-        var value: String,
+        var textKey: String,
+        val authKey: String,
         var encrypted: Boolean,
         var replacementKeyId: Long = 0,
         var revoked: Boolean = false
 ) {
-    constructor(value: ByteArray)
+    constructor(text: ByteArray, auth: ByteArray, name: String="")
             : this(
             id = -1,
-            name = "",
-            value = UrlBase64.encode(value).toString(charset = Charsets.UTF_8),
+            name = name,
+            textKey = UrlBase64.encode(text).toString(charset = Charsets.UTF_8),
+            authKey = UrlBase64.encode(auth).toString(charset = Charsets.UTF_8),
             encrypted = false
     )
+
+    constructor(): this(id = -1, name="_TEMP_", textKey = "", authKey = "", encrypted = false)
 }

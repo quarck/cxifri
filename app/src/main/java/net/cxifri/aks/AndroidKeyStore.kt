@@ -89,7 +89,7 @@ class AndroidKeyStore() {
         }
     }
 
-    fun createKey(id: Long): SecretKey? {
+    fun createKey(id: Long, force: Boolean = false): SecretKey? {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
             return null
 
@@ -99,8 +99,12 @@ class AndroidKeyStore() {
             val keyStore = KeyStore.getInstance("AndroidKeyStore")
             keyStore.load(null)
 
-            if (keyStore.containsAlias(keyName))
-                return null// already there
+            if (keyStore.containsAlias(keyName)) {
+                if (force)
+                    keyStore.deleteEntry(keyName)
+                else
+                    return null// already there
+            }
 
             val keyGenerator = KeyGenerator.getInstance(
                     KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore")

@@ -197,8 +197,8 @@ class KeysActivity : AppCompatActivity() {
     }
 
     private fun doSave(name: String, password: String) {
-        val key = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
-        KeyHelper().saveKey(this, name, key, passwordKeyCBPreferAndroidKeyStore.isChecked)
+        val key = DerivedKeyGenerator().generateFromTextPassword(password).copy(name = name)
+        KeyHelper().saveKey(this, key, passwordKeyCBPreferAndroidKeyStore.isChecked)
 
         viewKeysLayout.visibility = View.VISIBLE
         addKeyOptionsLayout.visibility = View.GONE
@@ -279,10 +279,10 @@ class KeysActivity : AppCompatActivity() {
             db -> db.deleteKey(key.id)
         }
 
-        val matchingState = keyStates.find{ it.key.value == key.value }
+        val matchingState = keyStates.find{ it.key.textKey == key.textKey }
         if (matchingState != null) {
             keysRoot.removeView(matchingState.layout)
-            keyStates.removeAll { it.key.value == key.value }
+            keyStates.removeAll { it.key.textKey == key.textKey }
         }
     }
 

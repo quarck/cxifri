@@ -45,7 +45,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.Toast
 import net.cxifri.R
-import net.cxifri.crypto.RandomKeyGenerator
+import net.cxifri.crypto.RandomSharedSecretGenerator
 import net.cxifri.keysdb.KeyHelper
 import net.cxifri.ui.camera.CameraManager
 import net.cxifri.utils.hasCameraPermission
@@ -53,6 +53,7 @@ import net.cxifri.utils.requestCameraPermission
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import net.cxifri.crypto.AESTwofishSerpentEngine
+import net.cxifri.crypto.DerivedKeyGenerator
 import org.bouncycastle.util.encoders.UrlBase64
 import java.io.IOException
 import java.util.*
@@ -351,15 +352,17 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
 
         Log.e(TAG, "Result: ${rawResult.text}")
 
-        val rawKey = RandomKeyGenerator().verifyChecksum(UrlBase64.decode(rawResult.text))
+        val sharedSecret = RandomSharedSecretGenerator().verifyChecksum(UrlBase64.decode(rawResult.text))
 
-        if (rawKey != null && rawKey.size == AESTwofishSerpentEngine.KEY_LENGTH_BYTES) {
+        if (sharedSecret != null && sharedSecret.size >= RandomSharedSecretGenerator.SHARED_SECRET_LEN) {
             shutdownScanning()
             findViewById<LinearLayout>(R.id.layoutKeyNameAndSave).visibility = View.VISIBLE
             findViewById<View>(R.id.fillWhiteView).visibility = View.VISIBLE
             findViewById<Button>(R.id.buttonSave)?.setOnClickListener {
                 val name = findViewById<EditText>(R.id.editTextKeyName).text.toString()
-                KeyHelper().saveKey(this, name, rawKey, true)
+                KeyHelper().saveKey(this,
+                        DerivedKeyGenerator().generateFromSharedSecret(sharedSecret, name=name),
+                        true)
                 Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
                 finish()
             }

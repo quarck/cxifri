@@ -39,8 +39,10 @@ class KeysDatabase(val context: Context)
         if (oldVersion == newVersion)
             return
 
-        if (newVersion != DATABASE_VERSION_V1)
-            throw Exception("DB storage error: upgrade from $oldVersion to $newVersion is not supported")
+        if (newVersion != DATABASE_VERSION_V2) {
+            impl.dropTables(db)
+            impl.createDb(db)
+        }
     }
 
     private fun<T> implApplyToWritable(fn: KeysDatabaseImpl.(db: SQLiteDatabase) -> T) =
@@ -63,8 +65,8 @@ class KeysDatabase(val context: Context)
     companion object {
         private val LOG_TAG = "KeysStorage"
 
-        private const val DATABASE_VERSION_V1 = 1
-        private const val DATABASE_CURRENT_VERSION = DATABASE_VERSION_V1
+        private const val DATABASE_VERSION_V2 = 2
+        private const val DATABASE_CURRENT_VERSION = DATABASE_VERSION_V2
 
         private const val DATABASE_NAME = "keys"
     }

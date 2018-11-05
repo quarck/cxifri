@@ -24,45 +24,71 @@ import org.bouncycastle.crypto.params.KeyParameter
 
 class DerivedKeyGenerator {
 
-    val DEFAULT_NUM_ITERATIONS = 10000
-    val SALT_AES = "cxifri-AES"
-    val SALT_TWOFISH = "cxifri-Twofish"
-    val SALT_SERPENT = "cxifri-Serpent"
-
-    fun generateForAES(password: String): ByteArray {
-        val pGen = PKCS5S2ParametersGenerator(SHA256Digest())
-        pGen.init(
-                password.toByteArray(charset = Charsets.UTF_8),
-                SALT_AES.toByteArray(charset = Charsets.UTF_8),
-                DEFAULT_NUM_ITERATIONS
-        )
-        val keyLenBytes = 32
-        val key = pGen.generateDerivedMacParameters(keyLenBytes * 8) as KeyParameter
-        return key.key
+    // TODO: unit test it to make sure differnt secrets do produce different pws, as well
+    // as different salts
+    // also test byteArrayof(0, 1, 1, .... 1) vs byteArrayOf(0, 2, 2, ... 2), e.g. first zero
+    fun generateKeyBits(secret: ByteArray, salt: ByteArray): ByteArray {
+        val gen = PKCS5S2ParametersGenerator(SHA256Digest())
+        gen.init(secret, salt, NUM_ITERATIONS)
+        val param = gen.generateDerivedMacParameters(KEY_LEN_BYTES_EACH * 8) as KeyParameter
+        return param.key
     }
 
-    fun generateForAESTwofishSerpent(password: String): ByteArray {
-        val keyLenBytesEach = 32
+    // TODO: ensure different keys produce different binary keys
+    fun generateFromSharedSecret(textSecret: ByteArray, authSecret: ByteArray, name: String=""): KeyEntry {
 
-        val saltAES = SALT_AES.toByteArray(charset = Charsets.UTF_8)
-        val saltTwofish = SALT_TWOFISH.toByteArray(charset = Charsets.UTF_8)
-        val saltSerpent = SALT_SERPENT.toByteArray(charset = Charsets.UTF_8)
+        val textKey = generateKeyBits(textSecret, textSaltAES) +
+                        generateKeyBits(textSecret, textSaltTwofish) +
+                        generateKeyBits(textSecret, textSaltSerpent)
 
-        val pGenAES = PKCS5S2ParametersGenerator(SHA256Digest())
-        val pGenTwofish = PKCS5S2ParametersGenerator(SHA256Digest())
-        val pGenSerpent = PKCS5S2ParametersGenerator(SHA256Digest())
+        val authKey = generateKeyBits(authSecret, macSaltAES) +
+                generateKeyBits(authSecret, macSaltTwofish) +
+                generateKeyBits(authSecret, macSaltSerpent)
 
+        return KeyEntry(textKey, authKey, name)
+    }
+
+    fun generateFromSharedSecret(wholeSecret: ByteArray, name: String=""): KeyEntry {
+        val textSecret = ByteArray(wholeSecret.size / 2)
+        val authSecret = ByteArray(wholeSecret.size / 2)
+
+        System.arraycopy(wholeSecret, 0, textSecret, 0, wholeSecret.size / 2)
+        System.arraycopy(wholeSecret, wholeSecret.size / 2, authSecret, 0, wholeSecret.size / 2)
+
+        val ret = generateFromSharedSecret(textSecret, authSecret, name)
+
+        textSecret.wipe()
+        authSecret.wipe()
+        return ret
+    }
+
+    fun generateFromTextPassword(password: String, name: String=""): KeyEntry {
         val passAsByteArray = password.toByteArray(charset = Charsets.UTF_8)
-        pGenAES.init(passAsByteArray, saltAES, DEFAULT_NUM_ITERATIONS)
-        pGenTwofish.init(passAsByteArray, saltTwofish, DEFAULT_NUM_ITERATIONS)
-        pGenSerpent.init(passAsByteArray, saltSerpent, DEFAULT_NUM_ITERATIONS)
-
-        val keyAES = pGenAES.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
-        val keyTwofish = pGenTwofish.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
-        val keySerpent = pGenSerpent.generateDerivedMacParameters(keyLenBytesEach * 8) as KeyParameter
-
+        val ret = generateFromSharedSecret(passAsByteArray, passAsByteArray, name)
         passAsByteArray.wipe()
+        return ret
+    }
 
-        return keyAES.key + keyTwofish.key + keySerpent.key
+    companion object {
+
+        const val NUM_ITERATIONS = 10000
+
+        const val SALT_TEXT_AES = "cxifri-text-AES"
+        const val SALT_TEXT_TWOFISH = "cxifri-text-Twofish"
+        const val SALT_TEXT_SERPENT = "cxifri-text-Serpent"
+
+        const val SALT_MAC_AES = "cxifri-mac-AES"
+        const val SALT_MAC_TWOFISH = "cxifri-mac-Twofish"
+        const val SALT_MAC_SERPENT = "cxifri-mac-Serpent"
+
+        const val KEY_LEN_BYTES_EACH = 32
+
+        val textSaltAES = SALT_TEXT_AES.toByteArray(charset = Charsets.UTF_8)
+        val textSaltTwofish = SALT_TEXT_TWOFISH.toByteArray(charset = Charsets.UTF_8)
+        val textSaltSerpent = SALT_TEXT_SERPENT.toByteArray(charset = Charsets.UTF_8)
+
+        val macSaltAES = SALT_MAC_AES.toByteArray(charset = Charsets.UTF_8)
+        val macSaltTwofish = SALT_MAC_TWOFISH.toByteArray(charset = Charsets.UTF_8)
+        val macSaltSerpent = SALT_MAC_SERPENT.toByteArray(charset = Charsets.UTF_8)
     }
 }

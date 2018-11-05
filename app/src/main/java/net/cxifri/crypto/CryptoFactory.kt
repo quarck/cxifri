@@ -14,12 +14,10 @@ object CryptoFactory {
     }
 
     fun deriveKeyFromPassword(password: String): KeyEntry {
-        val bytes = DerivedKeyGenerator().generateForAESTwofishSerpent(password)
-        return KeyEntry(
-                id = -1,
-                name="\$\$TEMP\$\$",
-                value = UrlBase64.encode(bytes).toString(charset =  Charsets.UTF_8),
-                encrypted = false
-        )
+        return DerivedKeyGenerator().generateFromTextPassword(password)
+    }
+
+    fun deriveKeyFromSharedSecret(secret: ByteArray): KeyEntry {
+        return DerivedKeyGenerator().generateFromSharedSecret(secret)
     }
 }

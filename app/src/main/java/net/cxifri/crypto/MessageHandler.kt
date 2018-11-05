@@ -17,7 +17,7 @@
 package net.cxifri.crypto
 
 import net.cxifri.dataprocessing.GZipBlob
-import net.cxifri.keysdb.asDecryptedBinary
+import net.cxifri.keysdb.binaryKey
 import net.cxifri.utils.wipe
 import org.bouncycastle.util.encoders.UrlBase64
 
@@ -80,14 +80,15 @@ class MessageHandler(
     }
 
     private fun packKeyReplacementMessage(message: KeyReplacementMessage): ByteArray {
-        val newBinaryKey = message.newKey.asDecryptedBinary
-        if (newBinaryKey == null)
-            throw Exception("Key cannot be accessed")
-        val binaryMessage = ByteArray(2 + newBinaryKey.size)
-        binaryMessage[0] = MESSAGE_FORMAT_KEY_REPLACEMENT
-        binaryMessage[1] = if (message.receiverMustDeleteOldKey) 1 else 0
-        System.arraycopy(newBinaryKey, 0, binaryMessage, 2, newBinaryKey.size)
-        return binaryMessage
+//        val newBinaryKey = message.newKey.asDecryptedBinary
+//        if (newBinaryKey == null)
+//            throw Exception("Key cannot be accessed")
+//        val binaryMessage = ByteArray(2 + newBinaryKey.size)
+//        binaryMessage[0] = MESSAGE_FORMAT_KEY_REPLACEMENT
+//        binaryMessage[1] = if (message.receiverMustDeleteOldKey) 1 else 0
+//        System.arraycopy(newBinaryKey, 0, binaryMessage, 2, newBinaryKey.size)
+//        return binaryMessage
+        TODO("packKeyReplacement message is not implemented yet")
     }
 
     private fun packKeyIsNoLongerSecureMessage(message: KeyRevokeMessage): ByteArray {
@@ -147,14 +148,15 @@ class MessageHandler(
 
     private fun unpackReplacementKeyMessage(key: KeyEntry, blob: ByteArray): KeyReplacementMessage? {
 
-        if (blob.size <= 2)
-            return null
-
-        val receiverMustDeleteOldKey = blob[1] != 0.toByte()
-        val binaryKey = ByteArray(blob.size - 2)
-        System.arraycopy(blob, 2, binaryKey, 0, binaryKey.size)
-
-        return KeyReplacementMessage(key, KeyEntry(binaryKey), receiverMustDeleteOldKey)
+//        if (blob.size <= 2)
+//            return null
+//
+//        val receiverMustDeleteOldKey = blob[1] != 0.toByte()
+//        val binaryKey = ByteArray(blob.size - 2)
+//        System.arraycopy(blob, 2, binaryKey, 0, binaryKey.size)
+//
+//        return KeyReplacementMessage(key, KeyEntry(binaryKey), receiverMustDeleteOldKey)
+        TODO("Unpack key replacement isnt implemented")
     }
 
     private fun unpackKeyRevokeMessage(key: KeyEntry, blob: ByteArray): KeyRevokeMessage? {
@@ -164,7 +166,8 @@ class MessageHandler(
 
     override fun encrypt(message: MessageBase, key: KeyEntry): String {
         val packed = packMessageForEncryption(message)
-        val encoded = binaryCryptor.encrypt(packed, key.asDecryptedBinary ?: throw Exception("Key failed"))
+        val binaryKeyPair = key.binaryKey ?: throw Exception("Cannot access encryption key")
+        val encoded = binaryCryptor.encrypt(packed, binaryKeyPair.first, binaryKeyPair.second)
         val base64 = UrlBase64.encode(encoded)
         return base64.toString(charset = Charsets.UTF_8)
     }
@@ -175,7 +178,8 @@ class MessageHandler(
 
         try {
             val unbase64 = UrlBase64.decode(message)
-            decryptedBinary = binaryCryptor.decrypt(unbase64, key.asDecryptedBinary ?: throw Exception("Key failed"))
+            val binaryKeyPair = key.binaryKey ?: throw Exception("Cannot access encryption key")
+            decryptedBinary = binaryCryptor.decrypt(unbase64, binaryKeyPair.first, binaryKeyPair.second)
         }
         catch (ex: Exception) {
             decryptedBinary = null
@@ -203,11 +207,13 @@ class MessageHandler(
 
         for (key in keys) {
             try {
-                decryptedBinary = binaryCryptor.decrypt(unbase64, key.asDecryptedBinary
-                        ?: throw Exception("Key failed"))
-                if (decryptedBinary != null) {
-                    matchedKey = key
-                    break
+                val binaryKeyPair = key.binaryKey
+                if (binaryKeyPair != null) {
+                    decryptedBinary = binaryCryptor.decrypt(unbase64, binaryKeyPair.first, binaryKeyPair.second)
+                    if (decryptedBinary != null) {
+                        matchedKey = key
+                        break
+                    }
                 }
             } catch (ex: Exception) {
                 decryptedBinary = null

@@ -31,7 +31,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
     // MessageBase layout:
     // [IV PLAIN TEXT] ENCRYPTED[ MAC, MESSAGE]
     // MAC = MAC of SALT + MESSAGE
-    override fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
+    override fun encrypt(message: ByteArray, textKey: ByteArray, authKey: ByteArray): ByteArray {
 
         val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
         val mac = CBCBlockCipherMac(createEngine())
@@ -41,7 +41,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
         val random = SecureRandom()
         random.nextBytes(iv)
 
-        val params = ParametersWithIV(KeyParameter(key), iv)
+        val params = ParametersWithIV(KeyParameter(textKey), iv)
         cipher.init(true, params)
 
         val outputSize = iv.size + cipher.getOutputSize(mac.macSize + message.size) // IV goes un-encrypted
@@ -54,7 +54,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
         var wPos = iv.size
         var remSize = outputSize - iv.size
 
-        mac.init(KeyParameter(key))
+        mac.init(KeyParameter(authKey))
         mac.update(message, 0, message.size)
 
         val macResult = ByteArray(mac.macSize)
@@ -85,7 +85,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
     }
 
     // Returns null if decryption fails or MAC check fails
-    override fun decrypt(message: ByteArray, key: ByteArray): ByteArray? {
+    override fun decrypt(message: ByteArray, textKey: ByteArray, authKey: ByteArray): ByteArray? {
 
         val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
         val mac = CBCBlockCipherMac(createEngine())
@@ -98,7 +98,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
 
             System.arraycopy(message, 0, iv, 0, iv.size)
 
-            val params = ParametersWithIV(KeyParameter(key), iv)
+            val params = ParametersWithIV(KeyParameter(textKey), iv)
             cipher.init(false, params)
 
             val outputSize = cipher.getOutputSize(message.size - iv.size)
@@ -111,7 +111,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
 
             val decryptedRawL = outL + finalL
 
-            mac.init(KeyParameter(key))
+            mac.init(KeyParameter(authKey))
 
             val macCalculated = ByteArray(mac.macSize)
             val macMessage = ByteArray(mac.macSize)

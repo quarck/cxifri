@@ -34,11 +34,17 @@ class KeysDatabaseImpl {
                         "( " +
                         "$KEY_ID INTEGER PRIMARY KEY, " +
                         "$KEY_NAME TEXT, " +
-                        "$KEY_VALUE TEXT, " +
+                        "$KEY_VALUE_TEXT TEXT, " +
+                        "$KEY_VALUE_AUTH TEXT, " +
                         "$KEY_IS_ENCRYPTED INTEGER, " +
                         "$KEY_IS_REVOKED INTEGER, " +
                         "$KEY_REPLACEMENT_KEY_ID INTEGER, " +
-                        "$KEY_RESERVED_FIELD INTEGER" +
+                        "$KEY_RESERVED_INT_FIELD_1 INTEGER, " +
+                        "$KEY_RESERVED_INT_FIELD_2 INTEGER, " +
+                        "$KEY_RESERVED_INT_FIELD_3 INTEGER, " +
+                        "$KEY_RESERVED_STR_FIELD_1 TEXT, " +
+                        "$KEY_RESERVED_STR_FIELD_2 TEXT, " +
+                        "$KEY_RESERVED_STR_FIELD_3 TEXT " +
                         " )"
 
         Log.d(LOG_TAG, "Creating DB TABLE using query: " + CREATE_PKG_TABLE)
@@ -68,17 +74,27 @@ class KeysDatabaseImpl {
         val values = ContentValues()
 
         values.put(KEY_NAME, key.name)
-        values.put(KEY_VALUE, key.value)
+        values.put(KEY_VALUE_TEXT, key.textKey)
+        values.put(KEY_VALUE_AUTH, key.authKey)
         values.put(KEY_IS_ENCRYPTED, if (key.encrypted) 1 else 0)
         values.put(KEY_IS_REVOKED, if (key.revoked) 1 else 0)
         values.put(KEY_REPLACEMENT_KEY_ID, key.replacementKeyId)
-        values.put(KEY_RESERVED_FIELD, 0)
+        values.put(KEY_RESERVED_INT_FIELD_1, 0)
+        values.put(KEY_RESERVED_INT_FIELD_2, 0)
+        values.put(KEY_RESERVED_INT_FIELD_3, 0)
+        values.put(KEY_RESERVED_STR_FIELD_1, "")
+        values.put(KEY_RESERVED_STR_FIELD_2, "")
+        values.put(KEY_RESERVED_STR_FIELD_3, "")
 
         return values
     }
 
     fun deleteKey(db: SQLiteDatabase, keyId: Long): Int {
         return db.delete(TABLE_NAME, " $KEY_ID = ?", arrayOf(keyId.toString()))
+    }
+
+    fun deleteAll(db: SQLiteDatabase): Int {
+        return db.delete(TABLE_NAME, null, null)
     }
 
     fun getKeys(db: SQLiteDatabase): List<KeyEntry> {
@@ -136,7 +152,9 @@ class KeysDatabaseImpl {
                         ?: throw Exception("Can't read key ID"),
                 name = (cursor.getString(PROJECTION_KEY_NAME) as String?)
                         ?: throw Exception("Can't read key name"),
-                value = (cursor.getString(PROJECTION_KEY_VALUE) as String?)
+                textKey = (cursor.getString(PROJECTION_KEY_VALUE_TEXT) as String?)
+                        ?: throw Exception("Can't read key value"),
+                authKey = (cursor.getString(PROJECTION_KEY_VALUE_AUTH) as String?)
                         ?: throw Exception("Can't read key value"),
                 encrypted = ((cursor.getInt(PROJECTION_KEY_IS_ENCRYPTED) as Int?)
                         ?: throw Exception("Can't get isEncrypted flag")) != 0,
@@ -154,30 +172,34 @@ class KeysDatabaseImpl {
 
         private const val KEY_ID = "a"
         private const val KEY_NAME = "b"
-        private const val KEY_VALUE = "c"
+        private const val KEY_VALUE_TEXT = "ct"
+        private const val KEY_VALUE_AUTH = "ca"
         private const val KEY_IS_ENCRYPTED = "d"
         private const val KEY_IS_REVOKED = "e"
         private const val KEY_REPLACEMENT_KEY_ID = "f"
-        private const val KEY_RESERVED_FIELD = "h"
+        private const val KEY_RESERVED_INT_FIELD_1 = "h"
+        private const val KEY_RESERVED_INT_FIELD_2 = "i"
+        private const val KEY_RESERVED_INT_FIELD_3 = "j"
+        private const val KEY_RESERVED_STR_FIELD_1 = "k"
+        private const val KEY_RESERVED_STR_FIELD_2 = "l"
+        private const val KEY_RESERVED_STR_FIELD_3 = "m"
 
         private val SELECT_COLUMNS = arrayOf<String>(
                 KEY_ID,
                 KEY_NAME,
-                KEY_VALUE,
+                KEY_VALUE_TEXT,
+                KEY_VALUE_AUTH,
                 KEY_IS_ENCRYPTED,
                 KEY_IS_REVOKED,
-                KEY_REPLACEMENT_KEY_ID,
-                KEY_RESERVED_FIELD
+                KEY_REPLACEMENT_KEY_ID
         )
 
         const val PROJECTION_KEY_ID = 0
         const val PROJECTION_KEY_NAME = 1
-        const val PROJECTION_KEY_VALUE = 2
-        const val PROJECTION_KEY_IS_ENCRYPTED = 3
-
-        const val PROJECTION_KEY_IS_REVOKED = 4
-        const val PROJECTION_KEY_REPLACEMENT_KEY_ID = 5
-        const val PROJECTION_RESERVED_FIELD = 6
-
+        const val PROJECTION_KEY_VALUE_TEXT = 2
+        const val PROJECTION_KEY_VALUE_AUTH = 3
+        const val PROJECTION_KEY_IS_ENCRYPTED = 4
+        const val PROJECTION_KEY_IS_REVOKED = 5
+        const val PROJECTION_KEY_REPLACEMENT_KEY_ID = 6
     }
 }
