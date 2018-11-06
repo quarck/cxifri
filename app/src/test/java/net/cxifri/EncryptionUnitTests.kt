@@ -2,6 +2,9 @@ package net.cxifri
 
 import net.cxifri.crypto.AESTwofishSerpentEngine
 import net.cxifri.crypto.BinaryMessageHandler
+import net.cxifri.crypto.DerivedKeyGenerator
+import net.cxifri.crypto.KeyEntry
+import net.cxifri.keysdb.binaryKey
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine
@@ -11,32 +14,6 @@ import org.junit.Test
 import org.junit.Assert.*
 
 class EncryptionUnitTests {
-
-//    fun runAESTestsForDataLen(len: Int) {
-//
-//        val key = byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
-//
-//        val dataIn = ByteArray(len)
-//        for (i in 0 until len) {
-//            dataIn[i] = i.toByte()
-//        }
-//
-//        val encrypted = BinaryMessageHandler { AESEngine() }.encrypt(dataIn, key)
-//
-//        val decrypted = BinaryMessageHandler { AESEngine() }.decrypt(encrypted, key)
-//
-//        assertNotNull(decrypted)
-//
-//        for (i in 0 until len) {
-//            assertEquals(dataIn[i], decrypted!![i])
-//        }
-//
-//        // deliberately destroy the key
-//        key[0] = 100
-//
-//        val decrypted2 = BinaryMessageHandler { AESEngine() }.decrypt(encrypted, key)
-//        assertNull(decrypted2)
-//    }
 
     fun runAESTWSerpTestsForDataLen(len: Int) {
 
@@ -148,5 +125,85 @@ class EncryptionUnitTests {
         for (i in 0 until 16) {
             assertEquals(encryptedIndividual[i], encryptedChained[i])
         }
+    }
+
+    fun ensureMacFail(k1: KeyEntry, k2: KeyEntry) {
+
+        val dataIn = ByteArray(1010)
+        for (i in 0 until dataIn.size) {
+            dataIn[i] = i.toByte()
+        }
+
+        val (bk1t, bk1a) = k1.binaryKey ?: throw Exception("")
+        val (bk2t, bk2a) = k2.binaryKey ?: throw Exception("")
+
+        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t, bk1a)
+
+        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk2t, bk2a)
+
+        assertNull(decrypted)
+    }
+
+    fun ensureMacWorks(k1: KeyEntry) {
+
+        val dataIn = ByteArray(1010)
+        for (i in 0 until dataIn.size) {
+            dataIn[i] = i.toByte()
+        }
+
+        val (bk1t, bk1a) = k1.binaryKey ?: throw Exception("")
+
+        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t, bk1a)
+
+        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk1t, bk1a)
+
+        assertNotNull(decrypted)
+
+        for (i in 0 until decrypted!!.size) {
+            assertEquals(dataIn[i], decrypted!![i])
+        }
+    }
+
+    @Test
+    fun macValidityTest() {
+        val generator = DerivedKeyGenerator()
+
+
+        ensureMacFail(
+            generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(0, 1, 2, 3, 4)),
+            generator.generateFromSharedSecret(byteArrayOf(1, 1, 2, 3, 4), byteArrayOf(0, 1, 2, 3, 4))
+        )
+
+        ensureMacFail(
+                generator.generateFromSharedSecret(byteArrayOf(0, 0, 0, 0, 4), byteArrayOf(0, 1, 2, 3, 4)),
+                generator.generateFromSharedSecret(byteArrayOf(0, 0, 0, 0, 5), byteArrayOf(0, 1, 2, 3, 4))
+        )
+
+        ensureMacFail(
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(0, 1, 2, 3, 4)),
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(1, 1, 2, 3, 4))
+        )
+
+        ensureMacFail(
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 4, 3, 4), byteArrayOf(0, 1, 2, 3, 4)),
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(1, 1, 2, 3, 4))
+        )
+
+        ensureMacFail(
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4)),
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4))
+        )
+
+        ensureMacFail(
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4)),
+                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4))
+        )
+
+        ensureMacFail(
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4)),
+                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4))
+        )
+
+        ensureMacWorks(generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4)))
     }
 }

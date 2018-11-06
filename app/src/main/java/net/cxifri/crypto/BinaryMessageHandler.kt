@@ -28,52 +28,38 @@ import org.bouncycastle.crypto.params.ParametersWithIV
 import java.security.SecureRandom
 
 class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHandlerInterface {
-    // MessageBase layout:
-    // [IV PLAIN TEXT] ENCRYPTED[ MAC, MESSAGE]
-    // MAC = MAC of SALT + MESSAGE
+
     override fun encrypt(message: ByteArray, textKey: ByteArray, authKey: ByteArray): ByteArray {
 
         val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
         val mac = CBCBlockCipherMac(createEngine())
-        val cipherBlockSize = cipher.blockSize
 
-        val iv = ByteArray(cipherBlockSize)
+        val iv = ByteArray(cipher.blockSize)
         val random = SecureRandom()
         random.nextBytes(iv)
 
-        val params = ParametersWithIV(KeyParameter(textKey), iv)
-        cipher.init(true, params)
+        cipher.init(true, ParametersWithIV(KeyParameter(textKey), iv))
 
-        val outputSize = iv.size + cipher.getOutputSize(mac.macSize + message.size) // IV goes un-encrypted
-
-        val output = ByteArray(outputSize)
+        val output = ByteArray(iv.size + mac.macSize + cipher.getOutputSize(message.size))
 
         // Copy the IV into the output
         System.arraycopy(iv, 0, output, 0, iv.size)
 
         var wPos = iv.size
-        var remSize = outputSize - iv.size
-
-        mac.init(KeyParameter(authKey))
-        mac.update(message, 0, message.size)
-
-        val macResult = ByteArray(mac.macSize)
-        mac.doFinal(macResult, 0)
-
-        var outL = cipher.processBytes(macResult, 0, macResult.size, output, wPos)
+        var outL = cipher.processBytes(message, 0, message.size, output, wPos)
         wPos += outL
-        remSize -= outL
-
-        outL = cipher.processBytes(message, 0, message.size, output, wPos)
-        wPos += outL
-        remSize -= outL
 
         outL = cipher.doFinal(output, wPos)
         wPos += outL
-        remSize -= outL
 
-        if (remSize < 0)
+        if (output.size  < mac.macSize + wPos)
             throw Exception("Internal error")
+
+        // Mac of the encrypted output
+        mac.init(KeyParameter(authKey))
+        mac.update(/*in*/output, 0, wPos)
+        mac.doFinal(/*out*/output, wPos)
+        wPos += mac.macSize
 
         if (wPos != output.size) {
             val finalOutput = ByteArray(wPos)
@@ -84,57 +70,56 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
         return output
     }
 
-    // Returns null if decryption fails or MAC check fails
     override fun decrypt(message: ByteArray, textKey: ByteArray, authKey: ByteArray): ByteArray? {
 
-        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
         val mac = CBCBlockCipherMac(createEngine())
-        val cipherBlockSize = cipher.blockSize
+
+        if (message.size <= mac.macSize)
+            return null
+
+        mac.init(KeyParameter(authKey))
+        mac.update(message, 0, message.size - mac.macSize)
+
+        val macResult = ByteArray(mac.macSize)
+        mac.doFinal(macResult, 0)
+
+        var matchedBytes = 0
+        val macOffset = message.size - mac.macSize
+        for (i in 0 until macResult.size) {
+            matchedBytes += if (macResult[i] == message[i + macOffset]) 1 else 0
+        }
+        if (matchedBytes != macResult.size)
+            return null
+
+        val cipher = PaddedBufferedBlockCipher(CBCBlockCipher(createEngine()))
+
+        val remainingSize = message.size - mac.macSize
 
         try {
-            val iv = ByteArray(cipherBlockSize)
-            if (iv.size >= message.size)
+            val iv = ByteArray(cipher.blockSize)
+
+            if (iv.size >= remainingSize)
                 throw CryptoException()
 
             System.arraycopy(message, 0, iv, 0, iv.size)
 
-            val params = ParametersWithIV(KeyParameter(textKey), iv)
-            cipher.init(false, params)
+            cipher.init(false, ParametersWithIV(KeyParameter(textKey), iv))
 
-            val outputSize = cipher.getOutputSize(message.size - iv.size)
+            val outputSize = cipher.getOutputSize(remainingSize - iv.size)
             val decryptedRaw = ByteArray(outputSize)
 
-            val outL = cipher.processBytes(message, iv.size, message.size - iv.size,
+            val outL = cipher.processBytes(message, iv.size, remainingSize - iv.size,
                     decryptedRaw, 0)
 
             val finalL = cipher.doFinal(decryptedRaw, outL)
 
-            val decryptedRawL = outL + finalL
-
-            mac.init(KeyParameter(authKey))
-
-            val macCalculated = ByteArray(mac.macSize)
-            val macMessage = ByteArray(mac.macSize)
-
-            if (macMessage.size > decryptedRawL)
-                return null
-
-            System.arraycopy(decryptedRaw, 0, macMessage, 0, macMessage.size)
-            mac.update(decryptedRaw, macMessage.size, decryptedRawL - macMessage.size)
-            mac.doFinal(macCalculated, 0)
-
-            var matchedBytes = 0
-            for (i in 0 until macCalculated.size) {
-                matchedBytes += if (macCalculated[i] == macMessage[i]) 1 else 0
+            return if (outL + finalL != decryptedRaw.size) {
+                val decrypted = ByteArray(outL + finalL)
+                System.arraycopy(decryptedRaw, 0, decrypted, 0, decrypted.size)
+                decrypted
             }
-
-            if (matchedBytes != macCalculated.size)
-                return null
-
-            val decrypted = ByteArray(decryptedRawL - macMessage.size)
-            System.arraycopy(decryptedRaw, macMessage.size, decrypted, 0, decrypted.size)
-
-            return decrypted
+            else
+                decryptedRaw
         }
         catch (ex: InvalidCipherTextException) {
             return null
