@@ -39,7 +39,7 @@ class KeysDatabase(val context: Context)
         if (oldVersion == newVersion)
             return
 
-        if (newVersion != DATABASE_VERSION_V2) {
+        if (oldVersion != DATABASE_VERSION_V2) {
             impl.dropTables(db)
             impl.createDb(db)
         }
