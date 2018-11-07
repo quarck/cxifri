@@ -74,8 +74,8 @@ class KeysDatabaseImpl {
         val values = ContentValues()
 
         values.put(KEY_NAME, key.name)
-        values.put(KEY_VALUE_TEXT, key.textKey)
-        values.put(KEY_VALUE_AUTH, key.authKey)
+        values.put(KEY_VALUE_TEXT, key.key)
+        values.put(KEY_VALUE_AUTH, "")
         values.put(KEY_IS_ENCRYPTED, if (key.encrypted) 1 else 0)
         values.put(KEY_IS_REVOKED, if (key.revoked) 1 else 0)
         values.put(KEY_REPLACEMENT_KEY_ID, key.replacementKeyId)
@@ -152,9 +152,7 @@ class KeysDatabaseImpl {
                         ?: throw Exception("Can't read key ID"),
                 name = (cursor.getString(PROJECTION_KEY_NAME) as String?)
                         ?: throw Exception("Can't read key name"),
-                textKey = (cursor.getString(PROJECTION_KEY_VALUE_TEXT) as String?)
-                        ?: throw Exception("Can't read key value"),
-                authKey = (cursor.getString(PROJECTION_KEY_VALUE_AUTH) as String?)
+                key = (cursor.getString(PROJECTION_KEY_VALUE_TEXT) as String?)
                         ?: throw Exception("Can't read key value"),
                 encrypted = ((cursor.getInt(PROJECTION_KEY_IS_ENCRYPTED) as Int?)
                         ?: throw Exception("Can't get isEncrypted flag")) != 0,

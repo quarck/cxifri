@@ -33,6 +33,7 @@ import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
 import net.cxifri.crypto.DerivedKeyGenerator
+import net.cxifri.crypto.KeyEntry
 
 
 class RandomKeyQRCodeShareActivity : AppCompatActivity() {
@@ -89,7 +90,7 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
         name?.text?.toString()?.let {
             KeyHelper().saveKey(
                     this,
-                    DerivedKeyGenerator().generateFromSharedSecret(sharedSecret, name = name.text.toString()),
+                    KeyEntry(sharedSecret, name = name.text.toString()),
                     true)
             Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
             finish()

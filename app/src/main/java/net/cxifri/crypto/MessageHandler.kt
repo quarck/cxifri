@@ -142,8 +142,8 @@ class MessageHandler(
 
     override fun encrypt(message: MessageBase, key: KeyEntry): String {
         val packed = packMessageForEncryption(message)
-        val binaryKeyPair = key.binaryKey ?: throw Exception("Cannot access encryption key")
-        val encoded = binaryCryptor.encrypt(packed, binaryKeyPair.first, binaryKeyPair.second)
+        val key = key.binaryKey ?: throw Exception("Cannot access encryption key")
+        val encoded = binaryCryptor.encrypt(packed, key)
         val base64 = UrlBase64.encode(encoded)
         return base64.toString(charset = Charsets.UTF_8)
     }
@@ -154,8 +154,8 @@ class MessageHandler(
 
         try {
             val unbase64 = UrlBase64.decode(message)
-            val binaryKeyPair = key.binaryKey ?: throw Exception("Cannot access encryption key")
-            decryptedBinary = binaryCryptor.decrypt(unbase64, binaryKeyPair.first, binaryKeyPair.second)
+            val key = key.binaryKey ?: throw Exception("Cannot access encryption key")
+            decryptedBinary = binaryCryptor.decrypt(unbase64, key)
         }
         catch (ex: Exception) {
             decryptedBinary = null
@@ -183,9 +183,9 @@ class MessageHandler(
 
         for (key in keys) {
             try {
-                val binaryKeyPair = key.binaryKey
-                if (binaryKeyPair != null) {
-                    decryptedBinary = binaryCryptor.decrypt(unbase64, binaryKeyPair.first, binaryKeyPair.second)
+                val binaryKey = key.binaryKey
+                if (binaryKey != null) {
+                    decryptedBinary = binaryCryptor.decrypt(unbase64, binaryKey)
                     if (decryptedBinary != null) {
                         matchedKey = key
                         break

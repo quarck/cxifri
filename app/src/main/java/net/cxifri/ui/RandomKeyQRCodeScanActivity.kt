@@ -54,6 +54,7 @@ import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import net.cxifri.crypto.AESTwofishSerpentEngine
 import net.cxifri.crypto.DerivedKeyGenerator
+import net.cxifri.crypto.KeyEntry
 import org.bouncycastle.util.encoders.UrlBase64
 import java.io.IOException
 import java.util.*
@@ -361,7 +362,7 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
             findViewById<Button>(R.id.buttonSave)?.setOnClickListener {
                 val name = findViewById<EditText>(R.id.editTextKeyName).text.toString()
                 KeyHelper().saveKey(this,
-                        DerivedKeyGenerator().generateFromSharedSecret(sharedSecret, name=name),
+                        KeyEntry(sharedSecret, name=name),
                         true)
                 Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
                 finish()

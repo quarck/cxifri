@@ -24,32 +24,26 @@ import net.cxifri.aks.AndroidKeyStore
 import net.cxifri.crypto.KeyEntry
 import org.bouncycastle.util.encoders.UrlBase64
 
-val KeyEntry.binaryKey: Pair<ByteArray, ByteArray>?
+val KeyEntry.binaryKey: ByteArray?
     get() {
-        var ret: Pair<ByteArray, ByteArray>? = null
+        var ret: ByteArray? = null
 
         if (encrypted && (Build.VERSION.SDK_INT < Build.VERSION_CODES.M)) {
             return null // no encryption is supported - can't decrypt
         }
 
-        val binaryTextKey = UrlBase64.decode(textKey)
-        val binaryAuthKey = UrlBase64.decode(authKey)
+        val binaryTextKey = UrlBase64.decode(key)
 
         if (encrypted) {
             try {
                 val aks = AndroidKeyStore()
-                val binaryPTTextKey = aks.decrypt(id, binaryTextKey)
-                val binaryPTAuthKey = aks.decrypt(id, binaryAuthKey)
-
-                if (binaryPTTextKey != null && binaryPTAuthKey != null) {
-                    ret = Pair(binaryPTTextKey, binaryPTAuthKey)
-                }
+                ret = aks.decrypt(id, binaryTextKey)
             }
             catch (ex: Exception) {
                 Log.e("KeyHelper", "exception decrypting key: ${ex}, ${ex.stackTrace}")
             }
         } else {
-            ret = Pair(binaryTextKey, binaryAuthKey)
+            ret = binaryTextKey
         }
 
         return ret
@@ -72,7 +66,7 @@ class KeyHelper {
                 keyEntryIn: KeyEntry,
                 preferAndroidKeyStore: Boolean
     ) {
-        val (textKey, authKey) = keyEntryIn.binaryKey ?: throw Exception("Can't read binary key")
+        val key = keyEntryIn.binaryKey ?: throw Exception("Can't read binary key")
 
         KeysDatabase(context).use {
             db ->
@@ -83,14 +77,11 @@ class KeyHelper {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && preferAndroidKeyStore) {
                         val aks = AndroidKeyStore()
                         aks.createKey(id, force=true) // create matching keystore key that would be encrypting this key in DB
-                        val encryptedTextKey = aks.encrypt(id, textKey)
-                        val encryptedAuthKey = aks.encrypt(id, authKey)
+                        val encryptedTextKey = aks.encrypt(id, key)
                         val encryptedBase64TextKey = UrlBase64.encode(encryptedTextKey)
-                        val encryptedBase64AuthKey = UrlBase64.encode(encryptedAuthKey)
                         KeyEntry(id,
                                 keyEntryIn.name,
                                 encryptedBase64TextKey.toString(charset = Charsets.UTF_8),
-                                encryptedBase64AuthKey.toString(charset = Charsets.UTF_8),
                                 true)
                     }
                     else {

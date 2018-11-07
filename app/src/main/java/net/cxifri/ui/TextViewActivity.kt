@@ -39,7 +39,7 @@ class TextViewActivity : AppCompatActivity() {
     val textViewAuthStatusValid by UIItem<TextView>(R.id.textViewAuthStatusValid)
     val textViewMessage by UIItem<TextView>(R.id.textViewMessage)
 
-    var currentKeyId: Int = -1
+    var currentKeyId: Long = -1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +60,7 @@ class TextViewActivity : AppCompatActivity() {
 
     fun handleIntent(intent: Intent) {
         val text = intent.getStringExtra(INTENT_EXTRA_TEXT) ?: throw Exception("Must give text")
-        currentKeyId = intent.getIntExtra(INTENT_EXTRA_KEY_ID, -1)
+        currentKeyId = intent.getLongExtra(INTENT_EXTRA_KEY_ID, -1L)
         val keyName = intent.getStringExtra(INTENT_EXTRA_KEY_NAME) ?: throw Exception("Must give key name")
 
         textViewMessage.text = text

@@ -5,13 +5,22 @@ import net.cxifri.crypto.BinaryMessageHandler
 import net.cxifri.crypto.DerivedKeyGenerator
 import net.cxifri.crypto.KeyEntry
 import net.cxifri.keysdb.binaryKey
+import org.bouncycastle.crypto.CryptoException
+import org.bouncycastle.crypto.InvalidCipherTextException
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine
+import org.bouncycastle.crypto.macs.CBCBlockCipherMac
+import org.bouncycastle.crypto.modes.CBCBlockCipher
+import org.bouncycastle.crypto.modes.EAXBlockCipher
+import org.bouncycastle.crypto.paddings.PKCS7Padding
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher
 import org.bouncycastle.crypto.params.KeyParameter
+import org.bouncycastle.crypto.params.ParametersWithIV
 import org.junit.Test
 
 import org.junit.Assert.*
+import java.security.SecureRandom
 
 class EncryptionUnitTests {
 
@@ -205,5 +214,102 @@ class EncryptionUnitTests {
         )
 
         ensureMacWorks(generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4)))
+    }
+
+    fun encrypt(message: ByteArray, textKey: ByteArray): ByteArray {
+
+        val random = SecureRandom()
+        val cipher = EAXBlockCipher(AESEngine())
+
+        val iv = ByteArray(cipher.blockSize)
+        random.nextBytes(iv)
+
+        // pad the message
+        cipher.init(true, ParametersWithIV(KeyParameter(textKey), iv))
+
+        val output = ByteArray(iv.size + cipher.getOutputSize(message.size))
+
+        // Copy the IV into the output
+        System.arraycopy(iv, 0, output, 0, iv.size)
+
+        var wPos = iv.size
+        var outL = cipher.processBytes(message, 0, message.size, output, wPos)
+        wPos += outL
+
+        outL = cipher.doFinal(output, wPos)
+        wPos += outL
+
+        if (output.size  < wPos)
+            throw Exception("Internal error")
+
+        if (wPos != output.size) {
+            val finalOutput = ByteArray(wPos)
+            System.arraycopy(output, 0, finalOutput, 0, wPos)
+            return finalOutput
+        }
+
+        return output
+    }
+
+
+    fun decrypt(message: ByteArray, textKey: ByteArray): ByteArray? {
+
+        val cipher = EAXBlockCipher(AESEngine())
+
+        val remainingSize = message.size
+
+        try {
+            val iv = ByteArray(cipher.blockSize)
+
+            if (iv.size >= remainingSize)
+                throw CryptoException()
+
+            System.arraycopy(message, 0, iv, 0, iv.size)
+
+            cipher.init(false, ParametersWithIV(KeyParameter(textKey), iv))
+
+            val outputSize = cipher.getOutputSize(remainingSize - iv.size)
+            val decryptedRaw = ByteArray(outputSize)
+
+            val outL = cipher.processBytes(message, iv.size, remainingSize - iv.size,
+                    decryptedRaw, 0)
+
+            val finalL = cipher.doFinal(decryptedRaw, outL)
+
+            val decrypted = ByteArray(outL + finalL)
+            System.arraycopy(decryptedRaw, 0, decrypted, 0, decrypted.size)
+            return decrypted
+        }
+        catch (ex: InvalidCipherTextException) {
+            return null
+        }
+    }
+
+
+
+    @Test
+    fun testEAX() {
+        val key1 = byteArrayOf(
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+        )
+
+        val key2 = byteArrayOf(
+                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
+                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+        )
+
+        val msg = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 10)
+
+        val encrypted = encrypt(msg, key1)
+        val decrypted = decrypt(encrypted, key1)
+        assertNotNull(decrypted)
+
+        val encryptedOld = BinaryMessageHandler({AESEngine()}).encrypt(msg, key1, key2)
+        val decryptedOld = BinaryMessageHandler({AESEngine()}).decrypt(encryptedOld, key1, key2)
+        assertNotNull(decryptedOld)
+
+        val failDecryptedNew = decrypt(encrypted, key2)
+        assertNull(failDecryptedNew)
     }
 }

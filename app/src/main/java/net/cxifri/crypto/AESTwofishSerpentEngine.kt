@@ -19,10 +19,13 @@ package net.cxifri.crypto
 import net.cxifri.utils.wipe
 import org.bouncycastle.crypto.BlockCipher
 import org.bouncycastle.crypto.CipherParameters
+import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.engines.AESEngine
 import org.bouncycastle.crypto.engines.SerpentEngine
 import org.bouncycastle.crypto.engines.TwofishEngine
+import org.bouncycastle.crypto.generators.PKCS5S2ParametersGenerator
 import org.bouncycastle.crypto.params.KeyParameter
+import java.nio.charset.Charset
 
 class AESTwofishSerpentEngine() : BlockCipher {
 
@@ -42,27 +45,26 @@ class AESTwofishSerpentEngine() : BlockCipher {
 
         if (params is KeyParameter) {
             val key = params.key
-            if (key.size == KEY_LENGTH_BYTES) {
+            if (key.size == KEY_LENGTH) {
 
-                val aesKey = ByteArray(KEY_LENGTH_AES)
-                val twofishKey = ByteArray(KEY_LENGTH_TWOFISH)
-                val serpentKey = ByteArray(KEY_LENGTH_SERPENT)
+                val genA = PKCS5S2ParametersGenerator(SHA256Digest())
+                val genT = PKCS5S2ParametersGenerator(SHA256Digest())
+                val genS = PKCS5S2ParametersGenerator(SHA256Digest())
 
-                var srcPos = 0
-                System.arraycopy(key, srcPos, aesKey, 0, KEY_LENGTH_AES)
-                srcPos += KEY_LENGTH_AES
+                genA.init(key, SALT_AES, NUM_PCKS_ITERS)
+                genT.init(key, SALT_TWOFISH, NUM_PCKS_ITERS)
+                genS.init(key, SALT_SERPENT, NUM_PCKS_ITERS)
 
-                System.arraycopy(key, srcPos, twofishKey, 0, KEY_LENGTH_TWOFISH)
-                srcPos += KEY_LENGTH_TWOFISH
+                val keyParamA = genA.generateDerivedParameters(KEY_LENGTH_UND * 8) as KeyParameter
+                val keyParamT = genT.generateDerivedParameters(KEY_LENGTH_UND * 8) as KeyParameter
+                val keyParamS = genS.generateDerivedParameters(KEY_LENGTH_UND * 8) as KeyParameter
 
-                System.arraycopy(key, srcPos, serpentKey, 0, KEY_LENGTH_SERPENT)
-
-                aesEngine.init(forEncryption, KeyParameter(aesKey))
-                twofishEngine.init(forEncryption, KeyParameter(twofishKey))
-                serpentEngine.init(forEncryption, KeyParameter(serpentKey))
+                aesEngine.init(forEncryption, keyParamA)
+                twofishEngine.init(forEncryption, keyParamT)
+                serpentEngine.init(forEncryption, keyParamS)
 
             } else {
-                throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init, key length is ${key.size}, supported key length: $KEY_LENGTH_BYTES")
+                throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init, key length is ${key.size}, supported key length: $KEY_LENGTH")
             }
             return
         }
@@ -114,9 +116,13 @@ class AESTwofishSerpentEngine() : BlockCipher {
     companion object {
         val BLOCK_SIZE = 16
 
-        val KEY_LENGTH_AES = 32
-        val KEY_LENGTH_TWOFISH = 32
-        val KEY_LENGTH_SERPENT = 32
-        val KEY_LENGTH_BYTES = KEY_LENGTH_AES + KEY_LENGTH_TWOFISH + KEY_LENGTH_SERPENT
+        val KEY_LENGTH_UND = 32 // key length of each underlying cipher
+        val KEY_LENGTH = 48
+
+        val SALT_AES = "cxifri-text-AES-ZzeqOthuLXNpK5BU1XT/c".toByteArray(charset = Charsets.UTF_8)
+        val SALT_TWOFISH = "cxifri-text-Twofish-YKwa3IqWv/MTZ0qhaK5CA".toByteArray(charset = Charsets.UTF_8)
+        val SALT_SERPENT = "cxifri-text-Serpent-PAQThlVjYhYqCcJFHz0BT".toByteArray(charset = Charsets.UTF_8)
+
+        val NUM_PCKS_ITERS = 10
     }
 }

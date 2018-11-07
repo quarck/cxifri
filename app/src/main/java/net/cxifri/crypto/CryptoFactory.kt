@@ -17,7 +17,7 @@ object CryptoFactory {
         return DerivedKeyGenerator().generateFromTextPassword(password)
     }
 
-    fun deriveKeyFromSharedSecret(secret: ByteArray): KeyEntry {
-        return DerivedKeyGenerator().generateFromSharedSecret(secret)
-    }
+//    fun deriveKeyFromSharedSecret(secret: ByteArray): KeyEntry {
+//        return DerivedKeyGenerator().generateFromSharedSecret(secret, "")
+//    }
 }

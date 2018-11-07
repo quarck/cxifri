@@ -279,10 +279,10 @@ class KeysActivity : AppCompatActivity() {
             db -> db.deleteKey(key.id)
         }
 
-        val matchingState = keyStates.find{ it.key.textKey == key.textKey }
+        val matchingState = keyStates.find{ it.key.key == key.key }
         if (matchingState != null) {
             keysRoot.removeView(matchingState.layout)
-            keyStates.removeAll { it.key.textKey == key.textKey }
+            keyStates.removeAll { it.key.key == key.key }
         }
     }
 

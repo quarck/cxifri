@@ -74,6 +74,6 @@ class RandomSharedSecretGenerator {
     }
 
     companion object {
-        const val SHARED_SECRET_LEN = 80
+        const val SHARED_SECRET_LEN = 32 + 16
     }
 }
