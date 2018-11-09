@@ -63,10 +63,23 @@ class KeyGenerationTests {
 
         assertEquals(textKey.size, 32*3)
 
+        var ineq_12 = 0
+        var ineq_13 = 0
+        var ineq_23 = 0
+
         for (i in 0 until 32) {
-            assertNotEquals(textKey[i], textKey[i+32])
-            assertNotEquals(textKey[i], textKey[i+64])
-            assertNotEquals(textKey[i+32], textKey[i+64])
+            if (textKey[i] != textKey[i+32])
+                ineq_12 += 1
+
+            if (textKey[i] != textKey[i+64])
+                ineq_13 += 1
+
+            if (textKey[i+32] != textKey[i+64])
+                ineq_23 += 1
         }
+
+        assertTrue(ineq_12 > 28)
+        assertTrue(ineq_13 > 28)
+        assertTrue(ineq_23 > 28)
     }
 }
