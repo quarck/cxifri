@@ -24,31 +24,23 @@ import org.bouncycastle.crypto.params.KeyParameter
 
 class DerivedKeyGenerator {
 
-    fun generateKeyBits(secret: ByteArray, salt: ByteArray): ByteArray {
-        val gen = PKCS5S2ParametersGenerator(SHA256Digest())
-        gen.init(secret, salt, NUM_ITERATIONS)
-        val param = gen.generateDerivedParameters(KEY_LEN_BYTES * 8) as KeyParameter
-        return param.key
-    }
+    fun generateFromTextPassword(password: String, keyLenBytes: Int, name: String=""): KeyEntry {
 
-    fun generateFromSharedSecret(secret: ByteArray, name: String): KeyEntry {
-        val textKey = generateKeyBits(secret, SALT_TEXT.toByteArray(charset= Charsets.UTF_8))
-        return KeyEntry(textKey, name)
-    }
+        val passwordBytes = password.toByteArray(charset = Charsets.UTF_8)
 
-    fun generateFromTextPassword(password: String, name: String=""): KeyEntry {
-        val passAsByteArray = password.toByteArray(charset = Charsets.UTF_8)
-        val ret = generateFromSharedSecret(passAsByteArray, name)
-        passAsByteArray.wipe()
+        val pkcsGen = PKCS5S2ParametersGenerator(SHA256Digest()).apply{
+            init(passwordBytes, SALT_TEXT, NUM_ITERATIONS)
+        }
+        val param = pkcsGen.generateDerivedParameters(keyLenBytes * 8) as KeyParameter
+        val ret = KeyEntry(param.key, name)
+
+        passwordBytes.wipe()
         return ret
     }
 
     companion object {
 
-        const val NUM_ITERATIONS = 60000
-
-        const val SALT_TEXT = "cxifri-text-pass-/exgD19HBcMPArzKeBdvptTg5SXjG1nh9w0CgF"
-
-        const val KEY_LEN_BYTES = 32+16
+        const val NUM_ITERATIONS = 100000
+        val SALT_TEXT = "cxifri-text-pass-/exgD19HBcMPArzKeBdvptTg5SXjG1nh9w0CgF".toByteArray(charset= Charsets.UTF_8)
     }
 }

@@ -28,14 +28,14 @@ class RandomSharedSecretGenerator {
     // Mac is used as CRC for code transmission, thus no need for any secure key
     val crcKey = byteArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-    fun generate(): ByteArray {
-        val key = ByteArray(SHARED_SECRET_LEN)
+    fun generate(len: Int): ByteArray {
+        val key = ByteArray(len)
         random.nextBytes(key)
         return key
     }
 
-    fun generateKeywithCSum(): Pair<ByteArray, ByteArray> {
-        val key = ByteArray(SHARED_SECRET_LEN)
+    fun generateKeywithCSum(len: Int): Pair<ByteArray, ByteArray> {
+        val key = ByteArray(len)
         random.nextBytes(key)
         val mac = CBCBlockCipherMac(AESEngine())
 
@@ -71,9 +71,5 @@ class RandomSharedSecretGenerator {
         val key = ByteArray(keyLen)
         System.arraycopy(keyIn, 0, key, 0, keyLen)
         return key
-    }
-
-    companion object {
-        const val SHARED_SECRET_LEN = 32 + 16
     }
 }

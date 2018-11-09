@@ -30,6 +30,7 @@ import android.widget.*
 import net.cxifri.aks.AndroidKeyStore
 import net.cxifri.crypto.DerivedKeyGenerator
 import net.cxifri.R
+import net.cxifri.crypto.CryptoFactory
 import net.cxifri.crypto.KeyEntry
 import net.cxifri.keysdb.KeyHelper
 import net.cxifri.keysdb.KeysDatabase
@@ -197,7 +198,7 @@ class KeysActivity : AppCompatActivity() {
     }
 
     private fun doSave(name: String, password: String) {
-        val key = DerivedKeyGenerator().generateFromTextPassword(password).copy(name = name)
+        val key = CryptoFactory.deriveKeyFromPassword(password, name)
         KeyHelper().saveKey(this, key, passwordKeyCBPreferAndroidKeyStore.isChecked)
 
         viewKeysLayout.visibility = View.VISIBLE

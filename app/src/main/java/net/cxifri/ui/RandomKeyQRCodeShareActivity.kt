@@ -22,8 +22,6 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import net.cxifri.R
-import net.cxifri.crypto.AESTwofishSerpentEngine
-import net.cxifri.crypto.RandomSharedSecretGenerator
 import net.cxifri.dataprocessing.QREncoder
 import net.cxifri.keysdb.KeyHelper
 
@@ -32,8 +30,7 @@ import android.view.WindowManager
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
 import android.widget.Toast
-import net.cxifri.crypto.DerivedKeyGenerator
-import net.cxifri.crypto.KeyEntry
+import net.cxifri.crypto.*
 
 
 class RandomKeyQRCodeShareActivity : AppCompatActivity() {
@@ -55,7 +52,7 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
         val imageView = findViewById<ImageView>(R.id.imageViewQR)
         val gen = QREncoder(Math.max(getDimensions()*8/10, 512))
 
-        val (secretBits, csum) = RandomSharedSecretGenerator().generateKeywithCSum()
+        val (secretBits, csum) = CryptoFactory.generateRandomKeyWithCsum()
         sharedSecret = secretBits
         val base64key = UrlBase64.encode(sharedSecret + csum).toString(charset = Charsets.UTF_8)
 

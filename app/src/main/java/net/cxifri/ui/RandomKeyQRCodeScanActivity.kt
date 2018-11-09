@@ -355,7 +355,7 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
 
         val sharedSecret = RandomSharedSecretGenerator().verifyChecksum(UrlBase64.decode(rawResult.text))
 
-        if (sharedSecret != null && sharedSecret.size >= RandomSharedSecretGenerator.SHARED_SECRET_LEN) {
+        if (sharedSecret != null && sharedSecret.size == AESTwofishSerpentEngine.KEY_LENGTH) {
             shutdownScanning()
             findViewById<LinearLayout>(R.id.layoutKeyNameAndSave).visibility = View.VISIBLE
             findViewById<View>(R.id.fillWhiteView).visibility = View.VISIBLE

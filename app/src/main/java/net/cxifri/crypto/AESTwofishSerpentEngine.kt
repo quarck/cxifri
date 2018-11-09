@@ -29,10 +29,10 @@ import java.nio.charset.Charset
 
 class AESTwofishSerpentEngine() : BlockCipher {
 
-
     val aesEngine = AESEngine()
     val twofishEngine = TwofishEngine()
     val serpentEngine = SerpentEngine()
+
     var encrypting: Boolean = false
 
     val aesBlock = ByteArray(aesEngine.blockSize)
@@ -41,35 +41,29 @@ class AESTwofishSerpentEngine() : BlockCipher {
 
     override fun init(forEncryption: Boolean, params: CipherParameters?) {
 
-        encrypting = forEncryption
-
-        if (params is KeyParameter) {
-            val key = params.key
-            if (key.size == KEY_LENGTH) {
-
-                val genA = PKCS5S2ParametersGenerator(SHA256Digest())
-                val genT = PKCS5S2ParametersGenerator(SHA256Digest())
-                val genS = PKCS5S2ParametersGenerator(SHA256Digest())
-
-                genA.init(key, SALT_AES, NUM_PCKS_ITERS)
-                genT.init(key, SALT_TWOFISH, NUM_PCKS_ITERS)
-                genS.init(key, SALT_SERPENT, NUM_PCKS_ITERS)
-
-                val keyParamA = genA.generateDerivedParameters(KEY_LENGTH_UND * 8) as KeyParameter
-                val keyParamT = genT.generateDerivedParameters(KEY_LENGTH_UND * 8) as KeyParameter
-                val keyParamS = genS.generateDerivedParameters(KEY_LENGTH_UND * 8) as KeyParameter
-
-                aesEngine.init(forEncryption, keyParamA)
-                twofishEngine.init(forEncryption, keyParamT)
-                serpentEngine.init(forEncryption, keyParamS)
-
-            } else {
-                throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init, key length is ${key.size}, supported key length: $KEY_LENGTH")
-            }
-            return
+        if (params !is KeyParameter) {
+            throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init - " + params?.javaClass?.name)
         }
 
-        throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init - " + params?.javaClass?.name)
+        val key: ByteArray = params.key
+        if (key.size != KEY_LENGTH) {
+            throw IllegalArgumentException("invalid parameter passed to AESTwofishSerpent init, key length is ${key.size}, supported key length: $KEY_LENGTH")
+        }
+
+        encrypting = forEncryption
+
+        aesEngine.init(
+                forEncryption,
+                KeyParameter(key, 0 * KEY_LENGTH_UNDERLYING, KEY_LENGTH_UNDERLYING)
+        )
+        twofishEngine.init(
+                forEncryption,
+                KeyParameter(key, 1 * KEY_LENGTH_UNDERLYING, KEY_LENGTH_UNDERLYING)
+        )
+        serpentEngine.init(
+                forEncryption,
+                KeyParameter(key, 2 * KEY_LENGTH_UNDERLYING, KEY_LENGTH_UNDERLYING)
+        )
     }
 
     override fun getAlgorithmName(): String {
@@ -90,13 +84,19 @@ class AESTwofishSerpentEngine() : BlockCipher {
     override fun processBlock(input: ByteArray, inOff: Int, output: ByteArray, outOff: Int): Int {
 
         if (encrypting) {
+            // aesBlock = E_aes(input)
             aesEngine.processBlock(input, inOff, aesBlock, 0)
+            // twofishBlock = E_twofish(aesBlock) == E_twofish(E_aes(input))
             twofishEngine.processBlock(aesBlock, 0, twofishBlock, 0)
+            // output = E_serpent(twofishBlock) == E_serpent(E_twofish(E_aes(input)))
             serpentEngine.processBlock(twofishBlock, 0, output, outOff)
         }
         else {
+            // serpentBlock = D_serpent(input)
             serpentEngine.processBlock(input, inOff, serpentBlock, 0)
+            // twofishBlock = D_twofish(serpentBlock) == D_twofish(D_serpent(input))
             twofishEngine.processBlock(serpentBlock, 0, twofishBlock, 0)
+            // output = D_aes(twofishBlock) == D_aes(D_twofish(D_serpent(input)))
             aesEngine.processBlock(twofishBlock, 0, output, outOff)
         }
 
@@ -116,13 +116,7 @@ class AESTwofishSerpentEngine() : BlockCipher {
     companion object {
         val BLOCK_SIZE = 16
 
-        val KEY_LENGTH_UND = 32 // key length of each underlying cipher
-        val KEY_LENGTH = 48
-
-        val SALT_AES = "cxifri-text-AES-ZzeqOthuLXNpK5BU1XT/c".toByteArray(charset = Charsets.UTF_8)
-        val SALT_TWOFISH = "cxifri-text-Twofish-YKwa3IqWv/MTZ0qhaK5CA".toByteArray(charset = Charsets.UTF_8)
-        val SALT_SERPENT = "cxifri-text-Serpent-PAQThlVjYhYqCcJFHz0BT".toByteArray(charset = Charsets.UTF_8)
-
-        val NUM_PCKS_ITERS = 10
+        val KEY_LENGTH_UNDERLYING = 32 // key length of each underlying cipher
+        val KEY_LENGTH = KEY_LENGTH_UNDERLYING * 3 // each underlying cipher is using individual key
     }
 }

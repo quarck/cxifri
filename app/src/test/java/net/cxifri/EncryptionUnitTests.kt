@@ -35,23 +35,14 @@ class EncryptionUnitTests {
                 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
         )
 
-        val keyAuth = byteArrayOf(
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-        )
-
         val dataIn = ByteArray(len)
         for (i in 0 until len) {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, keyText, keyAuth)
+        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, keyText)
 
-        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, keyText, keyAuth)
+        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, keyText)
 
         assertNotNull(decrypted)
 
@@ -60,9 +51,9 @@ class EncryptionUnitTests {
         }
 
         // deliberately destroy the key
-        keyAuth[0] = 100
+        keyText[0] = 100
 
-        val decrypted2 = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, keyText, keyAuth)
+        val decrypted2 = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, keyText)
         assertNull(decrypted2)
     }
 
@@ -101,10 +92,7 @@ class EncryptionUnitTests {
         val keyChained = byteArrayOf(
                 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
                 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1,
-                0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2,
-                0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2,
-                0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0, 3, 3, 3, 3,
-                0, 0, 0, 0, 3, 3, 3, 3, 0, 0, 0, 0, 3, 3, 3, 3
+                0, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 2, 2, 2, 2
         )
 
         val aesEngine = AESEngine()
@@ -143,12 +131,12 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val (bk1t, bk1a) = k1.binaryKey ?: throw Exception("")
-        val (bk2t, bk2a) = k2.binaryKey ?: throw Exception("")
+        val bk1t = k1.binaryKey ?: throw Exception("")
+        val bk2t = k2.binaryKey ?: throw Exception("")
 
-        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t, bk1a)
+        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t)
 
-        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk2t, bk2a)
+        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk2t)
 
         assertNull(decrypted)
     }
@@ -160,11 +148,11 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val (bk1t, bk1a) = k1.binaryKey ?: throw Exception("")
+        val bk1t = k1.binaryKey ?: throw Exception("")
 
-        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t, bk1a)
+        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t)
 
-        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk1t, bk1a)
+        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk1t)
 
         assertNotNull(decrypted)
 
@@ -179,41 +167,21 @@ class EncryptionUnitTests {
 
 
         ensureMacFail(
-            generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(0, 1, 2, 3, 4)),
-            generator.generateFromSharedSecret(byteArrayOf(1, 1, 2, 3, 4), byteArrayOf(0, 1, 2, 3, 4))
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4), "")
         )
 
         ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 0, 0, 0, 4), byteArrayOf(0, 1, 2, 3, 4)),
-                generator.generateFromSharedSecret(byteArrayOf(0, 0, 0, 0, 5), byteArrayOf(0, 1, 2, 3, 4))
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
+                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4), "")
         )
 
         ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(0, 1, 2, 3, 4)),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(1, 1, 2, 3, 4))
+                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4), ""),
+                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4), "")
         )
 
-        ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 4, 3, 4), byteArrayOf(0, 1, 2, 3, 4)),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4), byteArrayOf(1, 1, 2, 3, 4))
-        )
-
-        ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4)),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4))
-        )
-
-        ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4)),
-                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4))
-        )
-
-        ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4)),
-                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4))
-        )
-
-        ensureMacWorks(generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4)))
+        ensureMacWorks(generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4), ""))
     }
 
     fun encrypt(message: ByteArray, textKey: ByteArray): ByteArray {
@@ -305,8 +273,8 @@ class EncryptionUnitTests {
         val decrypted = decrypt(encrypted, key1)
         assertNotNull(decrypted)
 
-        val encryptedOld = BinaryMessageHandler({AESEngine()}).encrypt(msg, key1, key2)
-        val decryptedOld = BinaryMessageHandler({AESEngine()}).decrypt(encryptedOld, key1, key2)
+        val encryptedOld = BinaryMessageHandler({AESEngine()}).encrypt(msg, key1)
+        val decryptedOld = BinaryMessageHandler({AESEngine()}).decrypt(encryptedOld, key1)
         assertNotNull(decryptedOld)
 
         val failDecryptedNew = decrypt(encrypted, key2)

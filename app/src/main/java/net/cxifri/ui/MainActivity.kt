@@ -299,7 +299,7 @@ class MainActivity : AppCompatActivity() {
                                 ))
                                 .setPositiveButton(android.R.string.ok) { _, _ ->
                                     background {
-                                        doEncrypt(CryptoFactory.deriveKeyFromPassword(password), msg)
+                                        doEncrypt(CryptoFactory.deriveKeyFromPassword(password, ""), msg)
                                     }
                                 }
                                 .setNegativeButton(android.R.string.cancel) { _, _ -> }
@@ -309,7 +309,7 @@ class MainActivity : AppCompatActivity() {
                     return@background
                 }
 
-                cKey = CryptoFactory.deriveKeyFromPassword(password)
+                cKey = CryptoFactory.deriveKeyFromPassword(password, "")
             }
 
             doEncrypt(cKey, msg)
@@ -324,7 +324,7 @@ class MainActivity : AppCompatActivity() {
 
         background {
             try {
-                val cKey = currentKey ?: CryptoFactory.deriveKeyFromPassword(password)
+                val cKey = currentKey ?: CryptoFactory.deriveKeyFromPassword(password, "")
                 val decrypted = CryptoFactory.createMessageHandler().decrypt(msg, cKey)
 
                 if (decrypted != null) {

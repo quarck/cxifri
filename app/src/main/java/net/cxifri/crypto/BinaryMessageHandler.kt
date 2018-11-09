@@ -29,12 +29,12 @@ import org.bouncycastle.crypto.params.KeyParameter
 import org.bouncycastle.crypto.params.ParametersWithIV
 import java.security.SecureRandom
 
-class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHandlerInterface {
+class BinaryMessageHandler: BinaryMessageHandlerInterface {
 
     override fun encrypt(message: ByteArray, key: ByteArray): ByteArray {
 
         val random = SecureRandom()
-        val cipher = EAXBlockCipher(createEngine())
+        val cipher = EAXBlockCipher(AESTwofishSerpentEngine())
 
         val iv = ByteArray(cipher.blockSize)
         random.nextBytes(iv)
@@ -62,7 +62,7 @@ class BinaryMessageHandler(val createEngine: ()->BlockCipher): BinaryMessageHand
 
     override fun decrypt(message: ByteArray, key: ByteArray): ByteArray? {
 
-        val cipher = EAXBlockCipher(createEngine())
+        val cipher = EAXBlockCipher(AESTwofishSerpentEngine())
 
         try {
             val ivSize = cipher.blockSize
