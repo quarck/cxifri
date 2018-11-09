@@ -1,5 +1,6 @@
 package net.cxifri
 
+import net.cxifri.crypto.CryptoFactory
 import net.cxifri.crypto.DerivedKeyGenerator
 import net.cxifri.crypto.KeyEntry
 import net.cxifri.dataprocessing.GZipBlob
@@ -30,49 +31,35 @@ class KeyGenerationTests {
 
     @Test
     fun testKeyDependsOnInput() {
-        val generator = DerivedKeyGenerator()
 
         runKeyInequalityAsserts(
-                generator.generateFromTextPassword("Hello"),
-                generator.generateFromTextPassword("hello")
+                CryptoFactory.deriveKeyFromPassword("Hello", ""),
+                CryptoFactory.deriveKeyFromPassword("hello", "")
         )
 
         runKeyInequalityAsserts(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(1, 1, 2, 3, 4, 0, 1, 2, 3, 4), "")
+                CryptoFactory.deriveKeyFromPassword("hello1", ""),
+                CryptoFactory.deriveKeyFromPassword("hello2", "")
         )
 
         runKeyInequalityAsserts(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4), "")
+                CryptoFactory.deriveKeyFromPassword("", ""),
+                CryptoFactory.deriveKeyFromPassword(" ", "")
         )
 
         runKeyInequalityAsserts(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 4, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4), "")
-        )
-
-        runKeyInequalityAsserts(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4), "")
-        )
-
-        runKeyInequalityAsserts(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4), "")
-        )
-
-        runKeyInequalityAsserts(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4), "")
+                CryptoFactory.deriveKeyFromPassword(
+                        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", ""),
+                CryptoFactory.deriveKeyFromPassword(
+                        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab", "")
         )
     }
 
     @Test
     fun testAESTwfSerpentKeysAreIndependent() {
-        val generator = DerivedKeyGenerator()
 
-        val textKey = generator.generateFromTextPassword("test").binaryKey ?: throw Exception("")
+
+        val textKey = CryptoFactory.deriveKeyFromPassword("test", "").binaryKey ?: throw Exception("")
 
         assertEquals(textKey.size, 32*3)
 
@@ -81,10 +68,5 @@ class KeyGenerationTests {
             assertNotEquals(textKey[i], textKey[i+64])
             assertNotEquals(textKey[i+32], textKey[i+64])
         }
-    }
-
-    @Test
-    fun testChainKeyGen() {
-        // TBD
     }
 }

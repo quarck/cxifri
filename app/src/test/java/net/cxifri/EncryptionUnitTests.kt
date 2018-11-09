@@ -1,9 +1,6 @@
 package net.cxifri
 
-import net.cxifri.crypto.AESTwofishSerpentEngine
-import net.cxifri.crypto.BinaryMessageHandler
-import net.cxifri.crypto.DerivedKeyGenerator
-import net.cxifri.crypto.KeyEntry
+import net.cxifri.crypto.*
 import net.cxifri.keysdb.binaryKey
 import org.bouncycastle.crypto.CryptoException
 import org.bouncycastle.crypto.InvalidCipherTextException
@@ -40,9 +37,9 @@ class EncryptionUnitTests {
             dataIn[i] = i.toByte()
         }
 
-        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, keyText)
+        val encrypted = BinaryMessageHandler().encrypt(dataIn, keyText)
 
-        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, keyText)
+        val decrypted = BinaryMessageHandler().decrypt(encrypted, keyText)
 
         assertNotNull(decrypted)
 
@@ -53,7 +50,7 @@ class EncryptionUnitTests {
         // deliberately destroy the key
         keyText[0] = 100
 
-        val decrypted2 = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, keyText)
+        val decrypted2 = BinaryMessageHandler().decrypt(encrypted, keyText)
         assertNull(decrypted2)
     }
 
@@ -134,9 +131,9 @@ class EncryptionUnitTests {
         val bk1t = k1.binaryKey ?: throw Exception("")
         val bk2t = k2.binaryKey ?: throw Exception("")
 
-        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t)
+        val encrypted = BinaryMessageHandler().encrypt(dataIn, bk1t)
 
-        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk2t)
+        val decrypted = BinaryMessageHandler().decrypt(encrypted, bk2t)
 
         assertNull(decrypted)
     }
@@ -150,9 +147,9 @@ class EncryptionUnitTests {
 
         val bk1t = k1.binaryKey ?: throw Exception("")
 
-        val encrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.encrypt(dataIn, bk1t)
+        val encrypted = BinaryMessageHandler().encrypt(dataIn, bk1t)
 
-        val decrypted = BinaryMessageHandler { AESTwofishSerpentEngine() }.decrypt(encrypted, bk1t)
+        val decrypted = BinaryMessageHandler().decrypt(encrypted, bk1t)
 
         assertNotNull(decrypted)
 
@@ -163,25 +160,18 @@ class EncryptionUnitTests {
 
     @Test
     fun macValidityTest() {
-        val generator = DerivedKeyGenerator()
-
 
         ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 1, 1, 2, 3, 4), "")
+                CryptoFactory.deriveKeyFromPassword("aaaaaaaaaaaaaaaaaa", ""),
+                CryptoFactory.deriveKeyFromPassword("aaaaaaaaaaaaaaaaab", "")
         )
 
         ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4), "")
+                CryptoFactory.deriveKeyFromPassword("aaaaaaaaaaaaaaaaaa", ""),
+                CryptoFactory.deriveKeyFromPassword("baaaaaaaaaaaaaaaaa", "")
         )
 
-        ensureMacFail(
-                generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4), ""),
-                generator.generateFromSharedSecret(byteArrayOf(0, 2, 2, 3, 4, 0, 1, 2, 3, 4), "")
-        )
-
-        ensureMacWorks(generator.generateFromSharedSecret(byteArrayOf(0, 1, 2, 3, 4, 0, 1, 2, 6, 4), ""))
+        ensureMacWorks(CryptoFactory.deriveKeyFromPassword("aaaaaaaaaaaaaaaaaa", ""))
     }
 
     fun encrypt(message: ByteArray, textKey: ByteArray): ByteArray {
@@ -251,33 +241,5 @@ class EncryptionUnitTests {
         catch (ex: InvalidCipherTextException) {
             return null
         }
-    }
-
-
-
-    @Test
-    fun testEAX() {
-        val key1 = byteArrayOf(
-                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-        )
-
-        val key2 = byteArrayOf(
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
-                1, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
-        )
-
-        val msg = byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 10)
-
-        val encrypted = encrypt(msg, key1)
-        val decrypted = decrypt(encrypted, key1)
-        assertNotNull(decrypted)
-
-        val encryptedOld = BinaryMessageHandler({AESEngine()}).encrypt(msg, key1)
-        val decryptedOld = BinaryMessageHandler({AESEngine()}).decrypt(encryptedOld, key1)
-        assertNotNull(decryptedOld)
-
-        val failDecryptedNew = decrypt(encrypted, key2)
-        assertNull(failDecryptedNew)
     }
 }
