@@ -80,14 +80,32 @@
                 android:ems="10"
                 android:inputType="textPersonName"
                 android:text=""
-                android:hint="@string/key_name"/>
+                android:hint="@string/key_name"
+                android:importantForAutofill="no"
+                tools:targetApi="o" />
+
+            <CheckBox
+                android:id="@+id/checkBoxPreferAndroidKeyStore"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/use_androidkeystore_if_supported"
+                android:textAppearance="@style/TextMedium" />
+
+            <TextView
+                android:id="@+id/textAndroidKeyStoreComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10sp"
+                android:ems="10"
+                android:text="@string/aks_comment"
+                android:textAppearance="@style/TextSmallWarning" />
 
             <Button
                 android:id="@+id/buttonSave"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Save" />
-
+                android:text="@string/button_save_title" />
 
         </LinearLayout>
 

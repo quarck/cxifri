@@ -18,9 +18,6 @@ package net.cxifri.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageView
 import net.cxifri.R
 import net.cxifri.dataprocessing.QREncoder
 import net.cxifri.keysdb.KeyHelper
@@ -29,7 +26,7 @@ import org.bouncycastle.util.encoders.UrlBase64
 import android.view.WindowManager
 import android.graphics.Point
 import android.support.v7.app.AppCompatActivity
-import android.widget.Toast
+import android.widget.*
 import net.cxifri.crypto.*
 
 
@@ -82,15 +79,23 @@ class RandomKeyQRCodeShareActivity : AppCompatActivity() {
     }
 
     private fun onButtonSave(v: View) {
-        val name = findViewById<EditText>(R.id.editTextKeyName)
+        val name = findViewById<EditText>(R.id.editTextKeyName)?.text?.toString()
 
-        name?.text?.toString()?.let {
-            KeyHelper().saveKey(
-                    this,
-                    KeyEntry(sharedSecret, name = name.text.toString()),
-                    true)
-            Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
-            finish()
+        if (name == null || name.isEmpty()) {
+            Toast.makeText(
+                    this@RandomKeyQRCodeShareActivity,
+                    R.string.key_name_is_empty,
+                    Toast.LENGTH_LONG).show()
+            return
         }
+
+        val preferAks = findViewById<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)?.isChecked ?: true
+
+        KeyHelper().saveKey(
+                this,
+                KeyEntry(sharedSecret, name = name),
+                preferAks)
+        Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
+        finish()
     }
 }

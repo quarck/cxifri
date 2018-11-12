@@ -340,7 +340,9 @@
                     android:layout_height="wrap_content"
                     android:text="@string/button_save_title"
                     android:textAppearance="@style/TextMediumAccent"
-                    android:background="@color/buttonBackgroundColor"/>
+                    android:background="@color/buttonBackgroundColor"
+                    android:layout_margin="5dp"
+                    />
 
                 <Button
                     android:id="@+id/buttonCancel"
@@ -349,7 +351,8 @@
                     android:layout_height="wrap_content"
                     android:text="@string/button_cancel_title"
                     android:textAppearance="@style/TextMediumAccent"
-                    android:background="@color/buttonBackgroundColor"/>
+                    android:background="@color/buttonBackgroundColor"
+                    android:layout_margin="5dp"/>
 
             </LinearLayout>
 

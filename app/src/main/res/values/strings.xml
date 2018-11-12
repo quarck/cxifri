@@ -25,7 +25,7 @@
     <string name="add_a_new_key_menu_item">Add a new key</string>
     <string name="encrypt_decrypt_activity_label">cxifri</string>
     <string name="use_androidkeystore_if_supported">Store in AndroidKeyStore if supported</string>
-    <string name="aks_comment">AndroidKeyStore is a secure storage backed by the device encryption hardware. Storing key with AndroidKeyStore is generally more secure, but on some devices you might loose access to stored keys if you change your device password (and possibly under other similar circumstancies)</string>
+    <string name="aks_comment">AndroidKeyStore is a storage backed by the device encryption hardware\nCheck your device manual to ensure such hardware is present\n\nStoring key with AndroidKeyStore is generally more secure\n\nOn some devices access to information stored in AndroidKeyStore can be lost after change of device password (and possibly under other similar circumstances)</string>
     <string name="generate_random_key">Generate Random Key (QR code)</string>
     <string name="scan_random_key">Scan a random key (QR code)</string>
     <string name="title_activity_random_key_generation">Random Key</string>

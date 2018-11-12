@@ -32,7 +32,9 @@
 
 package net.cxifri.ui
 
+import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.os.*
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -40,10 +42,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.Toast
+import android.widget.*
 import net.cxifri.R
 import net.cxifri.crypto.RandomSharedSecretGenerator
 import net.cxifri.keysdb.KeyHelper
@@ -256,6 +255,21 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
         inactivityTimer = InactivityTimer(this)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        var allGranted = true
+        for (result in grantResults) {
+            if (result != PackageManager.PERMISSION_GRANTED)
+                allGranted = false
+        }
+
+        if (allGranted) {
+            startActivity(Intent(this, this.javaClass))
+            finish()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -359,11 +373,21 @@ class RandomKeyQRCodeScanActivity : AppCompatActivity(), SurfaceHolder.Callback 
             shutdownScanning()
             findViewById<LinearLayout>(R.id.layoutKeyNameAndSave).visibility = View.VISIBLE
             findViewById<View>(R.id.fillWhiteView).visibility = View.VISIBLE
+
             findViewById<Button>(R.id.buttonSave)?.setOnClickListener {
                 val name = findViewById<EditText>(R.id.editTextKeyName).text.toString()
+                if (name.isEmpty())  {
+                    Toast.makeText(
+                            this@RandomKeyQRCodeScanActivity,
+                            R.string.key_name_is_empty,
+                            Toast.LENGTH_LONG).show()
+                    return@setOnClickListener
+                }
+
+                val preferAks = findViewById<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)?.isChecked ?: true
                 KeyHelper().saveKey(this,
                         KeyEntry(sharedSecret, name=name),
-                        true)
+                        preferAks)
                 Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
                 finish()
             }
