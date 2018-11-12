@@ -47,6 +47,8 @@ class MainActivity : AppCompatActivity() {
 
     var isTextEncrypted = false
 
+    var isKeyEverSelected = false
+
     var currentKey: KeyEntry? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -216,7 +218,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onButtonKeySelect(v: View) {
+    private fun doSelectKeys(continueWithEncrypt: Boolean) {
         val keys = KeysDatabase(context = this).use { it.keys }
 
         val builder = AlertDialog.Builder(this)
@@ -237,14 +239,21 @@ class MainActivity : AppCompatActivity() {
             if (which >= 0 && which < values.size && which < names.size) {
                 val keyId = values[which]
                 onKeySelected(keyId)
+                if (continueWithEncrypt) {
+                    doEncrypt()
+                }
             }
         }
 
         return builder.create().show()
+    }
 
+    private fun onButtonKeySelect(v: View) {
+        doSelectKeys(false)
     }
 
     private fun onKeySelected(keyId: Long) {
+        isKeyEverSelected = true
         if (keyId != -1L) {
             passwordText.visibility = View.GONE
             currentKey = KeysDatabase(context = this).use { it.getKey(keyId) }
@@ -258,6 +267,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onKeySelected(key: KeyEntry?) {
+        isKeyEverSelected = true
         if (key != null) {
             passwordText.visibility = View.GONE
             currentKey = key
@@ -281,7 +291,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun onButtonEncrypt(v: View) {
+    private fun doEncrypt() {
         val msg = messageText.text.toString()
         val password = passwordText.text.toString()
 
@@ -327,6 +337,13 @@ class MainActivity : AppCompatActivity() {
 
             doEncrypt(cKey, msg)
         }
+    }
+
+    private fun onButtonEncrypt(v: View) {
+        if (!isKeyEverSelected)
+            doSelectKeys(continueWithEncrypt = true)
+        else
+            doEncrypt()
     }
 
     private fun decryptIterateAllKeys(text: String) {
