@@ -45,6 +45,8 @@ class MainActivity : AppCompatActivity() {
     val passwordText by UIItem<EditText>(R.id.password)
     val textViewError by UIItem<TextView>(R.id.textViewError)
 
+    val pleaseWaitText by UIItem<TextView>(R.id.textDerivingKeysStatus)
+
     var isTextEncrypted = false
 
     var isKeyEverSelected = false
@@ -167,7 +169,8 @@ class MainActivity : AppCompatActivity() {
             is TextMessage ->
                 runOnUiThread {
                     messageText.setText(message.text)
-                    onKeySelected(message.key)
+                    if (updateKey)
+                        onKeySelected(message.key)
                 }
             is KeyReplacementMessage -> TODO("Not implemented")
 
@@ -297,46 +300,45 @@ class MainActivity : AppCompatActivity() {
         val password = passwordText.text.toString()
 
         textViewError.visibility = View.GONE
+        val cKey = currentKey //  ?: CryptoFactory.deriveKeyFromPassword(key)
 
-        background {
-            var cKey = currentKey //  ?: CryptoFactory.deriveKeyFromPassword(key)
-            if (cKey == null) {
-
-                if (password.isEmpty()) {
-                    runOnUiThread {
-                        Toast.makeText(this@MainActivity, R.string.password_is_empty, Toast.LENGTH_LONG).show()
-                    }
-                    return@background
-                }
-
-                val complexity  = PasswordComplexityEstimator.getExhaustiveSearchComplexity(password)
-                if (!complexity.isSecure) {
-
-                    runOnUiThread {
-                        val builder = AlertDialog.Builder(this)
-                                .setIcon(R.drawable.ic_launcher_foreground)
-                                .setTitle(getString(R.string.password_stength_notice))
-                                .setMessage(getString(R.string.still_proceed_question).format(
-                                        complexity.formatPc(this),
-                                        complexity.formatGpu(this),
-                                        complexity.formatCluster(this)
-                                ))
-                                .setPositiveButton(android.R.string.ok) { _, _ ->
-                                    background {
-                                        doEncrypt(CryptoFactory.deriveKeyFromPassword(password, ""), msg)
-                                    }
-                                }
-                                .setNegativeButton(android.R.string.cancel) { _, _ -> }
-
-                        builder.create().show()
-                    }
-                    return@background
-                }
-
-                cKey = CryptoFactory.deriveKeyFromPassword(password, "")
+        if (cKey == null) {
+            if (password.isEmpty()) {
+                Toast.makeText(this, R.string.password_is_empty, Toast.LENGTH_LONG).show()
+                return
             }
 
-            doEncrypt(cKey, msg)
+            val complexity = PasswordComplexityEstimator.getExhaustiveSearchComplexity(password)
+            if (!complexity.isSecure) {
+                val builder = AlertDialog.Builder(this)
+                        .setIcon(R.drawable.ic_launcher_foreground)
+                        .setTitle(getString(R.string.password_stength_notice))
+                        .setMessage(getString(R.string.still_proceed_question).format(
+                                complexity.formatPc(this),
+                                complexity.formatGpu(this),
+                                complexity.formatCluster(this)
+                        ))
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            pleaseWaitText.visibility = View.VISIBLE
+                            background {
+                                val key = CryptoFactory.deriveKeyFromPassword(password, "")
+                                runOnUiThread { pleaseWaitText.visibility = View.GONE }
+                                doEncrypt(key, msg)
+                            }
+                        }
+                        .setNegativeButton(android.R.string.cancel) { _, _ -> }
+
+                builder.create().show()
+                return
+            }
+
+            pleaseWaitText.visibility = View.VISIBLE
+        }
+
+        background {
+            val key = cKey ?: CryptoFactory.deriveKeyFromPassword(password, "")
+            runOnUiThread { pleaseWaitText.visibility = View.GONE }
+            doEncrypt(key, msg)
         }
     }
 
@@ -368,9 +370,14 @@ class MainActivity : AppCompatActivity() {
 
         textViewError.visibility = View.GONE
 
+        if (currentKey == null)
+            pleaseWaitText.visibility = View.VISIBLE
+
         background {
             try {
                 val cKey = currentKey ?: CryptoFactory.deriveKeyFromPassword(password, "")
+                runOnUiThread { pleaseWaitText.visibility = View.GONE }
+
                 val decrypted = CryptoFactory.createMessageHandler().decrypt(msg, cKey)
 
                 if (decrypted != null) {

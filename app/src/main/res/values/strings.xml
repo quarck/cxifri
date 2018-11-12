@@ -88,4 +88,5 @@
     <string name="format_weeks" formatted="false">%.0f weeks</string>
     <string name="format_months" formatted="false">%.0f months</string>
     <string name="format_years" formatted="false">%.0f years</string>
+    <string name="please_wait_deriving_the_password_based_key">Please wait, deriving the password based key\n(PKCS5S2/SHA256, 100000 iterations)</string>
 </resources>

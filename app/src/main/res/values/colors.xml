@@ -15,4 +15,5 @@
     <color name="verticalLineSeparator">#efefef</color>
 
     <color name="colorCameraBlackout">#7f1f3f1f</color>
+    <color name="please_wait_color">#E0E0E0E0</color>
 </resources>

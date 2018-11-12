@@ -37,6 +37,7 @@ import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.keysdb.toStringDetails
 import net.cxifri.utils.PasswordComplexityEstimator
 import net.cxifri.utils.UIItem
+import net.cxifri.utils.background
 
 class KeyStateEntry(
         var context: Context,
@@ -122,6 +123,8 @@ class KeysActivity : AppCompatActivity() {
     val passwordKeyErrorText by UIItem<TextView>(R.id.textError)
     val passwordKeyCBPreferAndroidKeyStore by UIItem<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)
 
+    val pleaseWaitText by UIItem<TextView>(R.id.textDerivingKeysStatus)
+
 //    val layoutAddNewKeyButtons by UIItem<LinearLayout>(R.id.layoutAddNewKeyButtons)
 
     lateinit var keyStates: MutableList<KeyStateEntry>
@@ -198,17 +201,29 @@ class KeysActivity : AppCompatActivity() {
     }
 
     private fun doSave(name: String, password: String) {
-        val key = CryptoFactory.deriveKeyFromPassword(password, name)
-        KeyHelper().saveKey(this, key, passwordKeyCBPreferAndroidKeyStore.isChecked)
 
-        viewKeysLayout.visibility = View.VISIBLE
-        addKeyOptionsLayout.visibility = View.GONE
-        addPasswordKeyLayout.visibility = View.GONE
-        keyName.setText("")
-        keyPassword.setText("")
-        keyPasswordConfirmation.setText("")
+        pleaseWaitText.visibility = View.VISIBLE
 
-        Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
+        val preferAks = passwordKeyCBPreferAndroidKeyStore.isChecked
+
+        background {
+            val key = CryptoFactory.deriveKeyFromPassword(password, name)
+            KeyHelper().saveKey(this@KeysActivity, key, preferAks)
+
+            runOnUiThread{
+                pleaseWaitText.visibility = View.GONE
+
+                viewKeysLayout.visibility = View.VISIBLE
+                addKeyOptionsLayout.visibility = View.GONE
+                addPasswordKeyLayout.visibility = View.GONE
+                keyName.setText("")
+                keyPassword.setText("")
+                keyPasswordConfirmation.setText("")
+
+                Toast.makeText(this, R.string.key_saved, Toast.LENGTH_LONG).show()
+                reloadKeys()
+            }
+        }
     }
 
     private fun onButtonAddPasswordKeySave(v: View) {
@@ -243,7 +258,6 @@ class KeysActivity : AppCompatActivity() {
                     ))
                     .setPositiveButton(android.R.string.ok) { _, _ ->
                         doSave(name, password)
-                        reloadKeys()
                     }
                     .setNegativeButton(android.R.string.cancel) { _, _ -> }
 
@@ -252,7 +266,6 @@ class KeysActivity : AppCompatActivity() {
         }
 
         doSave(name, password)
-        reloadKeys()
     }
 
 
