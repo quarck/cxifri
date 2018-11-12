@@ -257,6 +257,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun onKeySelected(key: KeyEntry?) {
+        if (key != null) {
+            passwordText.visibility = View.GONE
+            currentKey = key
+            buttonKeySelect.text = getString(R.string.key_format).format(currentKey?.name)
+        }
+        else {
+            passwordText.visibility = View.VISIBLE
+            buttonKeySelect.text = getString(R.string.key_type_below)
+            currentKey = null
+        }
+    }
+
 
     private fun doEncrypt(key: KeyEntry, msg: String) {
         try {
@@ -316,6 +329,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun decryptIterateAllKeys(text: String) {
+
+        val keys = KeysDatabase(context = this).use { it.keys }
+
+        val messageHandler = CryptoFactory.createMessageHandler()
+
+        val message = messageHandler.decrypt(text, keys)
+        if (message != null) {
+            onKeySelected(message.key)
+            onMessageDecrypted(message)
+        }
+        else {
+            onDecryptFailed()
+        }
+    }
+
     private fun onButtonDecrypt(v: View) {
         val msg = messageText.text.toString()
         val password = passwordText.text.toString()
@@ -332,10 +361,10 @@ class MainActivity : AppCompatActivity() {
                     onMessageDecrypted(decrypted)
                 }
                 else {
-                    onDecryptFailed()
+                    decryptIterateAllKeys(msg)
                 }
             } catch (ex: Exception) {
-                onDecryptFailed()
+                decryptIterateAllKeys(msg)
             }
         }
     }

@@ -1,9 +1,9 @@
 package net.cxifri.crypto
 
-open class MessageBase()
+open class MessageBase(val key: KeyEntry)
 
-class TextMessage(val key: KeyEntry, val text: String): MessageBase()
+class TextMessage(key: KeyEntry, val text: String): MessageBase(key)
 
-class KeyReplacementMessage(val key: KeyEntry, val newKey: KeyEntry, val receiverMustDeleteOldKey: Boolean): MessageBase()
+class KeyReplacementMessage(key: KeyEntry, val newKey: KeyEntry, val receiverMustDeleteOldKey: Boolean): MessageBase(key)
 
-class KeyRevokeMessage(val key: KeyEntry): MessageBase()
+class KeyRevokeMessage(key: KeyEntry): MessageBase(key)
