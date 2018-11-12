@@ -162,11 +162,12 @@ class MainActivity : AppCompatActivity() {
         return success
     }
 
-    private fun onMessageDecrypted(message: MessageBase) {
+    private fun onMessageDecrypted(message: MessageBase, updateKey: Boolean) {
         when (message) {
             is TextMessage ->
                 runOnUiThread {
                     messageText.setText(message.text)
+                    onKeySelected(message.key)
                 }
             is KeyReplacementMessage -> TODO("Not implemented")
 
@@ -354,8 +355,7 @@ class MainActivity : AppCompatActivity() {
 
         val message = messageHandler.decrypt(text, keys)
         if (message != null) {
-            onKeySelected(message.key)
-            onMessageDecrypted(message)
+            onMessageDecrypted(message, true)
         }
         else {
             onDecryptFailed()
@@ -375,7 +375,7 @@ class MainActivity : AppCompatActivity() {
 
                 if (decrypted != null) {
                     isTextEncrypted = false
-                    onMessageDecrypted(decrypted)
+                    onMessageDecrypted(decrypted, false)
                 }
                 else {
                     decryptIterateAllKeys(msg)
