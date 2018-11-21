@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/kriptileto.iml" filepath="$PROJECT_DIR$/kriptileto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/cxifri.iml" filepath="$PROJECT_DIR$/cxifri.iml" />
     </modules>
   </component>
 </project>
