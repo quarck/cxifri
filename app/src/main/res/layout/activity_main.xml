@@ -87,19 +87,6 @@
 
         </RelativeLayout>
 
-        <TextView
-            android:id="@+id/textViewError"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:ems="10"
-            android:text="Some encryption error text would be here"
-            android:textAppearance="@style/TextError"
-            tools:ignore="HardcodedText"
-            android:visibility="gone"
-            android:padding="10dp"/>
-
-
     </LinearLayout>
 
     <LinearLayout
