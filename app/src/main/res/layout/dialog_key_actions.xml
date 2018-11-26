@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/textViewKeyActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_margin="0sp"
+        android:padding="10sp"
+        android:text="Key actions for key ___NAME___"
+        android:textAppearance="@style/TextMedium"
+        android:textAlignment="center"
+        android:gravity="center_horizontal"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/buttonReplace"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextMediumAccent"
+        android:layout_margin="5sp"
+        android:layout_gravity="center"
+        style="?attr/borderlessButtonStyle"
+        android:background="@color/buttonBackgroundColor"
+
+        android:text="@string/replace_key" />
+
+    <Button
+        android:id="@+id/buttonRevoke"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="@style/TextMediumAccent"
+        android:layout_margin="5sp"
+        android:layout_gravity="center"
+        style="?attr/borderlessButtonStyle"
+        android:background="@color/buttonBackgroundColor"
+        android:text="@string/revoke_key" />
+</LinearLayout>

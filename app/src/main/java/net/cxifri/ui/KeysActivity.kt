@@ -18,6 +18,7 @@ package net.cxifri.ui
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -40,18 +41,18 @@ import net.cxifri.utils.UIItem
 import net.cxifri.utils.background
 
 class KeyStateEntry(
-        var context: Context,
-        inflater: LayoutInflater,
+        val context: Context,
+        val inflater: LayoutInflater,
         val key: KeyEntry,
-        isEven: Boolean,
         val onReplaceKey: (KeyEntry) -> Unit,
+        val onRevokeKey: (KeyEntry) -> Unit,
         val onDeleteKey: (KeyEntry) -> Unit
 ) {
     val layout: LinearLayout
-    val keyName: TextView
-    val keyDetails: TextView
-    val buttonActions: Button
-    val buttonDelete: Button
+    private val keyName: TextView
+    private val keyDetails: TextView
+    private val buttonActions: Button
+    private val buttonDelete: Button
 
     init {
         layout = inflater.inflate(R.layout.key_list_item, null) as LinearLayout? ?: throw Exception("Layout error")
@@ -68,24 +69,33 @@ class KeyStateEntry(
         keyDetails.setText(key.toStringDetails(context))
     }
 
-    fun onButtonActions(v: View) {
+    private fun onButtonActions(v: View) {
 
-        AlertDialog.Builder(context)
-                .setMessage("No button actions are currently supported (YET!)!")
-                .setCancelable(false)
-                .setPositiveButton(android.R.string.ok) {
-                    _, _ ->
-                }
-//                .setNegativeButton(android.R.string.cancel) {
-//                    _, _ ->
-//                }
-                .create()
-                .show()
+        val dialogView = inflater.inflate(R.layout.dialog_key_actions, null)
 
-        // onReplaceKey(key)
+        val builder = AlertDialog.Builder(context)
+        builder.setView(dialogView)
+
+        builder.setNegativeButton(android.R.string.cancel) {
+            _: DialogInterface?, _: Int ->
+        }
+
+        val dialog = builder.create()
+
+        dialogView.findViewById<Button>(R.id.buttonReplace)?.setOnClickListener{
+            dialog.cancel()
+            onReplaceKey(key)
+        }
+
+        dialogView.findViewById<Button>(R.id.buttonRevoke)?.setOnClickListener{
+            dialog.cancel()
+            onRevokeKey(key)
+        }
+
+        dialog.show()
     }
 
-    fun onButtonDelete(v: View) {
+    private fun onButtonDelete(v: View) {
 
         AlertDialog.Builder(context)
                 .setMessage("Delete key ${key.name}?")
@@ -103,31 +113,29 @@ class KeyStateEntry(
 }
 
 class KeysActivity : AppCompatActivity() {
-    val keysRoot by UIItem<LinearLayout>(R.id.layoutExistingKeysRoot)
+    private val keysRoot by UIItem<LinearLayout>(R.id.layoutExistingKeysRoot)
 
-    val addNewPasswordKeyButton by UIItem<Button>(R.id.buttonAddNewPasswordKey)
-    val genNewKeyButton by UIItem<Button>(R.id.buttonGenerateRandomKey)
-    val scanNewKeyButton by UIItem<Button>(R.id.buttonScanRandomKey)
-    val cancelNewKeyCreationButton by UIItem<Button>(R.id.buttonCancelCreatingNewKey)
+    private val addNewPasswordKeyButton by UIItem<Button>(R.id.buttonAddNewPasswordKey)
+    private val genNewKeyButton by UIItem<Button>(R.id.buttonGenerateRandomKey)
+    private val scanNewKeyButton by UIItem<Button>(R.id.buttonScanRandomKey)
+    private val cancelNewKeyCreationButton by UIItem<Button>(R.id.buttonCancelCreatingNewKey)
 
-    val viewKeysLayout by UIItem<ScrollView>(R.id.scrollViewKeys)
-    val addKeyOptionsLayout by UIItem<ScrollView>(R.id.layoutAddNewKeyButtons)
-    val addPasswordKeyLayout by UIItem<ScrollView>(R.id.layoutAddKey)
+    private val viewKeysLayout by UIItem<ScrollView>(R.id.scrollViewKeys)
+    private val addKeyOptionsLayout by UIItem<ScrollView>(R.id.layoutAddNewKeyButtons)
+    private val addPasswordKeyLayout by UIItem<ScrollView>(R.id.layoutAddKey)
 
-    val keyName by UIItem<EditText>(R.id.keyName)
-    val keyPassword by UIItem<EditText>(R.id.password)
-    val keyPasswordConfirmation by UIItem<EditText>(R.id.passwordConfirmation)
+    private val keyName by UIItem<EditText>(R.id.keyName)
+    private val keyPassword by UIItem<EditText>(R.id.password)
+    private val keyPasswordConfirmation by UIItem<EditText>(R.id.passwordConfirmation)
 
-    val passwordKeyButtonSaveKey by UIItem<Button>(R.id.buttonSaveKey)
-    val passwordKeyButtonCancel by UIItem<Button>(R.id.buttonCancel)
-    val passwordKeyErrorText by UIItem<TextView>(R.id.textError)
-    val passwordKeyCBPreferAndroidKeyStore by UIItem<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)
+    private val passwordKeyButtonSaveKey by UIItem<Button>(R.id.buttonSaveKey)
+    private val passwordKeyButtonCancel by UIItem<Button>(R.id.buttonCancel)
+    private val passwordKeyErrorText by UIItem<TextView>(R.id.textError)
+    private val passwordKeyCBPreferAndroidKeyStore by UIItem<CheckBox>(R.id.checkBoxPreferAndroidKeyStore)
 
-    val pleaseWaitText by UIItem<TextView>(R.id.textDerivingKeysStatus)
+    private val pleaseWaitText by UIItem<TextView>(R.id.textDerivingKeysStatus)
 
-//    val layoutAddNewKeyButtons by UIItem<LinearLayout>(R.id.layoutAddNewKeyButtons)
-
-    lateinit var keyStates: MutableList<KeyStateEntry>
+    private lateinit var keyStates: MutableList<KeyStateEntry>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -282,6 +290,10 @@ class KeysActivity : AppCompatActivity() {
         // Ignored - we don't have it implemented yet
     }
 
+    private fun onRevokeKey(key: KeyEntry){
+        // Ignored - we don't have it implemented yet
+    }
+
     private fun onDeleteKey(key: KeyEntry){
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -345,17 +357,15 @@ class KeysActivity : AppCompatActivity() {
         val keys = KeysDatabase(context = this).use { it.keys }
         keyStates = mutableListOf<KeyStateEntry>()
 
-        var idx = 0
         for (key in keys) {
             val keyState = KeyStateEntry(
                     context = this,
                     inflater = layoutInflater,
                     key = key,
-                    isEven = idx % 2 == 0,
                     onReplaceKey = this::onReplaceKey,
+                    onRevokeKey = this::onRevokeKey,
                     onDeleteKey = this::onDeleteKey
             )
-            idx += 1
 
             keyStates.add(keyState)
             keysRoot.addView(keyState.layout)

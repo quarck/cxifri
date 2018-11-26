@@ -36,18 +36,18 @@ import net.cxifri.utils.*
 
 class MainActivity : AppCompatActivity(), MainView {
 
-    val buttonEncrypt by UIItem<Button>(R.id.buttonEncrypt)
-    val buttonDecrypt by UIItem<Button>(R.id.buttonDecrypt)
+    private val buttonEncrypt by UIItem<Button>(R.id.buttonEncrypt)
+    private val buttonDecrypt by UIItem<Button>(R.id.buttonDecrypt)
 
-    val messageText by UIItem<EditText>(R.id.message)
-    val buttonKeySelect by UIItem<Button>(R.id.buttonKeySelect)
-    val passwordText by UIItem<EditText>(R.id.password)
+    private val messageText by UIItem<EditText>(R.id.message)
+    private val buttonKeySelect by UIItem<Button>(R.id.buttonKeySelect)
+    private val passwordText by UIItem<EditText>(R.id.password)
 
-    val pleaseWaitText by UIItem<TextView>(R.id.textDerivingKeysStatus)
+    private val pleaseWaitText by UIItem<TextView>(R.id.textDerivingKeysStatus)
 
-    var isTextEncrypted = false
+    private var isTextEncrypted = false
 
-    lateinit var controller: MainActivityController
+    private lateinit var controller: MainActivityController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,19 +76,14 @@ class MainActivity : AppCompatActivity(), MainView {
         when (item.itemId) {
             R.id.menu_clear ->
                 clearForm()
-
             R.id.menu_copy ->
                 copyText()
-
             R.id.menu_paste ->
                 pasteText()
-
             R.id.menu_share ->
                 shareText()
-
             R.id.menu_keys ->
                 startActivity(Intent(this, KeysActivity::class.java))
-
             R.id.menu_about ->
                 startActivity(Intent(this, AboutActivity::class.java))
         }
@@ -100,7 +95,7 @@ class MainActivity : AppCompatActivity(), MainView {
         handleIntent(intent)
     }
 
-    fun handleIntent(intent: Intent) {
+    private fun handleIntent(intent: Intent) {
         val intentTextExtra = intent.getStringExtra(TextViewActivity.INTENT_EXTRA_TEXT)
         val intentKeyIdExtra = intent.getLongExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, -1L)
 
@@ -140,64 +135,82 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun onIntentMessageDecryptResult(text: String, message: MessageBase?) {
 
-        when (message) {
-            null -> {
-                // Decrypt failed
-                runOnUiThread {
-                    isTextEncrypted = false // don't allow sharing
-                    runOnUiThread {
-                        messageText.setText(text)
-                        Toast.makeText(this, R.string.text_didnt_match_keys, Toast.LENGTH_LONG).show()
-                    }
-                }
-            }
+        isTextEncrypted = (message == null) || (message !is TextMessage)
 
-            is TextMessage -> {
-                runOnUiThread {
+        runOnUiThread {
+            when (message) {
+                null -> {
+                    // Decrypt failed
+                    messageText.setText(text)
+                    Toast.makeText(this, R.string.text_didnt_match_keys, Toast.LENGTH_LONG).show()
+                }
+
+                is TextMessage -> {
                     val intent = Intent(this, TextViewActivity::class.java)
                     intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, message.text)
                             .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, message.key.id)
                             .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, message.key.name)
                     startActivity(intent)
                 }
+
+                is KeyReplacementMessage ->
+                    onKeyReplacementMessage(message)
+
+                is KeyRevokeMessage ->
+                    onKeyRevokeMessage(message)
             }
-
-            is KeyReplacementMessage -> TODO("Not implemented")
-
-            is KeyRevokeMessage -> TODO("Not implemented also")
         }
     }
 
     override fun onMessageDecryptResult(text: String, message: MessageBase?) {
 
-        isTextEncrypted = message != null
+        isTextEncrypted = (message == null) || (message !is TextMessage)
 
-        when (message) {
-            null ->  {
-                runOnUiThread {
-                    Toast.makeText(this, R.string.failed_to_decrypt, Toast.LENGTH_LONG).show()
-                }
-            }
+        runOnUiThread {
+            when (message) {
+                null ->
+                    Toast.makeText(this, R.string.failed_to_decrypt, Toast.LENGTH_LONG)
+                            .show()
 
-            is TextMessage ->
-                runOnUiThread {
+                is TextMessage ->
                     messageText.setText(message.text)
-                }
-            is KeyReplacementMessage -> TODO("Not implemented")
 
-            is KeyRevokeMessage -> TODO("not impl allsss")
+                is KeyReplacementMessage ->
+                    onKeyReplacementMessage(message)
+
+                is KeyRevokeMessage ->
+                    onKeyRevokeMessage(message)
+            }
         }
     }
 
+    private fun onKeyRevokeMessage(message: KeyRevokeMessage) {
+        controller.revokeKey(message.key)
+    }
+
+    override fun onControllerKeyRevoked(key: KeyEntry) {
+        runOnUiThread {
+            val builder = AlertDialog.Builder(this)
+                    .setIcon(R.drawable.ic_launcher_foreground)
+                    .setTitle(getString(R.string.key_revoked_title_fmt).format(key.name))
+                    .setMessage(getString(R.string.key_revoked_desc))
+                    .setPositiveButton(android.R.string.ok) { _, _ -> }
+            builder.create().show()
+        }
+    }
+
+    private fun onKeyReplacementMessage(message: KeyReplacementMessage) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onMessageEncryptResult(message: String?) {
-        if (message != null) {
-            isTextEncrypted = true
-            runOnUiThread {
+
+        isTextEncrypted = message != null
+
+        runOnUiThread{
+            if (message != null) {
                 messageText.setText(message)
-            }
-        } else {
-            isTextEncrypted = false
-            runOnUiThread {
+            } else {
                 Toast.makeText(this, R.string.failed_to_encrypt, Toast.LENGTH_LONG).show()
             }
         }

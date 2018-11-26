@@ -12,6 +12,7 @@ import net.cxifri.utils.background
 
 interface MainView  {
     fun onControllerKeySelected(key: KeyEntry?)
+    fun onControllerKeyRevoked(key: KeyEntry)
 
     fun onKeyDerivationStarted()
     fun onKeyDerivationFinished()
@@ -141,5 +142,12 @@ class MainActivityController(val context: Context, val view: MainView) {
         val values = keys.map { it.id }.toList()
 
         return Pair(values, names)
+    }
+
+    fun revokeKey(key: KeyEntry) {
+        KeysDatabase(context).use {
+            it.update(key.copy(revoked = true))
+        }
+        view.onControllerKeyRevoked(key)
     }
 }
