@@ -1,9 +1,7 @@
 package net.cxifri
 
 import net.cxifri.crypto.CryptoFactory
-import net.cxifri.crypto.DerivedKeyGenerator
 import net.cxifri.crypto.KeyEntry
-import net.cxifri.dataprocessing.GZipBlob
 import net.cxifri.keysdb.binaryKey
 import org.junit.Test
 

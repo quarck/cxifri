@@ -16,7 +16,7 @@
 
 package net.cxifri.crypto
 
-import net.cxifri.dataprocessing.UrlWrapper
+import net.cxifri.encodings.UrlWrapper
 
 
 class UrlWrappedMessageHandler(val messageHandler: MessageHandlerInterface): MessageHandlerInterface {

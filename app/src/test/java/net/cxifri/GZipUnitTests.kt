@@ -1,6 +1,6 @@
 package net.cxifri
 
-import net.cxifri.dataprocessing.GZipBlob
+import net.cxifri.encodings.GZipEncoder
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -15,7 +15,7 @@ class GZipUnitTests {
     fun gzipIsCorrect() {
         val input = byteArrayOf(1, 2, 3, 4, 5)
 
-        val gz = GZipBlob()
+        val gz = GZipEncoder()
 
         val output = gz.deflate(input)
 

@@ -16,9 +16,8 @@
 
 package net.cxifri.crypto
 
-import net.cxifri.dataprocessing.GZipBlob
+import net.cxifri.encodings.GZipEncoder
 import net.cxifri.keysdb.binaryKey
-import net.cxifri.utils.wipe
 import org.bouncycastle.util.encoders.UrlBase64
 
 
@@ -52,7 +51,7 @@ class MessageHandler(
 
         val utf8 = message.text.toByteArray(charset = Charsets.UTF_8)
 
-        val gzipUtf8 = GZipBlob().deflate(utf8)
+        val gzipUtf8 = GZipEncoder().deflate(utf8)
 
         if (utf8.size < gzipUtf8.size) {
             val binaryMessage = ByteArray(1 + utf8.size)
@@ -113,7 +112,7 @@ class MessageHandler(
             }
 
             MESSAGE_FORMAT_GZIP_PLAINTEXT -> {
-                val ungzip = GZipBlob().inflate(blob, 1, blob.size-1)
+                val ungzip = GZipEncoder().inflate(blob, 1, blob.size-1)
                 return ungzip?.let { TextMessage(key, ungzip.toString(charset=Charsets.UTF_8)) }
             }
 

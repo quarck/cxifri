@@ -1,6 +1,6 @@
 package net.cxifri
 
-import net.cxifri.dataprocessing.UrlWrapper
+import net.cxifri.encodings.UrlWrapper
 import org.junit.Test
 
 import org.junit.Assert.*

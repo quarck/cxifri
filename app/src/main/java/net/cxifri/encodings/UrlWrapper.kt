@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.cxifri.dataprocessing
+package net.cxifri.encodings
 
 import android.net.Uri
 

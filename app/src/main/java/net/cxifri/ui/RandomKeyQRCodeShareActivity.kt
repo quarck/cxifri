@@ -19,7 +19,7 @@ package net.cxifri.ui
 import android.os.Bundle
 import android.view.View
 import net.cxifri.R
-import net.cxifri.dataprocessing.QREncoder
+import net.cxifri.encodings.QREncoder
 import net.cxifri.keysdb.KeyHelper
 
 import org.bouncycastle.util.encoders.UrlBase64

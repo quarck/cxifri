@@ -15,14 +15,14 @@
  */
 
 
-package net.cxifri.dataprocessing
+package net.cxifri.encodings
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 
-class GZipBlob {
+class GZipEncoder {
     fun deflate(inp: ByteArray): ByteArray {
         val byteStream = ByteArrayOutputStream()
         val gzipStream = GZIPOutputStream(byteStream)
