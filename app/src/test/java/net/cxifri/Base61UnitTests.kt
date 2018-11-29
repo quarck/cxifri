@@ -19,20 +19,45 @@ class Base61UnitTests {
     fun testBase61Encode() {
 
         val encoder = Base61Encoder()
-        val dataIn = byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8)
 
-        val dataOut = encoder.encode(dataIn, 0, dataIn.size)
-        val strOut = dataOut.toString(charset = Charsets.UTF_8)
-        assertEquals("Mx4CpSQdBAA", strOut)
+//        assertEquals(
+//                "ABCADEFAGHI",
+//                encoder.encode(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8)).toString(charset = Charsets.UTF_8)
+//        )
 
-        val decoded = encoder.decode(dataOut, 0, dataOut.size)
+//        assertEquals(
+//                "AA",
+//                encoder.encode(byteArrayOf(0)).toString(charset = Charsets.UTF_8)
+//        )
 
-        for (i in 0 until 8) {
-            assertEquals(
-                    dataIn[i],
-                    decoded[i]
-            )
-        }
+        assertEquals(
+                "BA",
+                encoder.encode(byteArrayOf(1)).toString(charset = Charsets.UTF_8)
+        )
+
+        assertEquals(
+                "ABCADA",
+                encoder.encode(byteArrayOf(0, 1, 2, 3 )).toString(charset = Charsets.UTF_8)
+        )
+
+        val decoded = encoder.decode("ABCADA".toByteArray())
+
+        println(decoded)
+
+//        assertEquals(
+//                "ABCADEFAGHIAJKLAWgA",
+//                encoder.encode(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 22, 32)).toString(charset = Charsets.UTF_8)
+//        )
+
+
+//        val decoded = encoder.decode(dataOut, 0, dataOut.size)
+//
+//        for (i in 0 until 8) {
+//            assertEquals(
+//                    dataIn[i],
+//                    decoded[i]
+//            )
+//        }
 
     }
 }

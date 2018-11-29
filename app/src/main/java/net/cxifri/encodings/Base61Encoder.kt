@@ -23,45 +23,14 @@
  * With base61, zero '0' symbol is reserved for future use. Can be used by the application code to
  * indicate special cases / etc.
  *
- * Encoded data is split into 8 byte blocks, and each 8 byte block is encoded with 11 symbols of
- * Base61 encoding: 2^(8*8) is less than 61 ^ 11, thus such encoding is possible.
+ * How efficient is it?
+ * The way how base61 encoding is implemented, it would on average encode every 100 bytes of input as
+ * 135 symbols of output. Compared to base64, base64 would encode 100 bytes as 100*8/6 = 133.333
+ * bytes on average. Thus base61 is 1.25% less efficient.
  *
- * How efficient is it? Base64 would encode every 6 bytes as 8 symbols of base64 text, thus on average
- * every 8 bytes would be encoded as 8 * 8 / 6 = 10.66.. symbols. Compared to 11 symbols for base61
- * is not a huge loss, it is about 3.125% less efficient.
- *
- * Can it be more efficient? In theory - yes. Technically 11 symbols of base61 encoding would
- * encode 65.238 bits of information, while they are used for encoding just 64 bits of the source text.
- * Thus, if we want we can create more efficient encoding that would encode 8.155 bytes per 11 symbols
- * of base61, which is 1.93% more efficient that current approach. However the resulting implementation
- * would have O(n*n) computational complexity, compared to O(n) with the current implementation.
- * Decision was made to got for O(n).
- *
- * Why not base62? The thing it, it would still require 11 symbols per each 8 bytes of input or
- * O(n*n) complexity for more efficient encoding. Thus there is no need to use 61 symbols. And
- * On the other hand 61 is a prime number, which is kind of nice.
- *
- * How the last block is encoded? (The one that is smaller than 8 bytes).
- * We can easily calculate the following translation table:
- *
- *  __________________________________________________________________
- *  | Length of the    |   Required base61          | Rounded up
- *  |  last block      |    len to encode           | base 61 len
- *  |      N           |  N * log(256) / log(61)    |
- *  ------------------------------------------------------------------
- *  |      1           |       1.349                |      2
- *  |      2           |       2.698                |      3
- *  |      3           |       4.047                |      5
- *  |      4           |       5.397                |      6
- *  |      5           |       6.745                |      7
- *  |      6           |       8.093                |      9
- *  |      7           |       9.442                |      10
- *  |      8 -- full block -- encoded as usual      |      11
- *  ------------------------------------------------------------------
- *
- * Thus, based on the length of the encoded text we identify what is the length of the last block,
- * as there is a direct 1-to-1 relationship, and thus there is no need for special padding symbols
- * to be used.
+ * Why not base62 (thus, using also zero)?
+ * base62 would not increase efficiency really significantly, but would complicate some implementation
+ * details - the fact that 61 is a prime helps in some mathematical aspects of the current implementation.
  *
  * Did you take any drugs while creating this?
  * I understand why you are asking, but the answer is no.
@@ -72,58 +41,44 @@ package net.cxifri.encodings
 
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
+import kotlin.experimental.and
 
 class Base61Encoder {
-    private  val encodingTable = byteArrayOf(
-            'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
-            'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
-            'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
-            'S'.toByte(), 'T'.toByte(), 'U'.toByte(), 'V'.toByte(), 'W'.toByte(), 'X'.toByte(),
-            'Y'.toByte(), 'Z'.toByte(),
-            'a'.toByte(), 'b'.toByte(), 'c'.toByte(), 'd'.toByte(), 'e'.toByte(), 'f'.toByte(),
-            'g'.toByte(), 'h'.toByte(), 'i'.toByte(), 'j'.toByte(), 'k'.toByte(), 'l'.toByte(),
-            'm'.toByte(), 'n'.toByte(), 'o'.toByte(), 'p'.toByte(), 'q'.toByte(), 'r'.toByte(),
-            's'.toByte(), 't'.toByte(), 'u'.toByte(), 'v'.toByte(), 'w'.toByte(), 'x'.toByte(),
-            'y'.toByte(), 'z'.toByte(),
-            '1'.toByte(), '2'.toByte(), '3'.toByte(),
-            '4'.toByte(), '5'.toByte(), '6'.toByte(),
-            '7'.toByte(), '8'.toByte(), '9'.toByte())
 
-    private val decodingTable = ByteArray(128)
+    fun encode(data: ByteArray, offset: Int, length: Int, out: OutputStream) {
 
-    private val ENCODED_BLOCK_SIZE = 11
-    private val BLOCK_SIZE = 8
-    private val BASE = 61
+        var inputIndex = offset
+        val endIndex = offset + length
 
-    init {
+        while ( inputIndex < endIndex) {
+            val blkSize = Math.min(endIndex - inputIndex, BLOCK_SIZE)
 
-        for (i in 0 until decodingTable.size) {
-            decodingTable[i] = 0xff.toByte()
-        }
+            var accumulatorValidBits = 0
+            var accumulator = 0
+            var nextInp = 0
 
-        for (i in 0 until encodingTable.size) {
-            decodingTable[encodingTable[i].toInt()] = i.toByte()
-        }
-    }
+            while ( nextInp < blkSize || accumulatorValidBits >= BITS_PER_SYMBOL_LOWER) {
 
-    fun encode(data: ByteArray, off: Int, length: Int, out: OutputStream) {
+                if (accumulatorValidBits < BITS_PER_SYMBOL_LOWER) {
 
-        val modulus = length % 8
-        val numFullBlocks = length / 8
-        var i = off
+                    accumulator = accumulator.shl(8) + data[inputIndex+nextInp].toInt()
+                    nextInp ++
 
-        for (blk in 0 until numFullBlocks) {
-            var block = 0L
-            for (bi in 0 until BLOCK_SIZE) {
-                block = block.shl(8) or (data[i].toLong() and 0xffL)
-                i++
+                    accumulatorValidBits += BITS_PER_BYTE
+                }
+                else {
+
+                    val chr = accumulator % BASE
+                    accumulator /= BASE
+                    out.write(ENCODING_TABLE[chr].toInt())
+
+                    accumulatorValidBits -= BITS_PER_SYMBOL_LOWER
+                }
             }
 
-            for (bo in 0 until ENCODED_BLOCK_SIZE) {
-                val chr = block % BASE
-                block /= BASE
-                out.write(encodingTable[chr.toInt()].toInt())
-            }
+            out.write(ENCODING_TABLE[accumulator].toInt())
+
+            inputIndex += blkSize
         }
     }
 
@@ -133,48 +88,113 @@ class Base61Encoder {
         return bOut.toByteArray()
     }
 
+    fun encode(data: ByteArray): ByteArray {
+        return encode(data, 0, data.size)
+    }
+
     private fun ignore(
             c: Char): Boolean {
         return c == '\n' || c == '\r' || c == '\t' || c == ' '
     }
 
-    fun decode(data: ByteArray, off: Int, length: Int, out: OutputStream) {
+    fun decode(data: ByteArray, offset: Int, length: Int, out: OutputStream) {
 
-        val block = ByteArray(ENCODED_BLOCK_SIZE)
-        val outBlock = ByteArray(BLOCK_SIZE)
-        var blockLong: Long
-        var blkSize: Int
+        val dblock = ByteArray(ENCODED_BLOCK_SIZE)
+        val block = ByteArray(BLOCK_SIZE)
 
-        var i = off
-        val end = off + length
+        var inputIndex = offset
+        val endIndex = offset + length
 
-        while ( i < end) {
-            blkSize = 0
+        while ( inputIndex < endIndex) {
 
-            for (blkIdx in 0 until ENCODED_BLOCK_SIZE) {
-                i = nextI(data, i, end)
-                if (i == -1)
+            var blkSize = 0
+            var blkWPos = ENCODED_BLOCK_SIZE
+
+            while (inputIndex < endIndex && blkSize < ENCODED_BLOCK_SIZE) {
+                inputIndex = nextI(data, inputIndex, endIndex)
+                if (inputIndex == -1)
                     break
-                block[blkIdx] = decodingTable[data[i++].toInt()]
+                blkWPos --
+                dblock[blkWPos] = DECODING_TABLE[data[inputIndex].toInt()]
+                inputIndex++
                 blkSize ++
             }
 
-            if (blkSize < ENCODED_BLOCK_SIZE)
+            if (blkSize == 0)
                 break
-            // decode the full size block now
 
-            blockLong = 0L
-            for (blkIdx in 0 until ENCODED_BLOCK_SIZE) {
-                val chr = block[ENCODED_BLOCK_SIZE-blkIdx-1]
-                blockLong = blockLong * BASE + chr
+            var accumulatorValidBits = BITS_IN_THE_LAST_SYMBOL[blkSize-1]
+            var accumulator = dblock[blkWPos].toInt()
+            var nextInp = blkWPos+1
+            var nextOutp = BLOCK_SIZE
+
+            while ( nextInp < ENCODED_BLOCK_SIZE || accumulatorValidBits >= BITS_PER_BYTE) {
+
+                if (accumulatorValidBits >= BITS_PER_BYTE) {
+                    // decodingTable[data[i++].toInt()]
+                    val chr = accumulator and 0xff
+                    //out.write(chr)
+                    nextOutp--
+                    block[nextOutp] = chr.toByte()
+                    accumulator = accumulator.ushr(8)
+                    accumulatorValidBits -= BITS_PER_BYTE
+                }
+                else {
+                    accumulator = accumulator * BASE + dblock[nextInp].toInt()
+                    nextInp++
+                    accumulatorValidBits += BITS_PER_SYMBOL_LOWER
+                }
             }
 
-            for (blkIdx in 0 until BLOCK_SIZE) {
-                outBlock[BLOCK_SIZE - blkIdx - 1] = (blockLong and 0xffL).toByte()
-                blockLong = blockLong.ushr(8)
-            }
-            out.write(outBlock)
-        }
+            out.write(block, nextOutp, block.size - nextOutp)
+
+//            out.write(ENCODING_TABLE[accumulator].toInt())
+      }
+
+
+//        var i = off
+//        val end = off + length
+//
+//        while ( i < end) {
+//            var blkSize = 0
+//
+//        }
+//
+
+
+//        val block = ByteArray(ENCODED_BLOCK_SIZE)
+//        val outBlock = ByteArray(BLOCK_SIZE)
+//        var blockLong: Long
+//        var blkSize: Int
+//
+//
+//        while ( i < end) {
+//            blkSize = 0
+//
+//            for (blkIdx in 0 until ENCODED_BLOCK_SIZE) {
+//                i = nextI(data, i, end)
+//                if (i == -1)
+//                    break
+//                block[blkIdx] = decodingTable[data[i++].toInt()]
+//                blkSize ++
+//            }
+//
+//            if (blkSize < ENCODED_BLOCK_SIZE)
+//                break
+//            // decode the full size block now
+//
+//            blockLong = 0L
+//            for (blkIdx in 0 until ENCODED_BLOCK_SIZE) {
+//                val chr = block[ENCODED_BLOCK_SIZE-blkIdx-1]
+//                blockLong = blockLong * BASE + chr
+//            }
+//
+//            for (blkIdx in 0 until BLOCK_SIZE) {
+//                outBlock[BLOCK_SIZE - blkIdx - 1] = (blockLong and 0xffL).toByte()
+//                blockLong = blockLong.ushr(8)
+//            }
+//            out.write(outBlock)
+//        }
     }
 
 
@@ -182,6 +202,10 @@ class Base61Encoder {
         val bOut = ByteArrayOutputStream()
         decode(data, off, length, bOut)
         return bOut.toByteArray()
+    }
+
+    fun decode(data: ByteArray): ByteArray {
+        return decode(data, 0, data.size)
     }
 
 
@@ -329,4 +353,90 @@ class Base61Encoder {
 //        }
 //        return i
 //    }
+
+    companion object {
+
+        private val BITS_PER_SYMBOL_LOWER = 59307 // fixed point, floor(log2(61)*10000)
+        private val BITS_PER_SYMBOL_UPPER = 59308 // fixed point, ceil(log2(61)*10000)
+        private val BITS_PER_BYTE = 80000 // same fixed point
+
+        // with the current precision, implementation is capable of correctly handling input
+        // byte array lengths up to 752. We choose to split data into blocks of 100 as
+        // it gives a nice boundary in terms of bit usage efficiency:
+        // 100 input bytes  - 800 bits of entropy - are encoded as 135 output symbols.
+        // on the other hand, 135 symbols can encode up to 135 * log2(61) bits of entrophy =
+        // = 800.6495 bits. Thus, per each 100 bytes block we are only loosing 0.64 bits to
+        // in-efficiency of the encoding.
+        //
+        private val BLOCK_SIZE = 100
+        private val ENCODED_BLOCK_SIZE = 135
+
+        private val ENCODING_TABLE = byteArrayOf(
+                'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
+                'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
+                'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
+                'S'.toByte(), 'T'.toByte(), 'U'.toByte(), 'V'.toByte(), 'W'.toByte(), 'X'.toByte(),
+                'Y'.toByte(), 'Z'.toByte(),
+                'a'.toByte(), 'b'.toByte(), 'c'.toByte(), 'd'.toByte(), 'e'.toByte(), 'f'.toByte(),
+                'g'.toByte(), 'h'.toByte(), 'i'.toByte(), 'j'.toByte(), 'k'.toByte(), 'l'.toByte(),
+                'm'.toByte(), 'n'.toByte(), 'o'.toByte(), 'p'.toByte(), 'q'.toByte(), 'r'.toByte(),
+                's'.toByte(), 't'.toByte(), 'u'.toByte(), 'v'.toByte(), 'w'.toByte(), 'x'.toByte(),
+                'y'.toByte(), 'z'.toByte(),
+                '1'.toByte(), '2'.toByte(), '3'.toByte(),
+                '4'.toByte(), '5'.toByte(), '6'.toByte(),
+                '7'.toByte(), '8'.toByte(), '9'.toByte())
+
+        private val DECODING_TABLE = ByteArray(128)
+
+        private val BASE = 61
+
+        private val BITS_IN_THE_LAST_SYMBOL = IntArray(ENCODED_BLOCK_SIZE)
+
+        init {
+
+            for (i in 0 until DECODING_TABLE.size) {
+                DECODING_TABLE[i] = 0xff.toByte()
+            }
+
+            for (i in 0 until ENCODING_TABLE.size) {
+                DECODING_TABLE[ENCODING_TABLE[i].toInt()] = i.toByte()
+            }
+
+            for (i in 0 until BITS_IN_THE_LAST_SYMBOL.size) {
+                BITS_IN_THE_LAST_SYMBOL[i] = -1
+            }
+
+            var acc_bits_lower = 0
+            var acc_bits_upper = 0
+            var nextInp = 0
+            var nextOutp = 0
+
+            while ( nextInp < BLOCK_SIZE || acc_bits_lower >= BITS_PER_SYMBOL_LOWER) {
+
+                if (acc_bits_lower < BITS_PER_SYMBOL_LOWER && acc_bits_upper < BITS_PER_SYMBOL_UPPER) {
+                    acc_bits_lower += BITS_PER_BYTE
+                    acc_bits_upper += BITS_PER_BYTE
+                    // here we should be reading next byte inp[nextInp]
+                    nextInp ++
+                }
+                else if (acc_bits_lower >= BITS_PER_SYMBOL_LOWER && acc_bits_upper >= BITS_PER_SYMBOL_UPPER) {
+                    acc_bits_lower -= BITS_PER_SYMBOL_LOWER
+                    acc_bits_upper -= BITS_PER_SYMBOL_UPPER
+                    // here we should be writing res at outp[nextOutp]
+                    nextOutp ++
+
+                    // if prev input was the last byte of input - we have no more bytes left,
+                    // thus we would need to output the current accumulator into the output, and
+                    // amount of bits of info it would have is acc_bits_lower (while doing real encoding
+                    // we would be using lower range)
+
+                    BITS_IN_THE_LAST_SYMBOL[nextOutp] = acc_bits_lower
+                }
+                else {
+                    throw Exception("Base61Encoder: Internal self consistency check failed: Precision is not sufficient")
+                }
+            }
+
+        }
+    }
 }
