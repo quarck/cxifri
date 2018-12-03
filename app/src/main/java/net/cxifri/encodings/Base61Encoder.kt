@@ -27,7 +27,62 @@ package net.cxifri.encodings
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
 
-class Base61Encoder {
+object Base61Encoder {
+
+    private val BLOCK_SIZE = 8
+    private val ENCODED_BLOCK_SIZE = 11
+
+    private val ENCODING_TABLE = byteArrayOf(
+            'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
+            'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
+            'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
+            'S'.toByte(), 'T'.toByte(), 'U'.toByte(), 'V'.toByte(), 'W'.toByte(), 'X'.toByte(),
+            'Y'.toByte(), 'Z'.toByte(),
+            'a'.toByte(), 'b'.toByte(), 'c'.toByte(), 'd'.toByte(), 'e'.toByte(), 'f'.toByte(),
+            'g'.toByte(), 'h'.toByte(), 'i'.toByte(), 'j'.toByte(), 'k'.toByte(), 'l'.toByte(),
+            'm'.toByte(), 'n'.toByte(), 'o'.toByte(), 'p'.toByte(), 'q'.toByte(), 'r'.toByte(),
+            's'.toByte(), 't'.toByte(), 'u'.toByte(), 'v'.toByte(), 'w'.toByte(), 'x'.toByte(),
+            'y'.toByte(), 'z'.toByte(),
+            '1'.toByte(), '2'.toByte(), '3'.toByte(),
+            '4'.toByte(), '5'.toByte(), '6'.toByte(),
+            '7'.toByte(), '8'.toByte(), '9'.toByte())
+
+    private val DECODING_TABLE = ByteArray(128)
+
+    private val BASE = 61
+
+    private val MAX_ACC_IN_THE_LAST_SYMBOL = IntArray(ENCODED_BLOCK_SIZE)
+
+    init {
+        for (i in 0 until DECODING_TABLE.size) {
+            DECODING_TABLE[i] = 0xff.toByte()
+        }
+
+        for (i in 0 until ENCODING_TABLE.size) {
+            DECODING_TABLE[ENCODING_TABLE[i].toInt()] = i.toByte()
+        }
+
+        for (i in 0 until MAX_ACC_IN_THE_LAST_SYMBOL.size) {
+            MAX_ACC_IN_THE_LAST_SYMBOL[i] = -1
+        }
+
+        var max_acc = 0
+        var nextInp = 0
+        var nextOutp = 0
+
+        while ( nextInp < BLOCK_SIZE || max_acc >= BASE) {
+
+            if (max_acc < BASE) {
+                max_acc = max_acc * 256 + 255
+                nextInp ++
+            }
+            else {
+                max_acc /= BASE
+                nextOutp ++
+                MAX_ACC_IN_THE_LAST_SYMBOL[nextOutp] = max_acc
+            }
+        }
+    }
 
     private fun Int.lbyte(data: ByteArray, i: Int): Int {
         return this.shl(8) + ((data[i].toInt() + 256) % 256)
@@ -307,64 +362,5 @@ class Base61Encoder {
             i++
         }
         return if (i < finish) i else -1
-    }
-
-    companion object {
-
-        private val BLOCK_SIZE = 8
-        private val ENCODED_BLOCK_SIZE = 11
-
-        private val ENCODING_TABLE = byteArrayOf(
-                'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
-                'G'.toByte(), 'H'.toByte(), 'I'.toByte(), 'J'.toByte(), 'K'.toByte(), 'L'.toByte(),
-                'M'.toByte(), 'N'.toByte(), 'O'.toByte(), 'P'.toByte(), 'Q'.toByte(), 'R'.toByte(),
-                'S'.toByte(), 'T'.toByte(), 'U'.toByte(), 'V'.toByte(), 'W'.toByte(), 'X'.toByte(),
-                'Y'.toByte(), 'Z'.toByte(),
-                'a'.toByte(), 'b'.toByte(), 'c'.toByte(), 'd'.toByte(), 'e'.toByte(), 'f'.toByte(),
-                'g'.toByte(), 'h'.toByte(), 'i'.toByte(), 'j'.toByte(), 'k'.toByte(), 'l'.toByte(),
-                'm'.toByte(), 'n'.toByte(), 'o'.toByte(), 'p'.toByte(), 'q'.toByte(), 'r'.toByte(),
-                's'.toByte(), 't'.toByte(), 'u'.toByte(), 'v'.toByte(), 'w'.toByte(), 'x'.toByte(),
-                'y'.toByte(), 'z'.toByte(),
-                '1'.toByte(), '2'.toByte(), '3'.toByte(),
-                '4'.toByte(), '5'.toByte(), '6'.toByte(),
-                '7'.toByte(), '8'.toByte(), '9'.toByte())
-
-        private val DECODING_TABLE = ByteArray(128)
-
-        private val BASE = 61
-
-        private val MAX_ACC_IN_THE_LAST_SYMBOL = IntArray(ENCODED_BLOCK_SIZE)
-
-        init {
-            for (i in 0 until DECODING_TABLE.size) {
-                DECODING_TABLE[i] = 0xff.toByte()
-            }
-
-            for (i in 0 until ENCODING_TABLE.size) {
-                DECODING_TABLE[ENCODING_TABLE[i].toInt()] = i.toByte()
-            }
-
-            for (i in 0 until MAX_ACC_IN_THE_LAST_SYMBOL.size) {
-                MAX_ACC_IN_THE_LAST_SYMBOL[i] = -1
-            }
-
-            var max_acc = 0
-            var nextInp = 0
-            var nextOutp = 0
-
-            while ( nextInp < BLOCK_SIZE || max_acc >= BASE) {
-
-                if (max_acc < BASE) {
-                    max_acc = max_acc * 256 + 255
-                    nextInp ++
-                }
-                else {
-                    max_acc /= BASE
-                    nextOutp ++
-                    MAX_ACC_IN_THE_LAST_SYMBOL[nextOutp] = max_acc
-                }
-            }
-
-        }
     }
 }

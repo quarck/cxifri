@@ -12,13 +12,13 @@ import org.junit.Assert.*
  */
 class Base61UnitTests {
 
-    fun testEncodeDecode(e: Base61Encoder, b: ByteArray) {
-        val encoded = e.encode(b).toString(charset = Charsets.UTF_8)
+    fun testEncodeDecode(b: ByteArray) {
+        val encoded = Base61Encoder.encode(b).toString(charset = Charsets.UTF_8)
         assertNotNull(encoded)
 
         println(encoded)
 
-        val decoded = e.decode(encoded.toByteArray())
+        val decoded = Base61Encoder.decode(encoded.toByteArray())
         assertNotNull(decoded)
 
         assertEquals(b.size, decoded.size)
@@ -29,58 +29,56 @@ class Base61UnitTests {
 
     @Test
     fun testBase61Encode() {
-        val encoder = Base61Encoder()
-
-        testEncodeDecode(encoder, byteArrayOf())
-        testEncodeDecode(encoder, byteArrayOf(1))
-        testEncodeDecode(encoder, byteArrayOf(-1))
-        testEncodeDecode(encoder, byteArrayOf(1, 2))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17))
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18))
-        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18))
+        testEncodeDecode(byteArrayOf())
+        testEncodeDecode(byteArrayOf(1))
+        testEncodeDecode(byteArrayOf(-1))
+        testEncodeDecode(byteArrayOf(1, 2))
+        testEncodeDecode(byteArrayOf(-1, -2))
+        testEncodeDecode(byteArrayOf(1, 2, 3))
+        testEncodeDecode(byteArrayOf(-1, -2, -3))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17))
+        testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18))
+        testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18))
 
 
-        testEncodeDecode(encoder, byteArrayOf(
+        testEncodeDecode(byteArrayOf(
                 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
                 -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ))
 
-        testEncodeDecode(encoder, byteArrayOf(
+        testEncodeDecode(byteArrayOf(
                 -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5,
                 -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5
         ))
 
-        testEncodeDecode(encoder, byteArrayOf(
+        testEncodeDecode(byteArrayOf(
                 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
                 -1, -2, -3, -4, -5, -6, -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1, -1, -2, -3, -4, -5, -6,
@@ -88,7 +86,7 @@ class Base61UnitTests {
         ))
 
 
-        testEncodeDecode(encoder, byteArrayOf(
+        testEncodeDecode(byteArrayOf(
                 1, 1, 1, 1, 1, 1,
                 -1, -2, -3, -4, -5, -6,
                 -1, -2, -3, -4, -5, -6,
@@ -112,7 +110,7 @@ class Base61UnitTests {
                 -1, -2, -3, -4, -5, -6
         ))
 
-        testEncodeDecode(encoder, byteArrayOf(
+        testEncodeDecode(byteArrayOf(
                 -1, -2, -3, -4, -5, -6,
                 -1, -2, -3, -4, -5, -6,
                 -1, -2, -3, -4, -5, -6,

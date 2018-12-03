@@ -16,9 +16,9 @@
 
 package net.cxifri.crypto
 
+import net.cxifri.encodings.Base61Encoder
 import net.cxifri.encodings.GZipEncoder
 import net.cxifri.keysdb.binaryKey
-import org.bouncycastle.util.encoders.UrlBase64
 
 
 class MessageHandler(
@@ -143,8 +143,8 @@ class MessageHandler(
         val packed = packMessageForEncryption(message)
         val encoded = binaryCryptor.encrypt(packed,
                 key.binaryKey ?: throw Exception("Cannot access encryption key"))
-        val base64 = UrlBase64.encode(encoded)
-        return base64.toString(charset = Charsets.UTF_8)
+        val base61 = Base61Encoder.encode(encoded)
+        return base61.toString(charset = Charsets.UTF_8)
     }
 
     override fun decrypt(message: String, key: KeyEntry): MessageBase? {
@@ -152,8 +152,8 @@ class MessageHandler(
         var decryptedBinary: ByteArray?
 
         try {
-            val unbase64 = UrlBase64.decode(message)
-            decryptedBinary = binaryCryptor.decrypt(unbase64,
+            val unbase61 = Base61Encoder.decode(message.toByteArray(charset = Charsets.UTF_8))
+            decryptedBinary = binaryCryptor.decrypt(unbase61,
                     key.binaryKey ?: throw Exception("Cannot access encryption key"))
         }
         catch (ex: Exception) {
@@ -168,10 +168,10 @@ class MessageHandler(
 
     override fun decrypt(message: String, keys: List<KeyEntry>): MessageBase? {
 
-        val unbase64: ByteArray
+        val unbase61: ByteArray
 
         try {
-            unbase64 = UrlBase64.decode(message)
+            unbase61 = Base61Encoder.decode(message.toByteArray(charset = Charsets.UTF_8))
         }
         catch (ex: Exception) {
             return null
@@ -184,7 +184,7 @@ class MessageHandler(
             try {
                 val binaryKey = key.binaryKey
                 if (binaryKey != null) {
-                    decryptedBinary = binaryCryptor.decrypt(unbase64, binaryKey)
+                    decryptedBinary = binaryCryptor.decrypt(unbase61, binaryKey)
                     if (decryptedBinary != null) {
                         matchedKey = key
                         break
