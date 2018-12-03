@@ -16,8 +16,7 @@ class Base61UnitTests {
         val encoded = e.encode(b).toString(charset = Charsets.UTF_8)
         assertNotNull(encoded)
 
-        val bStr = b.map { it.toString() }.reduce{ x, y -> "$x,$y" }
-        println("Inp: {$bStr}, encoded: $encoded")
+        println(encoded)
 
         val decoded = e.decode(encoded.toByteArray())
         assertNotNull(decoded)
@@ -31,104 +30,125 @@ class Base61UnitTests {
     @Test
     fun testBase61Encode() {
         val encoder = Base61Encoder()
-        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
 
+        testEncodeDecode(encoder, byteArrayOf())
         testEncodeDecode(encoder, byteArrayOf(1))
-        testEncodeDecode(encoder, byteArrayOf(255.toByte()))
+        testEncodeDecode(encoder, byteArrayOf(-1))
+        testEncodeDecode(encoder, byteArrayOf(1, 2))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2))
         testEncodeDecode(encoder, byteArrayOf(1, 2, 3))
-        testEncodeDecode(encoder, byteArrayOf(255.toByte(), 254.toByte(), 253.toByte()))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18))
+        testEncodeDecode(encoder, byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18))
+
 
         testEncodeDecode(encoder, byteArrayOf(
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
-                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte()
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+                -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
         ))
 
         testEncodeDecode(encoder, byteArrayOf(
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
-                ))
+                -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5,
+                -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5, -1, -2, -3, -4, -5
+        ))
 
         testEncodeDecode(encoder, byteArrayOf(
-                1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+                1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+                -1, -2, -3, -4, -5, -6, -1, -2, -3, -4, -5, -6,
+                1, 1, 1, 1, 1, 1, -1, -2, -3, -4, -5, -6,
+                1, 1, 1, 1, 1, 1, -1, -2, -3, -4, -5, -6
         ))
 
 
         testEncodeDecode(encoder, byteArrayOf(
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                -1, -2, -3, -4, -5, -6,
                 1, 1, 1, 1, 1, 1,
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+                -1, -2, -3, -4, -5, -6
         ))
 
         testEncodeDecode(encoder, byteArrayOf(
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
-                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6,
+                -1, -2, -3, -4, -5, -6
         ))
 
     }

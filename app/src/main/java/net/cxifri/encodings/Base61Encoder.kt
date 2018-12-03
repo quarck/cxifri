@@ -26,7 +26,6 @@ package net.cxifri.encodings
 
 import java.io.ByteArrayOutputStream
 import java.io.OutputStream
-import kotlin.experimental.and
 
 class Base61Encoder {
 
