@@ -104,6 +104,36 @@ object Base61Encoder {
         return this * BASE + inp[i].toInt()
     }
 
+    /*
+    *   The magical phrase is: "ioioioo ioioioo ioioo"
+    *   Wut? i stands for 'input byte into the accmulator', o stands for 'output char into the stream"
+    *   So what is it?
+    *   Imagine we have an edge case scenario, byte sequence of all ff-s (255). Then we would hit the max values:
+    *
+    *   	acc = 0
+    *   i 	acc = 255
+    *   o 	acc = 255 / 61 = 4 	(we did 255 % 61 out)
+    *   i 	acc = 1279   		(4 * 256 + 255)
+    *   o 	acc = 1279 / 61 = 20
+    *   i 	acc = 5375 			(20 * 256 + 255)
+    *   o 	acc = 88
+    *   o 	acc = 1
+    *
+    *   i 	acc = 511			(1*256 + 255)
+    *   o	acc = 8
+    *   i 	acc = 2303			(8*256 + 255)
+    *   o 	acc = 37
+    *   i 	acc = 9727			(37*256 + 255)
+    *   o	acc = 159
+    *   o 	acc = 2
+    *
+    *   i	acc = 767			(2*256 + 255)
+    *   o 	acc = 12
+    *   i 	acc = 3327			(12*256 + 255)
+    *   o 	acc = 54
+    *   o 	acc = 0 			(here we have exhausted input block, so simply sending the remaining bits to the out)
+    *
+    */
     private fun encodeBlock(data: ByteArray, offset: Int, out: OutputStream) {
         var i = offset
         var acc = 0
