@@ -1,12 +1,9 @@
 package net.cxifri
 
 import net.cxifri.encodings.Base61Encoder
-import org.bouncycastle.util.encoders.EncoderException
 import org.junit.Test
 
 import org.junit.Assert.*
-import java.io.ByteArrayOutputStream
-import java.nio.charset.Charset
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -15,49 +12,124 @@ import java.nio.charset.Charset
  */
 class Base61UnitTests {
 
+    fun testEncodeDecode(e: Base61Encoder, b: ByteArray) {
+        val encoded = e.encode(b).toString(charset = Charsets.UTF_8)
+        assertNotNull(encoded)
+
+        val bStr = b.map { it.toString() }.reduce{ x, y -> "$x,$y" }
+        println("Inp: {$bStr}, encoded: $encoded")
+
+        val decoded = e.decode(encoded.toByteArray())
+        assertNotNull(decoded)
+
+        assertEquals(b.size, decoded.size)
+        for (i in 0 until b.size) {
+            assertEquals(b[i], decoded[i])
+        }
+    }
+
     @Test
     fun testBase61Encode() {
-
         val encoder = Base61Encoder()
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
 
-//        assertEquals(
-//                "ABCADEFAGHI",
-//                encoder.encode(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8)).toString(charset = Charsets.UTF_8)
-//        )
+        testEncodeDecode(encoder, byteArrayOf(1))
+        testEncodeDecode(encoder, byteArrayOf(255.toByte()))
+        testEncodeDecode(encoder, byteArrayOf(1, 2, 3))
+        testEncodeDecode(encoder, byteArrayOf(255.toByte(), 254.toByte(), 253.toByte()))
 
-//        assertEquals(
-//                "AA",
-//                encoder.encode(byteArrayOf(0)).toString(charset = Charsets.UTF_8)
-//        )
+        testEncodeDecode(encoder, byteArrayOf(
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(),
+                255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte(), 255.toByte()
+        ))
 
-        assertEquals(
-                "BA",
-                encoder.encode(byteArrayOf(1)).toString(charset = Charsets.UTF_8)
-        )
+        testEncodeDecode(encoder, byteArrayOf(
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+                ))
 
-        assertEquals(
-                "ABCADA",
-                encoder.encode(byteArrayOf(0, 1, 2, 3 )).toString(charset = Charsets.UTF_8)
-        )
-
-        val decoded = encoder.decode("ABCADA".toByteArray())
-
-        println(decoded)
-
-//        assertEquals(
-//                "ABCADEFAGHIAJKLAWgA",
-//                encoder.encode(byteArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 22, 32)).toString(charset = Charsets.UTF_8)
-//        )
+        testEncodeDecode(encoder, byteArrayOf(
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+        ))
 
 
-//        val decoded = encoder.decode(dataOut, 0, dataOut.size)
-//
-//        for (i in 0 until 8) {
-//            assertEquals(
-//                    dataIn[i],
-//                    decoded[i]
-//            )
-//        }
+        testEncodeDecode(encoder, byteArrayOf(
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                1, 1, 1, 1, 1, 1,
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+        ))
+
+        testEncodeDecode(encoder, byteArrayOf(
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte(),
+                255.toByte(), 254.toByte(), 253.toByte(), 255.toByte(), 254.toByte(), 253.toByte()
+        ))
 
     }
 }

@@ -20,21 +20,6 @@
  * A-Z, a-z, 1-9 set. Thus, such encoding is useful in applications where any other symbols are better
  * to be avoided.
  *
- * With base61, zero '0' symbol is reserved for future use. Can be used by the application code to
- * indicate special cases / etc.
- *
- * How efficient is it?
- * The way how base61 encoding is implemented, it would on average encode every 100 bytes of input as
- * 135 symbols of output. Compared to base64, base64 would encode 100 bytes as 100*8/6 = 133.333
- * bytes on average. Thus base61 is 1.25% less efficient.
- *
- * Why not base62 (thus, using also zero)?
- * base62 would not increase efficiency really significantly, but would complicate some implementation
- * details - the fact that 61 is a prime helps in some mathematical aspects of the current implementation.
- *
- * Did you take any drugs while creating this?
- * I understand why you are asking, but the answer is no.
- *
  */
 
 package net.cxifri.encodings
@@ -45,38 +30,209 @@ import kotlin.experimental.and
 
 class Base61Encoder {
 
+    private fun Int.lbyte(data: ByteArray, i: Int): Int {
+        return this.shl(8) + ((data[i].toInt() + 256) % 256)
+    }
+
+    private fun Int.sbyte(data: ByteArray, i: Int): Int {
+        val chr = this and 0xff
+        data[i] = chr.toByte()
+        return this.ushr(8)
+    }
+
+    private fun Int.osymbol(out: OutputStream): Int {
+        val chr = this % BASE
+        out.write(ENCODING_TABLE[chr].toInt())
+        return this / BASE
+    }
+
+    private fun Int.isymbol(inp: ByteArray, i: Int): Int {
+        return this * BASE + inp[i].toInt()
+    }
+
+    private fun encodeBlock(data: ByteArray, offset: Int, out: OutputStream) {
+        var i = offset
+        var acc = 0
+
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.osymbol(out)
+
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.osymbol(out)
+
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc = acc.lbyte(data, i++)
+        acc = acc.osymbol(out)
+        acc.osymbol(out)
+    }
+
+    private fun decodeBlock(inp: ByteArray, outp: ByteArray) {
+
+        var acc = 0
+        var i = 0
+        var o = BLOCK_SIZE - 1
+
+        acc = acc.isymbol(inp, i++)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+
+        acc = acc.isymbol(inp, i++)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+
+        acc = acc.isymbol(inp, i++)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+        acc = acc.isymbol(inp, i++)
+        acc = acc.sbyte(outp, o--)
+        acc = acc.isymbol(inp, i)
+        acc.sbyte(outp, o)
+    }
+
+    private fun encodePartialBlock(data: ByteArray, offset: Int, len: Int, out: OutputStream) {
+
+        var i = offset
+        val end = offset + len
+        var acc = 0
+
+        if (i < end) {
+            acc = acc.lbyte(data, i++)
+            acc = acc.osymbol(out)
+            if (i < end) {
+                acc = acc.lbyte(data, i++)
+                acc = acc.osymbol(out)
+
+                if (i < end) {
+                    acc = acc.lbyte(data, i++)
+                    acc = acc.osymbol(out)
+                    acc = acc.osymbol(out)
+
+                    if (i < end) {
+                        acc = acc.lbyte(data, i++)
+                        acc = acc.osymbol(out)
+
+                        if (i < end) {
+                            acc = acc.lbyte(data, i++)
+                            acc = acc.osymbol(out)
+
+                            if (i < end) {
+                                acc = acc.lbyte(data, i++)
+                                acc = acc.osymbol(out)
+                                acc = acc.osymbol(out)
+
+                                if (i < end) {
+                                    acc = acc.lbyte(data, i++)
+                                    acc = acc.osymbol(out)
+                                    if (i < end) {
+                                        acc = acc.lbyte(data, i++)
+                                        acc = acc.osymbol(out)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        acc.osymbol(out)
+
+    }
+
+    private fun decodePartialBlock(inp: ByteArray, inpLen: Int, outp: ByteArray): Int {
+
+        var acc = 0
+        var i = ENCODED_BLOCK_SIZE - inpLen
+        var o = BLOCK_SIZE
+
+        if (inpLen == 0)
+            throw Exception("Malformed block")
+
+        acc = acc.isymbol(inp, i++)
+
+        if (inpLen >= 11) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 10) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 9) {
+            acc = acc.isymbol(inp, i++)
+        }
+
+        if (inpLen >= 8) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 7) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 6) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 5) {
+            acc = acc.isymbol(inp, i++)
+        }
+
+        if (inpLen >= 4) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 3) {
+            acc = acc.isymbol(inp, i++)
+            acc = acc.sbyte(outp, --o)
+        }
+
+        if (inpLen >= 2) {
+            acc = acc.isymbol(inp, i)
+            acc.sbyte(outp, --o)
+        }
+
+        return o
+    }
+
+
     fun encode(data: ByteArray, offset: Int, length: Int, out: OutputStream) {
 
         var inputIndex = offset
         val endIndex = offset + length
 
         while ( inputIndex < endIndex) {
+
             val blkSize = Math.min(endIndex - inputIndex, BLOCK_SIZE)
 
-            var accumulatorValidBits = 0
-            var accumulator = 0
-            var nextInp = 0
-
-            while ( nextInp < blkSize || accumulatorValidBits >= BITS_PER_SYMBOL_LOWER) {
-
-                if (accumulatorValidBits < BITS_PER_SYMBOL_LOWER) {
-
-                    accumulator = accumulator.shl(8) + data[inputIndex+nextInp].toInt()
-                    nextInp ++
-
-                    accumulatorValidBits += BITS_PER_BYTE
-                }
-                else {
-
-                    val chr = accumulator % BASE
-                    accumulator /= BASE
-                    out.write(ENCODING_TABLE[chr].toInt())
-
-                    accumulatorValidBits -= BITS_PER_SYMBOL_LOWER
-                }
+            if (blkSize == BLOCK_SIZE) {
+                encodeBlock(data, inputIndex, out)
+            } else {
+                encodePartialBlock(data, inputIndex, blkSize, out)
             }
-
-            out.write(ENCODING_TABLE[accumulator].toInt())
 
             inputIndex += blkSize
         }
@@ -123,78 +279,15 @@ class Base61Encoder {
             if (blkSize == 0)
                 break
 
-            var accumulatorValidBits = BITS_IN_THE_LAST_SYMBOL[blkSize-1]
-            var accumulator = dblock[blkWPos].toInt()
-            var nextInp = blkWPos+1
-            var nextOutp = BLOCK_SIZE
-
-            while ( nextInp < ENCODED_BLOCK_SIZE || accumulatorValidBits >= BITS_PER_BYTE) {
-
-                if (accumulatorValidBits >= BITS_PER_BYTE) {
-                    // decodingTable[data[i++].toInt()]
-                    val chr = accumulator and 0xff
-                    //out.write(chr)
-                    nextOutp--
-                    block[nextOutp] = chr.toByte()
-                    accumulator = accumulator.ushr(8)
-                    accumulatorValidBits -= BITS_PER_BYTE
-                }
-                else {
-                    accumulator = accumulator * BASE + dblock[nextInp].toInt()
-                    nextInp++
-                    accumulatorValidBits += BITS_PER_SYMBOL_LOWER
-                }
+            if (blkSize == ENCODED_BLOCK_SIZE) {
+                decodeBlock(dblock, block)
+                out.write(block, 0, block.size)
             }
-
-            out.write(block, nextOutp, block.size - nextOutp)
-
-//            out.write(ENCODING_TABLE[accumulator].toInt())
-      }
-
-
-//        var i = off
-//        val end = off + length
-//
-//        while ( i < end) {
-//            var blkSize = 0
-//
-//        }
-//
-
-
-//        val block = ByteArray(ENCODED_BLOCK_SIZE)
-//        val outBlock = ByteArray(BLOCK_SIZE)
-//        var blockLong: Long
-//        var blkSize: Int
-//
-//
-//        while ( i < end) {
-//            blkSize = 0
-//
-//            for (blkIdx in 0 until ENCODED_BLOCK_SIZE) {
-//                i = nextI(data, i, end)
-//                if (i == -1)
-//                    break
-//                block[blkIdx] = decodingTable[data[i++].toInt()]
-//                blkSize ++
-//            }
-//
-//            if (blkSize < ENCODED_BLOCK_SIZE)
-//                break
-//            // decode the full size block now
-//
-//            blockLong = 0L
-//            for (blkIdx in 0 until ENCODED_BLOCK_SIZE) {
-//                val chr = block[ENCODED_BLOCK_SIZE-blkIdx-1]
-//                blockLong = blockLong * BASE + chr
-//            }
-//
-//            for (blkIdx in 0 until BLOCK_SIZE) {
-//                outBlock[BLOCK_SIZE - blkIdx - 1] = (blockLong and 0xffL).toByte()
-//                blockLong = blockLong.ushr(8)
-//            }
-//            out.write(outBlock)
-//        }
+            else {
+                val o = decodePartialBlock(dblock, blkSize, block)
+                out.write(block, o, block.size - o)
+            }
+        }
     }
 
 
@@ -217,159 +310,10 @@ class Base61Encoder {
         return if (i < finish) i else -1
     }
 
-
-//    override fun decode(
-//            data: String,
-//            out: OutputStream): Int {
-//        var b1: Byte
-//        var b2: Byte
-//        var b3: Byte
-//        var b4: Byte
-//        var length = 0
-//
-//        var end = data.length
-//
-//        while (end > 0) {
-//            if (!ignore(data[end - 1])) {
-//                break
-//            }
-//
-//            end--
-//        }
-//
-//        // empty data!
-//        if (end == 0) {
-//            return 0
-//        }
-//
-//        var i = 0
-//        var finish = end
-//
-//        while (finish > 0 && i != 4) {
-//            if (!ignore(data[finish - 1])) {
-//                i++
-//            }
-//
-//            finish--
-//        }
-//
-//        i = nextI(data, 0, finish)
-//
-//        while (i < finish) {
-//            b1 = decodingTable[data[i++]]
-//
-//            i = nextI(data, i, finish)
-//
-//            b2 = decodingTable[data[i++]]
-//
-//            i = nextI(data, i, finish)
-//
-//            b3 = decodingTable[data[i++]]
-//
-//            i = nextI(data, i, finish)
-//
-//            b4 = decodingTable[data[i++]]
-//
-//            if (b1.toInt() or b2.toInt() or b3.toInt() or b4.toInt() < 0) {
-//                throw IOException("invalid characters encountered in base64 data")
-//            }
-//
-//            out.write(b1 shl 2 or (b2 shr 4))
-//            out.write(b2 shl 4 or (b3 shr 2))
-//            out.write(b3 shl 6 or b4)
-//
-//            length += 3
-//
-//            i = nextI(data, i, finish)
-//        }
-//
-//        val e0 = nextI(data, i, end)
-//        val e1 = nextI(data, e0 + 1, end)
-//        val e2 = nextI(data, e1 + 1, end)
-//        val e3 = nextI(data, e2 + 1, end)
-//
-//        length += decodeLastBlock(out, data[e0], data[e1], data[e2], data[e3])
-//
-//        return length
-//    }
-//
-//    @Throws(IOException::class)
-//    private fun decodeLastBlock(out: OutputStream, c1: Char, c2: Char, c3: Char, c4: Char): Int {
-//        val b1: Byte
-//        val b2: Byte
-//        val b3: Byte
-//        val b4: Byte
-//
-//        if (c3.toByte() == padding) {
-//            if (c4.toByte() != padding) {
-//                throw IOException("invalid characters encountered at end of base64 data")
-//            }
-//
-//            b1 = decodingTable[c1]
-//            b2 = decodingTable[c2]
-//
-//            if (b1 or b2 < 0) {
-//                throw IOException("invalid characters encountered at end of base64 data")
-//            }
-//
-//            out.write(b1 shl 2 or (b2 shr 4))
-//
-//            return 1
-//        } else if (c4.toByte() == padding) {
-//            b1 = decodingTable[c1]
-//            b2 = decodingTable[c2]
-//            b3 = decodingTable[c3]
-//
-//            if (b1.toInt() or b2.toInt() or b3.toInt() < 0) {
-//                throw IOException("invalid characters encountered at end of base64 data")
-//            }
-//
-//            out.write(b1 shl 2 or (b2 shr 4))
-//            out.write(b2 shl 4 or (b3 shr 2))
-//
-//            return 2
-//        } else {
-//            b1 = decodingTable[c1]
-//            b2 = decodingTable[c2]
-//            b3 = decodingTable[c3]
-//            b4 = decodingTable[c4]
-//
-//            if (b1.toInt() or b2.toInt() or b3.toInt() or b4.toInt() < 0) {
-//                throw IOException("invalid characters encountered at end of base64 data")
-//            }
-//
-//            out.write(b1 shl 2 or (b2 shr 4))
-//            out.write(b2 shl 4 or (b3 shr 2))
-//            out.write(b3 shl 6 or b4)
-//
-//            return 3
-//        }
-//    }
-//
-//    private fun nextI(data: String, i: Int, finish: Int): Int {
-//        var i = i
-//        while (i < finish && ignore(data[i])) {
-//            i++
-//        }
-//        return i
-//    }
-
     companion object {
 
-        private val BITS_PER_SYMBOL_LOWER = 59307 // fixed point, floor(log2(61)*10000)
-        private val BITS_PER_SYMBOL_UPPER = 59308 // fixed point, ceil(log2(61)*10000)
-        private val BITS_PER_BYTE = 80000 // same fixed point
-
-        // with the current precision, implementation is capable of correctly handling input
-        // byte array lengths up to 752. We choose to split data into blocks of 100 as
-        // it gives a nice boundary in terms of bit usage efficiency:
-        // 100 input bytes  - 800 bits of entropy - are encoded as 135 output symbols.
-        // on the other hand, 135 symbols can encode up to 135 * log2(61) bits of entrophy =
-        // = 800.6495 bits. Thus, per each 100 bytes block we are only loosing 0.64 bits to
-        // in-efficiency of the encoding.
-        //
-        private val BLOCK_SIZE = 100
-        private val ENCODED_BLOCK_SIZE = 135
+        private val BLOCK_SIZE = 8
+        private val ENCODED_BLOCK_SIZE = 11
 
         private val ENCODING_TABLE = byteArrayOf(
                 'A'.toByte(), 'B'.toByte(), 'C'.toByte(), 'D'.toByte(), 'E'.toByte(), 'F'.toByte(),
@@ -390,10 +334,9 @@ class Base61Encoder {
 
         private val BASE = 61
 
-        private val BITS_IN_THE_LAST_SYMBOL = IntArray(ENCODED_BLOCK_SIZE)
+        private val MAX_ACC_IN_THE_LAST_SYMBOL = IntArray(ENCODED_BLOCK_SIZE)
 
         init {
-
             for (i in 0 until DECODING_TABLE.size) {
                 DECODING_TABLE[i] = 0xff.toByte()
             }
@@ -402,38 +345,24 @@ class Base61Encoder {
                 DECODING_TABLE[ENCODING_TABLE[i].toInt()] = i.toByte()
             }
 
-            for (i in 0 until BITS_IN_THE_LAST_SYMBOL.size) {
-                BITS_IN_THE_LAST_SYMBOL[i] = -1
+            for (i in 0 until MAX_ACC_IN_THE_LAST_SYMBOL.size) {
+                MAX_ACC_IN_THE_LAST_SYMBOL[i] = -1
             }
 
-            var acc_bits_lower = 0
-            var acc_bits_upper = 0
+            var max_acc = 0
             var nextInp = 0
             var nextOutp = 0
 
-            while ( nextInp < BLOCK_SIZE || acc_bits_lower >= BITS_PER_SYMBOL_LOWER) {
+            while ( nextInp < BLOCK_SIZE || max_acc >= BASE) {
 
-                if (acc_bits_lower < BITS_PER_SYMBOL_LOWER && acc_bits_upper < BITS_PER_SYMBOL_UPPER) {
-                    acc_bits_lower += BITS_PER_BYTE
-                    acc_bits_upper += BITS_PER_BYTE
-                    // here we should be reading next byte inp[nextInp]
+                if (max_acc < BASE) {
+                    max_acc = max_acc * 256 + 255
                     nextInp ++
                 }
-                else if (acc_bits_lower >= BITS_PER_SYMBOL_LOWER && acc_bits_upper >= BITS_PER_SYMBOL_UPPER) {
-                    acc_bits_lower -= BITS_PER_SYMBOL_LOWER
-                    acc_bits_upper -= BITS_PER_SYMBOL_UPPER
-                    // here we should be writing res at outp[nextOutp]
-                    nextOutp ++
-
-                    // if prev input was the last byte of input - we have no more bytes left,
-                    // thus we would need to output the current accumulator into the output, and
-                    // amount of bits of info it would have is acc_bits_lower (while doing real encoding
-                    // we would be using lower range)
-
-                    BITS_IN_THE_LAST_SYMBOL[nextOutp] = acc_bits_lower
-                }
                 else {
-                    throw Exception("Base61Encoder: Internal self consistency check failed: Precision is not sufficient")
+                    max_acc /= BASE
+                    nextOutp ++
+                    MAX_ACC_IN_THE_LAST_SYMBOL[nextOutp] = max_acc
                 }
             }
 
