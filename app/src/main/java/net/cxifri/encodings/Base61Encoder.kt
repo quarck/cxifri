@@ -51,8 +51,6 @@ object Base61Encoder {
 
     private val BASE = 61
 
-    private val MAX_ACC_IN_THE_LAST_SYMBOL = IntArray(ENCODED_BLOCK_SIZE)
-
     init {
         for (i in 0 until DECODING_TABLE.size) {
             DECODING_TABLE[i] = 0xff.toByte()
@@ -60,27 +58,6 @@ object Base61Encoder {
 
         for (i in 0 until ENCODING_TABLE.size) {
             DECODING_TABLE[ENCODING_TABLE[i].toInt()] = i.toByte()
-        }
-
-        for (i in 0 until MAX_ACC_IN_THE_LAST_SYMBOL.size) {
-            MAX_ACC_IN_THE_LAST_SYMBOL[i] = -1
-        }
-
-        var max_acc = 0
-        var nextInp = 0
-        var nextOutp = 0
-
-        while ( nextInp < BLOCK_SIZE || max_acc >= BASE) {
-
-            if (max_acc < BASE) {
-                max_acc = max_acc * 256 + 255
-                nextInp ++
-            }
-            else {
-                max_acc /= BASE
-                nextOutp ++
-                MAX_ACC_IN_THE_LAST_SYMBOL[nextOutp] = max_acc
-            }
         }
     }
 
