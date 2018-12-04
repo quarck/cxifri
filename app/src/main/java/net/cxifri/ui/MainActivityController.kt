@@ -49,6 +49,7 @@ class MainActivityController(val context: Context, val view: MainView) {
             return _currentKey?.id ?: -1L
         }
         set(value) {
+            _isKeyEverSelected = true
             _currentKey = KeysDatabase(context).use { it.getKey(value) }
             view.onControllerKeySelected(_currentKey)
         }
