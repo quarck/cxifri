@@ -44,6 +44,7 @@ class Base61UnitTests {
         testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6))
         testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7))
         testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7))
+
         testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8))
         testEncodeDecode(byteArrayOf(-1, -2, -3, -4, -5, -6, -7, -8))
         testEncodeDecode(byteArrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9))

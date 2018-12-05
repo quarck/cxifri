@@ -50,6 +50,7 @@ object Base61Encoder {
     private val DECODING_TABLE = ByteArray(128)
 
     private val BASE = 61
+    private val LAST_ACC_MAX = IntArray(ENCODED_BLOCK_SIZE)
 
     init {
         for (i in 0 until DECODING_TABLE.size) {
@@ -59,226 +60,79 @@ object Base61Encoder {
         for (i in 0 until ENCODING_TABLE.size) {
             DECODING_TABLE[ENCODING_TABLE[i].toInt()] = i.toByte()
         }
-    }
 
-    private fun Int.lbyte(data: ByteArray, i: Int): Int {
-        return this.shl(8) + ((data[i].toInt() + 256) % 256)
-    }
+        for (i in 0 until LAST_ACC_MAX.size) {
+            LAST_ACC_MAX[i] = -1
+        }
 
-    private fun Int.sbyte(data: ByteArray, i: Int): Int {
-        val chr = this and 0xff
-        data[i] = chr.toByte()
-        return this.ushr(8)
-    }
-
-    private fun Int.osymbol(out: OutputStream): Int {
-        val chr = this % BASE
-        out.write(ENCODING_TABLE[chr].toInt())
-        return this / BASE
-    }
-
-    private fun Int.isymbol(inp: ByteArray, i: Int): Int {
-        return this * BASE + inp[i].toInt()
-    }
-
-    /*
-    *   The magical phrase is: "ioioioo ioioioo ioioo"
-    *   Wut? i stands for 'input byte into the accmulator', o stands for 'output char into the stream"
-    *   So what is it?
-    *   Imagine we have an edge case scenario, byte sequence of all ff-s (255). Then we would hit the max values:
-    *
-    *   	acc = 0
-    *   i 	acc = 255
-    *   o 	acc = 255 / 61 = 4 	(we did 255 % 61 out)
-    *   i 	acc = 1279   		(4 * 256 + 255)
-    *   o 	acc = 1279 / 61 = 20
-    *   i 	acc = 5375 			(20 * 256 + 255)
-    *   o 	acc = 88
-    *   o 	acc = 1
-    *
-    *   i 	acc = 511			(1*256 + 255)
-    *   o	acc = 8
-    *   i 	acc = 2303			(8*256 + 255)
-    *   o 	acc = 37
-    *   i 	acc = 9727			(37*256 + 255)
-    *   o	acc = 159
-    *   o 	acc = 2
-    *
-    *   i	acc = 767			(2*256 + 255)
-    *   o 	acc = 12
-    *   i 	acc = 3327			(12*256 + 255)
-    *   o 	acc = 54
-    *   o 	acc = 0 			(here we have exhausted input block, so simply sending the remaining bits to the out)
-    *
-    */
-    private fun encodeBlock(data: ByteArray, offset: Int, out: OutputStream) {
-        var i = offset
-        var acc = 0
-
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.osymbol(out)
-
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.osymbol(out)
-
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc = acc.lbyte(data, i++)
-        acc = acc.osymbol(out)
-        acc.osymbol(out)
-    }
-
-    private fun decodeBlock(inp: ByteArray, outp: ByteArray) {
-
-        var acc = 0
         var i = 0
-        var o = BLOCK_SIZE - 1
+        var o = 0
+        var accMax = 0
 
-        acc = acc.isymbol(inp, i++)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-
-        acc = acc.isymbol(inp, i++)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-
-        acc = acc.isymbol(inp, i++)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-        acc = acc.isymbol(inp, i++)
-        acc = acc.sbyte(outp, o--)
-        acc = acc.isymbol(inp, i)
-        acc.sbyte(outp, o)
-    }
-
-    private fun encodePartialBlock(data: ByteArray, offset: Int, len: Int, out: OutputStream) {
-
-        var i = offset
-        val end = offset + len
-        var acc = 0
-
-        if (i < end) {
-            acc = acc.lbyte(data, i++)
-            acc = acc.osymbol(out)
-            if (i < end) {
-                acc = acc.lbyte(data, i++)
-                acc = acc.osymbol(out)
-
-                if (i < end) {
-                    acc = acc.lbyte(data, i++)
-                    acc = acc.osymbol(out)
-                    acc = acc.osymbol(out)
-
-                    if (i < end) {
-                        acc = acc.lbyte(data, i++)
-                        acc = acc.osymbol(out)
-
-                        if (i < end) {
-                            acc = acc.lbyte(data, i++)
-                            acc = acc.osymbol(out)
-
-                            if (i < end) {
-                                acc = acc.lbyte(data, i++)
-                                acc = acc.osymbol(out)
-                                acc = acc.osymbol(out)
-
-                                if (i < end) {
-                                    acc = acc.lbyte(data, i++)
-                                    acc = acc.osymbol(out)
-                                    if (i < end) {
-                                        acc = acc.lbyte(data, i++)
-                                        acc = acc.osymbol(out)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+        while (i < BLOCK_SIZE || accMax >= BASE) {
+            if (accMax < BASE) {
+                i++
+                accMax = accMax.shl(8) + 255
+            }
+            else {
+                accMax /= BASE
+                LAST_ACC_MAX[++o] = accMax
             }
         }
-
-        acc.osymbol(out)
-
     }
 
-    private fun decodePartialBlock(inp: ByteArray, inpLen: Int, outp: ByteArray): Int {
-
+    private fun encodeBlock(data: ByteArray, offset: Int, size: Int, out: OutputStream) {
+        var i = offset
+        val end = i + size
         var acc = 0
-        var i = ENCODED_BLOCK_SIZE - inpLen
-        var o = BLOCK_SIZE
+        var accMax = 0
 
-        if (inpLen == 0)
+        while (i < end || accMax >= BASE) {
+            if (accMax < BASE) {
+                acc = acc.shl(8) + ((data[i++].toInt() + 256) % 256)
+                accMax = accMax.shl(8) + 255
+            }
+            else {
+                val chr = acc % BASE
+                out.write(ENCODING_TABLE[chr].toInt())
+                acc /= BASE
+                accMax /= BASE
+            }
+        }
+        out.write(ENCODING_TABLE[acc].toInt())
+    }
+
+    private fun decodeBlock(inp: ByteArray, size: Int, outp: ByteArray): Int {
+
+        if (size <= 1 || size > ENCODED_BLOCK_SIZE)
             throw Exception("Malformed block")
 
-        acc = acc.isymbol(inp, i++)
+        var i = ENCODED_BLOCK_SIZE - size
+        val end = ENCODED_BLOCK_SIZE
+        var o = BLOCK_SIZE
 
-        if (inpLen >= 11) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
+        var accMax = LAST_ACC_MAX[size-1]
+        if (accMax < 0)
+            throw Exception("Malformed block")
 
-        if (inpLen >= 10) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
+        var acc =  inp[i++].toInt()
 
-        if (inpLen >= 9) {
-            acc = acc.isymbol(inp, i++)
-        }
+        while (i < end || accMax >= 255) {
+            if (accMax < 255) {
+                acc = acc * BASE + inp[i++].toInt()
+                accMax = accMax * BASE + BASE - 1
+            }
+            else {
+                val chr = acc and 0xff
+                outp[--o] = chr.toByte()
+                acc = acc.ushr(8)
 
-        if (inpLen >= 8) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
-
-        if (inpLen >= 7) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
-
-        if (inpLen >= 6) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
-
-        if (inpLen >= 5) {
-            acc = acc.isymbol(inp, i++)
-        }
-
-        if (inpLen >= 4) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
-
-        if (inpLen >= 3) {
-            acc = acc.isymbol(inp, i++)
-            acc = acc.sbyte(outp, --o)
-        }
-
-        if (inpLen >= 2) {
-            acc = acc.isymbol(inp, i)
-            acc.sbyte(outp, --o)
+                accMax = accMax.ushr(8)
+            }
         }
 
         return o
     }
-
 
     fun encode(data: ByteArray, offset: Int, length: Int, out: OutputStream) {
 
@@ -288,13 +142,7 @@ object Base61Encoder {
         while ( inputIndex < endIndex) {
 
             val blkSize = Math.min(endIndex - inputIndex, BLOCK_SIZE)
-
-            if (blkSize == BLOCK_SIZE) {
-                encodeBlock(data, inputIndex, out)
-            } else {
-                encodePartialBlock(data, inputIndex, blkSize, out)
-            }
-
+            encodeBlock(data, inputIndex, blkSize, out)
             inputIndex += blkSize
         }
     }
@@ -340,14 +188,8 @@ object Base61Encoder {
             if (blkSize == 0)
                 break
 
-            if (blkSize == ENCODED_BLOCK_SIZE) {
-                decodeBlock(dblock, block)
-                out.write(block, 0, block.size)
-            }
-            else {
-                val o = decodePartialBlock(dblock, blkSize, block)
-                out.write(block, o, block.size - o)
-            }
+            val o = decodeBlock(dblock, blkSize, block)
+            out.write(block, o, block.size - o)
         }
     }
 
