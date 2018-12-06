@@ -4,6 +4,7 @@ import net.cxifri.encodings.Base61Encoder
 import org.junit.Test
 
 import org.junit.Assert.*
+import java.security.SecureRandom
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -12,11 +13,12 @@ import org.junit.Assert.*
  */
 class Base61UnitTests {
 
-    fun testEncodeDecode(b: ByteArray) {
+    private fun testEncodeDecode(b: ByteArray, silent: Boolean = false) {
         val encoded = Base61Encoder.encode(b).toString(charset = Charsets.UTF_8)
         assertNotNull(encoded)
 
-        println(encoded)
+        if (!silent)
+            println(encoded)
 
         val decoded = Base61Encoder.decode(encoded.toByteArray())
         assertNotNull(decoded)
@@ -28,7 +30,7 @@ class Base61UnitTests {
     }
 
     @Test
-    fun testBase61Encode() {
+    fun testSizes() {
         testEncodeDecode(byteArrayOf())
         testEncodeDecode(byteArrayOf(1))
         testEncodeDecode(byteArrayOf(-1))
@@ -150,5 +152,46 @@ class Base61UnitTests {
                 -1, -2, -3, -4, -5, -6
         ))
 
+    }
+
+    private fun testRandomArrays(maxSize: Int, timeSeconds: Int) {
+        val start = System.currentTimeMillis()
+
+        val rnd = SecureRandom()
+
+        var num = 0
+        var totLen = 0
+
+        while (System.currentTimeMillis() - start < 1000L * timeSeconds) {
+
+            val bytes = ByteArray(rnd.nextInt(maxSize) + 1)
+            rnd.nextBytes(bytes)
+
+            testEncodeDecode(bytes, silent = true)
+            num += 1
+            totLen += bytes.size
+        }
+
+        println("$num iters total, avg len ${totLen / num}")
+    }
+
+    @Test
+    fun testRandomArrays_max128() {
+        testRandomArrays(128, 30)
+    }
+
+    @Test
+    fun testRandomArrays_max12() {
+        testRandomArrays(12, 30)
+    }
+
+    @Test
+    fun testRandomArrays_max17() {
+        testRandomArrays(17, 30)
+    }
+
+    @Test
+    fun testRandomArrays_max32() {
+        testRandomArrays(32, 30)
     }
 }
