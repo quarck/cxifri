@@ -33,6 +33,7 @@ import net.cxifri.crypto.DerivedKeyGenerator
 import net.cxifri.R
 import net.cxifri.crypto.CryptoFactory
 import net.cxifri.crypto.KeyEntry
+import net.cxifri.crypto.KeyRevokeMessage
 import net.cxifri.keysdb.KeyHelper
 import net.cxifri.keysdb.KeysDatabase
 import net.cxifri.keysdb.toStringDetails
@@ -46,7 +47,8 @@ class KeyStateEntry(
         val key: KeyEntry,
         val onReplaceKey: (KeyEntry) -> Unit,
         val onRevokeKey: (KeyEntry) -> Unit,
-        val onDeleteKey: (KeyEntry) -> Unit
+        val onDeleteKey: (KeyEntry) -> Unit,
+        val onShareRevocationMessage: (KeyEntry) -> Unit
 ) {
     val layout: LinearLayout
     private val keyName: TextView
@@ -65,8 +67,12 @@ class KeyStateEntry(
         buttonActions.setOnClickListener(this::onButtonActions)
         buttonDelete.setOnClickListener(this::onButtonDelete)
 
-        keyName.setText(key.name)
-        keyDetails.setText(key.toStringDetails(context))
+        keyName.text = key.name
+        keyDetails.text = key.toStringDetails(context)
+
+        if (key.revoked) {
+            setRevoked()
+        }
     }
 
     private fun onButtonActions(v: View) {
@@ -81,6 +87,9 @@ class KeyStateEntry(
         }
 
         val dialog = builder.create()
+
+        dialogView.findViewById<TextView>(R.id.textViewKeyActions)?.text =
+                context.getString(R.string.actions_for_key_fmt).format(key.name)
 
         dialogView.findViewById<Button>(R.id.buttonReplace)?.setOnClickListener{
             dialog.cancel()
@@ -109,6 +118,21 @@ class KeyStateEntry(
                 }
                 .create()
                 .show()
+    }
+
+    fun setRevoked(sendMsg: Boolean = false) {
+        buttonActions.visibility = View.GONE // no longer needed
+        keyDetails.visibility = View.GONE
+        layout.findViewById<TextView>(R.id.textViewKeyIsRevoked)?.visibility = View.VISIBLE
+        val btnRevoke = layout.findViewById<Button>(R.id.buttonShareKeyRevokeMessage)
+        btnRevoke?.visibility = View.VISIBLE
+        btnRevoke?.setOnClickListener {
+            onShareRevocationMessage(key)
+        }
+
+        if (sendMsg) {
+            onShareRevocationMessage(key)
+        }
     }
 }
 
@@ -291,7 +315,24 @@ class KeysActivity : AppCompatActivity() {
     }
 
     private fun onRevokeKey(key: KeyEntry){
-        // Ignored - we don't have it implemented yet
+        KeysDatabase(context = this).use {
+            db -> db.update(key.copy(revoked = true))
+        }
+
+        val matchingState = keyStates.find{ it.key.key == key.key }
+        if (matchingState != null) {
+            matchingState.setRevoked(true)
+        }
+    }
+
+    private fun onShareRevocationMessage(key: KeyEntry) {
+        val handler = CryptoFactory.createMessageHandler()
+        val text = handler.encrypt(KeyRevokeMessage(key), key)
+
+        val intent = Intent(android.content.Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(android.content.Intent.EXTRA_TEXT, text)
+        startActivity(Intent.createChooser(intent, getString(R.string.share_using)))
     }
 
     private fun onDeleteKey(key: KeyEntry){
@@ -364,7 +405,8 @@ class KeysActivity : AppCompatActivity() {
                     key = key,
                     onReplaceKey = this::onReplaceKey,
                     onRevokeKey = this::onRevokeKey,
-                    onDeleteKey = this::onDeleteKey
+                    onDeleteKey = this::onDeleteKey,
+                    onShareRevocationMessage = this::onShareRevocationMessage
             )
 
             keyStates.add(keyState)

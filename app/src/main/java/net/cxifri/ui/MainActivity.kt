@@ -221,7 +221,12 @@ class MainActivity : AppCompatActivity(), MainView {
         builder.setIcon(android.R.drawable.ic_menu_directions)
         builder.setTitle(getString(R.string.select_a_key))
 
-        var (values, names) = controller.getKeyIdsWithNames()
+        val keys: List<KeyEntry> = controller.getKeys()
+
+        val names = keys.asSequence()
+                .map { it.name + if (it.revoked) resources.getString(R.string.revoked_suffix) else ""}
+                .toMutableList()
+        val values = keys.asSequence().map { it.id }.toMutableList()
 
         names += listOf<String>(getString(R.string.text_password))
         values += listOf(-1L)
@@ -265,6 +270,26 @@ class MainActivity : AppCompatActivity(), MainView {
     override fun onEncryptPasswordIsEmpty() {
         runOnUiThread {
             Toast.makeText(this, R.string.password_is_empty, Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+    override fun onEncryptKeyIsRevoked() {
+        runOnUiThread {
+            val builder = AlertDialog.Builder(this)
+                    .setIcon(R.drawable.ic_launcher_foreground)
+                    .setTitle(getString(R.string.key_is_revoked_warning_title))
+                    .setMessage(getString(R.string.key_is_revoked_warning_text))
+                    .setPositiveButton(android.R.string.ok) { _, _ ->
+                        controller.encrypt(
+                                messageText.text.toString(),
+                                passwordText.text.toString(),
+                                allowRevokedKeys = true
+                        )
+                    }
+                    .setNegativeButton(android.R.string.cancel) { _, _ -> }
+
+            builder.create().show()
         }
     }
 

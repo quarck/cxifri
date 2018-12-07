@@ -17,6 +17,7 @@ interface MainView  {
     fun onKeyDerivationStarted()
     fun onKeyDerivationFinished()
 
+    fun onEncryptKeyIsRevoked()
     fun onEncryptPasswordIsEmpty()
     fun onEncryptPasswordIsInsecure(complexity: ExhaustiveSearchComplexity)
 
@@ -54,7 +55,14 @@ class MainActivityController(val context: Context, val view: MainView) {
             view.onControllerKeySelected(_currentKey)
         }
 
-    fun encrypt(msg: String, passwordForEmptyKey: String?, allowInsecurePassword: Boolean = false) {
+    fun encrypt(msg: String, passwordForEmptyKey: String?,
+                allowInsecurePassword: Boolean = false,
+                allowRevokedKeys: Boolean = false) {
+
+        if (_currentKey?.revoked == true && !allowRevokedKeys) {
+            view.onEncryptKeyIsRevoked()
+            return
+        }
 
         background {
             var key = _currentKey
@@ -136,14 +144,18 @@ class MainActivityController(val context: Context, val view: MainView) {
         }
     }
 
-    fun getKeyIdsWithNames(): Pair<List<Long>, List<String>> {
-        val keys = KeysDatabase(context).use { it.keys }
-
-        val names = keys.map { it.name }.toList()
-        val values = keys.map { it.id }.toList()
-
-        return Pair(values, names)
+    fun getKeys(): List<KeyEntry> {
+        return KeysDatabase(context).use { it.keys }
     }
+
+//    fun getKeyIdsWithNames(): Pair<List<Long>, List<String>> {
+//        val keys = KeysDatabase(context).use { it.keys }
+//
+//        val names = keys.map { it.name }.toList()
+//        val values = keys.map { it.id }.toList()
+//
+//        return Pair(values, names)
+//    }
 
     fun revokeKey(key: KeyEntry) {
         KeysDatabase(context).use {

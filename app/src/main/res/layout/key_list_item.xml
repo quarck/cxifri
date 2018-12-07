@@ -13,82 +13,113 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/buttonActions"
+        <LinearLayout
+            android:id="@+id/layoutButtons"
+            android:layout_alignParentEnd="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
+            android:orientation="vertical"
+
             android:layout_marginStart="5dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="5dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
-            android:text="@string/key_actions"
+            >
 
-            android:textAppearance="@style/TextMediumAccent"
-            style="?attr/borderlessButtonStyle"
-            android:background="@color/buttonBackgroundColor"
+            <Button
+                android:id="@+id/buttonActions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/key_actions"
+                android:textAppearance="@style/TextMediumAccent"
+                style="?attr/borderlessButtonStyle"
+                android:background="@color/buttonBackgroundColor"
+                />
 
-            />
+            <Button
+                android:id="@+id/buttonDelete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/deleteButtonBackgroundColor"
+                android:text="@string/delete_key"
+                style="?attr/borderlessButtonStyle"
+                android:textAppearance="@style/TextWarning" />
 
-        <Button
-            android:id="@+id/buttonDelete"
-            style="?attr/borderlessButtonStyle"
+        </LinearLayout>
+        
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/buttonActions"
-            android:layout_alignStart="@id/buttonActions"
-            android:layout_alignParentEnd="true"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:background="@color/deleteButtonBackgroundColor"
-            android:padding="0dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:text="@string/delete_key"
-            android:textAppearance="@style/TextWarning" />
-
-
-        <TextView
-            android:id="@+id/textViewKeyName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="16dp"
-
-            android:layout_toStartOf="@id/buttonActions"
-            android:layout_alignBaseline="@id/buttonActions"
+            android:orientation="vertical"
+            android:layout_toStartOf="@id/layoutButtons"
             android:layout_alignParentStart="true"
+            android:visibility="visible"
+            >
+            <TextView
+                android:id="@+id/textViewKeyName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="16dp"
 
-            android:ems="10"
-            android:text="_key_name_placeholder_ some long long"
-            android:textAppearance="@style/TextMedium"
-            tools:ignore="HardcodedText" />
+                android:ems="10"
+                android:text="_key_name_placeholder_ some long long"
+                android:textAppearance="@style/TextMedium"
+                tools:ignore="HardcodedText" />
 
-        <TextView
-            android:id="@+id/textViewKeyDetails"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            <TextView
+                android:id="@+id/textViewKeyIsRevoked"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginBottom="16dp"
+                android:ems="10"
+                android:text="@string/key_is_revoked"
+                android:textAppearance="@style/TextMediumError"
+                android:visibility="gone"
+                />
 
-            android:layout_toStartOf="@id/buttonDelete"
-            android:layout_alignBaseline="@id/buttonDelete"
-            android:layout_alignParentStart="true"
+            <TextView
+                android:id="@+id/textViewKeyDetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
 
-            android:ems="10"
-            android:text="Some extra key details can be added here"
-            android:textAppearance="@style/TextSmall"
-            tools:ignore="HardcodedText" />
+                android:ems="10"
+                android:text="Some extra key details can be added here"
+                android:textAppearance="@style/TextSmall"
+                tools:ignore="HardcodedText" />
+
+        </LinearLayout>
+
 
     </RelativeLayout>
+
+    <Button
+        android:id="@+id/buttonShareKeyRevokeMessage"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginBottom="5dp"
+        android:background="@color/deleteButtonBackgroundColor"
+        android:padding="0dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/re_send_revocation_message"
+        android:textAppearance="@style/TextWarning"
+        android:visibility="gone"/>
 
     <View
         android:layout_width="match_parent"
