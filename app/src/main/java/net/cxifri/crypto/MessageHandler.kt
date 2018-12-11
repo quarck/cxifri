@@ -25,10 +25,14 @@ class MessageHandler(
         private val binaryCryptor: BinaryMessageHandlerInterface
 ): MessageHandlerInterface {
 
-    val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
-    val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
-    val MESSAGE_FORMAT_KEY_REPLACEMENT: Byte = 2
-    val MESSAGE_FORMAT_KEY_REVOKE: Byte = 3
+    companion object {
+        const val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
+        const val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
+        const val MESSAGE_FORMAT_KEY_REPLACEMENT: Byte = 2
+        const val MESSAGE_FORMAT_KEY_REVOKE: Byte = 3
+
+        const val MESSAGE_FORMAT_KEY_REVOKE_SIZE = 16
+    }
 
     private fun packMessageForEncryption(message: MessageBase): ByteArray {
 
@@ -81,7 +85,9 @@ class MessageHandler(
 
     private fun packKeyIsNoLongerSecureMessage(message: KeyRevokeMessage): ByteArray {
         // just a single byte - message code for this one
-        return byteArrayOf(MESSAGE_FORMAT_KEY_REVOKE)
+        val ret = ByteArray(MESSAGE_FORMAT_KEY_REVOKE_SIZE)
+        ret[0] = MESSAGE_FORMAT_KEY_REVOKE
+        return ret
     }
 
 
@@ -135,7 +141,16 @@ class MessageHandler(
     }
 
     private fun unpackKeyRevokeMessage(key: KeyEntry, blob: ByteArray): KeyRevokeMessage? {
-        // nothing to unpack and first byte was already verified
+
+        if (blob.size != MESSAGE_FORMAT_KEY_REVOKE_SIZE) {
+            return null
+        }
+
+        for (i in 1 until MESSAGE_FORMAT_KEY_REVOKE_SIZE) {
+            if (blob[i] != 0.toByte())
+                return null
+        }
+
         return KeyRevokeMessage(key)
     }
 
