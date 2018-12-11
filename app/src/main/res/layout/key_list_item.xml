@@ -20,12 +20,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
 
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginBottom="5dp"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
             >
 
             <Button
@@ -36,6 +30,12 @@
                 android:textAppearance="@style/TextMediumAccent"
                 style="?attr/borderlessButtonStyle"
                 android:background="@color/buttonBackgroundColor"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
                 />
 
             <Button
@@ -45,7 +45,14 @@
                 android:background="@color/deleteButtonBackgroundColor"
                 android:text="@string/delete_key"
                 style="?attr/borderlessButtonStyle"
-                android:textAppearance="@style/TextWarning" />
+                android:textAppearance="@style/TextWarning"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:layout_marginEnd="5dp"
+                android:layout_marginBottom="5dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                />
 
         </LinearLayout>
         
