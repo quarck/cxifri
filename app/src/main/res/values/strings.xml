@@ -91,8 +91,7 @@
     <string name="please_wait_deriving_the_password_based_key">Please wait, deriving the password based key\n(PKCS5S2/SHA256, 100000 iterations)</string>
     <string name="key_revoked_title_fmt" formatted="false">Key %s is revoked</string>
     <string name="key_revoked_desc">This is a key revoke message, remove party indicated that key is no longer secure and should no longer be used</string>
-    <string name="revoke_key">REVOKE KEY</string>
-    <string name="replace_key">REPLACE KEY</string>
+    <string name="revoke_key">Revoke</string>
     <string name="actions_for_key_fmt" formatted="false">Actions for key %s</string>
     <string name="key_is_revoked">KEY IS REVOKED</string>
     <string name="re_send_revocation_message">Send Revocation Message</string>
@@ -101,4 +100,6 @@
 
     <string name="key_is_revoked_warning_title">Key is revoked!</string>
     <string name="key_is_revoked_warning_text">Continue encrypting using insecure key?</string>
+    <string name="revoke_key_question" formatted="true">Revoke key %s?</string>
+    <string name="delete_key_question" formatted="true">Delete key %s?</string>
 </resources>

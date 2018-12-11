@@ -45,7 +45,6 @@ class KeyStateEntry(
         val context: Context,
         val inflater: LayoutInflater,
         val key: KeyEntry,
-        val onReplaceKey: (KeyEntry) -> Unit,
         val onRevokeKey: (KeyEntry) -> Unit,
         val onDeleteKey: (KeyEntry) -> Unit,
         val onShareRevocationMessage: (KeyEntry) -> Unit
@@ -53,7 +52,7 @@ class KeyStateEntry(
     val layout: LinearLayout
     private val keyName: TextView
     private val keyDetails: TextView
-    private val buttonActions: Button
+    private val buttonRevoke: Button
     private val buttonDelete: Button
 
     init {
@@ -61,10 +60,10 @@ class KeyStateEntry(
 
         keyName = layout.findViewById<TextView>(R.id.textViewKeyName) ?: throw Exception("Layout error")
         keyDetails = layout.findViewById<TextView>(R.id.textViewKeyDetails) ?: throw Exception("Layout error")
-        buttonActions = layout.findViewById(R.id.buttonActions)
+        buttonRevoke = layout.findViewById(R.id.buttonRevoke)
         buttonDelete = layout.findViewById(R.id.buttonDelete)
 
-        buttonActions.setOnClickListener(this::onButtonActions)
+        buttonRevoke.setOnClickListener(this::onButtonRevoke)
         buttonDelete.setOnClickListener(this::onButtonDelete)
 
         keyName.text = key.name
@@ -75,39 +74,26 @@ class KeyStateEntry(
         }
     }
 
-    private fun onButtonActions(v: View) {
+    private fun onButtonRevoke(v: View) {
 
-        val dialogView = inflater.inflate(R.layout.dialog_key_actions, null)
-
-        val builder = AlertDialog.Builder(context)
-        builder.setView(dialogView)
-
-        builder.setNegativeButton(android.R.string.cancel) {
-            _: DialogInterface?, _: Int ->
-        }
-
-        val dialog = builder.create()
-
-        dialogView.findViewById<TextView>(R.id.textViewKeyActions)?.text =
-                context.getString(R.string.actions_for_key_fmt).format(key.name)
-
-        dialogView.findViewById<Button>(R.id.buttonReplace)?.setOnClickListener{
-            dialog.cancel()
-            onReplaceKey(key)
-        }
-
-        dialogView.findViewById<Button>(R.id.buttonRevoke)?.setOnClickListener{
-            dialog.cancel()
-            onRevokeKey(key)
-        }
-
-        dialog.show()
+        AlertDialog.Builder(context)
+                .setMessage(context.getString(R.string.revoke_key_question).format(key.name))
+                .setCancelable(false)
+                .setPositiveButton(android.R.string.ok) {
+                    _, _ ->
+                    onRevokeKey(key)
+                }
+                .setNegativeButton(android.R.string.cancel) {
+                    _, _ ->
+                }
+                .create()
+                .show()
     }
 
     private fun onButtonDelete(v: View) {
 
         AlertDialog.Builder(context)
-                .setMessage("Delete key ${key.name}?")
+                .setMessage(context.getString(R.string.delete_key_question).format(key.name))
                 .setCancelable(false)
                 .setPositiveButton(android.R.string.ok) {
                     _, _ ->
@@ -121,7 +107,7 @@ class KeyStateEntry(
     }
 
     fun setRevoked(sendMsg: Boolean = false) {
-        buttonActions.visibility = View.GONE // no longer needed
+        buttonRevoke.visibility = View.GONE // no longer needed
         keyDetails.visibility = View.GONE
         layout.findViewById<TextView>(R.id.textViewKeyIsRevoked)?.visibility = View.VISIBLE
         val btnRevoke = layout.findViewById<Button>(R.id.buttonShareKeyRevokeMessage)
@@ -310,10 +296,6 @@ class KeysActivity : AppCompatActivity() {
         keyPasswordConfirmation.setText("")
     }
 
-    private fun onReplaceKey(key: KeyEntry){
-        // Ignored - we don't have it implemented yet
-    }
-
     private fun onRevokeKey(key: KeyEntry){
         KeysDatabase(context = this).use {
             db -> db.update(key.copy(revoked = true))
@@ -403,7 +385,6 @@ class KeysActivity : AppCompatActivity() {
                     context = this,
                     inflater = layoutInflater,
                     key = key,
-                    onReplaceKey = this::onReplaceKey,
                     onRevokeKey = this::onRevokeKey,
                     onDeleteKey = this::onDeleteKey,
                     onShareRevocationMessage = this::onShareRevocationMessage

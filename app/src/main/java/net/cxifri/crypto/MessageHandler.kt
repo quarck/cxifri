@@ -28,7 +28,6 @@ class MessageHandler(
     companion object {
         const val MESSAGE_FORMAT_PLAINTEXT: Byte = 0
         const val MESSAGE_FORMAT_GZIP_PLAINTEXT: Byte = 1
-        const val MESSAGE_FORMAT_KEY_REPLACEMENT: Byte = 2
         const val MESSAGE_FORMAT_KEY_REVOKE: Byte = 3
 
         const val MESSAGE_FORMAT_KEY_REVOKE_SIZE = 16
@@ -39,9 +38,6 @@ class MessageHandler(
         return when (message) {
             is TextMessage ->
                 packTextMessage(message)
-
-            is KeyReplacementMessage ->
-                packKeyReplacementMessage(message)
 
             is KeyRevokeMessage ->
                 packKeyIsNoLongerSecureMessage(message)
@@ -71,18 +67,6 @@ class MessageHandler(
 
     }
 
-    private fun packKeyReplacementMessage(message: KeyReplacementMessage): ByteArray {
-//        val newBinaryKey = message.newKey.asDecryptedBinary
-//        if (newBinaryKey == null)
-//            throw Exception("Key cannot be accessed")
-//        val binaryMessage = ByteArray(2 + newBinaryKey.size)
-//        binaryMessage[0] = MESSAGE_FORMAT_KEY_REPLACEMENT
-//        binaryMessage[1] = if (message.receiverMustDeleteOldKey) 1 else 0
-//        System.arraycopy(newBinaryKey, 0, binaryMessage, 2, newBinaryKey.size)
-//        return binaryMessage
-        TODO("packKeyReplacement message is not implemented yet")
-    }
-
     private fun packKeyIsNoLongerSecureMessage(message: KeyRevokeMessage): ByteArray {
         // just a single byte - message code for this one
         val ret = ByteArray(MESSAGE_FORMAT_KEY_REVOKE_SIZE)
@@ -98,9 +82,6 @@ class MessageHandler(
         return when (blob[0]) {
             MESSAGE_FORMAT_PLAINTEXT, MESSAGE_FORMAT_GZIP_PLAINTEXT ->
                 unpackTextMessage(key, blob)
-
-            MESSAGE_FORMAT_KEY_REPLACEMENT ->
-                unpackReplacementKeyMessage(key, blob)
 
             MESSAGE_FORMAT_KEY_REVOKE ->
                 unpackKeyRevokeMessage(key, blob)
@@ -125,19 +106,6 @@ class MessageHandler(
             else ->
                 return null
         }
-    }
-
-    private fun unpackReplacementKeyMessage(key: KeyEntry, blob: ByteArray): KeyReplacementMessage? {
-
-//        if (blob.size <= 2)
-//            return null
-//
-//        val receiverMustDeleteOldKey = blob[1] != 0.toByte()
-//        val binaryKey = ByteArray(blob.size - 2)
-//        System.arraycopy(blob, 2, binaryKey, 0, binaryKey.size)
-//
-//        return KeyReplacementMessage(key, KeyEntry(binaryKey), receiverMustDeleteOldKey)
-        TODO("Unpack key replacement isnt implemented")
     }
 
     private fun unpackKeyRevokeMessage(key: KeyEntry, blob: ByteArray): KeyRevokeMessage? {

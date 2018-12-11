@@ -153,9 +153,6 @@ class MainActivity : AppCompatActivity(), MainView {
                     startActivity(intent)
                 }
 
-                is KeyReplacementMessage ->
-                    onKeyReplacementMessage(message)
-
                 is KeyRevokeMessage ->
                     onKeyRevokeMessage(message)
             }
@@ -174,9 +171,6 @@ class MainActivity : AppCompatActivity(), MainView {
 
                 is TextMessage ->
                     messageText.setText(message.text)
-
-                is KeyReplacementMessage ->
-                    onKeyReplacementMessage(message)
 
                 is KeyRevokeMessage ->
                     onKeyRevokeMessage(message)
@@ -197,10 +191,6 @@ class MainActivity : AppCompatActivity(), MainView {
                     .setPositiveButton(android.R.string.ok) { _, _ -> }
             builder.create().show()
         }
-    }
-
-    private fun onKeyReplacementMessage(message: KeyReplacementMessage) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     override fun onMessageEncryptResult(message: String?) {
