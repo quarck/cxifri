@@ -103,13 +103,12 @@
     <string name="revoke_key_question" formatted="true">Revoke key %s?</string>
     <string name="delete_key_question" formatted="true">Delete key %s?</string>
     <string name="about_cxifri">About Ĉifri</string>
-    <string name="simple_toy_ish_text_encryption_decryption_utility">Simple toy-ish text encryption / decryption utility</string>
-    <string name="no_warranty_of_any_kind_use_at_your_own_risk_ndeveloper_s_of_this_app_applied_all_the_best_effort_to_make_the_app_as_secure_as_possible_but_no_warranty_can_be_given">NO WARRANTY OF ANY KIND, USE AT YOUR OWN RISK Developer(s) of this app applied all the best effort to make the app as secure as possible, but no warranty can be given</string>
-    <string name="encryption_is_done_using_chained_aes_twofish_serphent_cipher">Encryption is done using chained AES-Twofish-Serphent cipher</string>
-    <string name="eax_mode_is_used_for_message_authentication">EAX mode is used for message authentication</string>
-    <string name="base61_encoding_is_used_to_generate_message_containing_only_symbols_a_z_a_z_and_0_9">Base61 encoding is used to generate message containing only symbols A-Z, a-z and 0-9</string>
-    <string name="source_code_is_available_on_github_under_apache_license_nhttps_github_com_quarck_cxifri">Source code is available on github under apache license: https://github.com/quarck/cxifri</string>
-    <string name="encryption_is_done_using_bouncy_castle_library_https_bouncycastle_org">Encryption is done using Bouncy Castle library [https://bouncycastle.org/]</string>
-    <string name="parts_of_zxing_https_github_com_zxing_zxing_library_were_used_for_qr_code_functionality">Parts of ZXIng [https://github.com/zxing/zxing] library were used for QR-code functionality</string>
-    <string name="c_sergey_parshin_quarck_gmail_com_2018">(c) Sergey Parshin (quarck@gmail.com), 2018</string>
+    <string name="about_desc">Simple toy-ish text encryption / decryption utility</string>
+    <string name="about_no_warranty_and_lic">Copyright © 2018 Sergey Parshin (quarck@gmail.com)\n\n\nLicensed under the Apache License, Version 2.0 (the "License");\nYou may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.</string>
+    <string name="about_cipher">Encryption is done using chained AES-Twofish-Serphent cipher</string>
+    <string name="about_auth">EAX mode is used for message authentication</string>
+    <string name="about_base61">Base61 encoding is used to generate message containing only symbols A-Z, a-z and 0-9</string>
+    <string name="about_github">Source code is available on github under apache license: https://github.com/quarck/cxifri</string>
+    <string name="about_bc">Encryption is done using Bouncy Castle library [https://bouncycastle.org/]</string>
+    <string name="about_zx">Parts of ZXIng [https://github.com/zxing/zxing] library were used for QR-code functionality</string>
 </resources>
