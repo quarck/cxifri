@@ -111,4 +111,5 @@
     <string name="about_github">Source code is available on github under apache license: https://github.com/quarck/cxifri</string>
     <string name="about_bc">Encryption is done using Bouncy Castle library [https://bouncycastle.org/]</string>
     <string name="about_zx">Parts of ZXIng [https://github.com/zxing/zxing] library were used for QR-code functionality</string>
+    <string name="toggle_day_night">Toggle Day / Night</string>
 </resources>

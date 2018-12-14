@@ -30,6 +30,11 @@
         tools:ignore="AlwaysShowAction" />
 
     <item
+        android:id="@+id/menu_night_day_theme"
+        android:title="@string/toggle_day_night"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/menu_keys"
         android:title="@string/manage_keys"
         app:showAsAction="never" />
