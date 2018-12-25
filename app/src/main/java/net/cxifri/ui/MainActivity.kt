@@ -24,7 +24,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.app.AppCompatDelegate
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -32,7 +31,6 @@ import android.view.WindowManager
 import android.widget.*
 import net.cxifri.R
 import net.cxifri.crypto.*
-import net.cxifri.settings.Settings
 import net.cxifri.utils.*
 
 
@@ -88,8 +86,6 @@ class MainActivity : AppCompatActivity(), MainView {
                 startActivity(Intent(this, KeysActivity::class.java))
             R.id.menu_about ->
                 startActivity(Intent(this, AboutActivity::class.java))
-            R.id.menu_night_day_theme ->
-                toggleDayNight()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -394,17 +390,6 @@ class MainActivity : AppCompatActivity(), MainView {
                     .setNegativeButton(android.R.string.cancel) { _, _ -> }
             return builder.create().show()
         }
-    }
-
-    private fun toggleDayNight() {
-        val set = Settings(this)
-        set.useNightTheme = !set.useNightTheme
-        AppCompatDelegate.setDefaultNightMode(
-                if (set.useNightTheme)
-                    AppCompatDelegate.MODE_NIGHT_YES
-                else
-                    AppCompatDelegate.MODE_NIGHT_NO
-        )
     }
 }
 
