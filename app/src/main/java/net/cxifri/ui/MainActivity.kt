@@ -33,7 +33,6 @@ import android.widget.*
 import net.cxifri.R
 import net.cxifri.crypto.*
 import net.cxifri.settings.Settings
-import net.cxifri.settings.settings
 import net.cxifri.utils.*
 
 
@@ -54,14 +53,6 @@ class MainActivity : AppCompatActivity(), MainView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        AppCompatDelegate.setDefaultNightMode(
-                if (settings.useNightTheme)
-                    AppCompatDelegate.MODE_NIGHT_YES
-                else
-                    AppCompatDelegate.MODE_NIGHT_NO
-        )
-
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
         supportActionBar?.setDisplayShowHomeEnabled(true)
@@ -414,14 +405,6 @@ class MainActivity : AppCompatActivity(), MainView {
                 else
                     AppCompatDelegate.MODE_NIGHT_NO
         )
-
-        val builder = AlertDialog.Builder(this)
-                .setIcon(R.drawable.ic_launcher_foreground)
-                .setTitle("")
-                .setMessage(getString(R.string.please_restart))
-                .setPositiveButton(android.R.string.ok) { _, _ -> }
-        builder.create().show()
-
     }
 }
 
