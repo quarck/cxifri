@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#003d30</color>
-    <color name="colorPrimaryDark">#00251f</color>
-    <color name="colorPrimaryLight">#49795b</color>
-    <color name="colorAccent">#9fdf9f</color>
-    <color name="primaryTextColor">#9f9f9f</color>
+    <color name="colorPrimary">#002d20</color>
+    <color name="colorPrimaryDark">#00150f</color>
+    <color name="colorPrimaryLight">#29493b</color>
+    <color name="colorAccent">#29393b</color>
+    <color name="primaryTextColor">#ffffff</color>
 
     <color name="errorTextColor">#d33030</color>
     <color name="colorTextAccent">#136060</color>
 
-    <color name="buttonBackgroundColor">#213121</color>
-    <color name="deleteButtonBackgroundColor">#322121</color>
+    <color name="buttonBackgroundColor">#112111</color>
+    <color name="deleteButtonBackgroundColor">#221111</color>
 
-    <color name="verticalLineSeparator">#626262</color>
+    <color name="verticalLineSeparator">#323232</color>
 
     <color name="colorCameraBlackout">#7f1f3f1f</color>
-    <color name="please_wait_color">#e0606060</color>
+    <color name="please_wait_color">#e0101010</color>
 </resources>
