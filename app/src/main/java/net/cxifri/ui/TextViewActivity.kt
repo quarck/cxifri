@@ -38,6 +38,7 @@ class TextViewActivity : AppCompatActivity() {
     val textViewMatchedKey by UIItem<TextView>(R.id.textViewMatchedKey)
     val textViewAuthStatusValid by UIItem<TextView>(R.id.textViewAuthStatusValid)
     val textViewMessage by UIItem<TextView>(R.id.textViewMessage)
+    val textViewKeyRevoked by UIItem<TextView>(R.id.textViewKeyIsRevoked)
 
     var currentKeyId: Long = -1L
 
@@ -66,6 +67,8 @@ class TextViewActivity : AppCompatActivity() {
         textViewMessage.text = text
         textViewMatchedKey.text = getString(R.string.matched_key).format(keyName)
         textViewAuthStatusValid.visibility = View.VISIBLE
+        textViewKeyRevoked.visibility =
+                if (intent.getBooleanExtra(INTENT_EXTRA_KEY_IS_NOT_REVOKED, false)) View.GONE else View.VISIBLE
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -127,6 +130,7 @@ class TextViewActivity : AppCompatActivity() {
         const val INTENT_EXTRA_TEXT = "text"
         const val INTENT_EXTRA_KEY_ID = "keyId"
         const val INTENT_EXTRA_KEY_NAME = "keyName"
+        const val INTENT_EXTRA_KEY_IS_NOT_REVOKED = "notRevoked"
     }
 }
 

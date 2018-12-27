@@ -150,6 +150,7 @@ class MainActivity : AppCompatActivity(), MainView {
                     intent.putExtra(TextViewActivity.INTENT_EXTRA_TEXT, message.text)
                             .putExtra(TextViewActivity.INTENT_EXTRA_KEY_ID, message.key.id)
                             .putExtra(TextViewActivity.INTENT_EXTRA_KEY_NAME, message.key.name)
+                            .putExtra(TextViewActivity.INTENT_EXTRA_KEY_IS_NOT_REVOKED, !message.key.revoked)
                     startActivity(intent)
                 }
 

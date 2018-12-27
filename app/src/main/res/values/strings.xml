@@ -70,6 +70,7 @@
     <string name="delete_key">Delete</string>
     <string name="key_actions">Actions</string>
     <string name="message_auth_status_is_valid">Message Auth Status: valid</string>
+    <string name="current_key_is_revoked">WARNING: current key was earlier revoked</string>
     <string name="matched_key" formatted="false">Matched key: %s</string>
     <string name="text_copied">Copied</string>
     <string name="text_cleared">Cleared</string>
